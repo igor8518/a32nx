@@ -1258,9 +1258,9 @@ class FlightPlanManager {
             if (runways && runways.length > 0) {
                 const direction = Simplane.getHeadingMagnetic();
                 let bestRunway = runways[0];
-                let bestDeltaAngle = Math.abs(Avionics.Utils.angleDiff(direction, bestRunway.direction));
+                let bestDeltaAngle = Math.abs(Avionics.Utils.diffAngle(direction, bestRunway.direction));
                 for (let i = 1; i < runways.length; i++) {
-                    const deltaAngle = Math.abs(Avionics.Utils.angleDiff(direction, runways[i].direction));
+                    const deltaAngle = Math.abs(Avionics.Utils.diffAngle(direction, runways[i].direction));
                     if (deltaAngle < bestDeltaAngle) {
                         bestDeltaAngle = deltaAngle;
                         bestRunway = runways[i];
@@ -1528,6 +1528,7 @@ class FlightPlanManager {
         Coherent.call("ACTIVATE_DIRECT_TO", icao).then(() => {
             this._incrementFlightPlanVersion();
             this.updateFlightPlan(callback);
+            SimVar.SetSimVarValue("K:A32NX.FMGC_DIR_TO_TRIGGER", "number", 1);
         });
     }
     cancelDirectTo(callback = EmptyCallback.Void) {

@@ -30,11 +30,11 @@ class CDUAocRequestsAtis {
         }
 
         if (store.reqID == 0) {
-            arrivalText = "~ARRIVAL[color]cyan";
+            arrivalText = "ARRIVAL[color]cyan";
         } else if (store.reqID == 1) {
-            departureText = "~DEPARTURE[color]cyan";
+            departureText = "DEPARTURE[color]cyan";
         } else {
-            enrouteText = "ENROUTE~[color]cyan";
+            enrouteText = "ENROUTE[color]cyan";
         }
 
         let arrText;
@@ -121,9 +121,14 @@ class CDUAocRequestsAtis {
             return mcdu.getDelaySwitchPage();
         };
         mcdu.onRightInput[5] = async () => {
+            const icao = store["arpt1"] || store["arrIcao"];
+            if (icao === "") {
+                mcdu.addNewMessage(NXFictionalMessages.noAirportSpecified);
+                return;
+            }
             store["sendStatus"] = "QUEUED";
             updateView();
-            const icao = store["arpt1"] || store["arrIcao"];
+
             const lines = [];
             const newMessage = { "id": Date.now(), "type": "ATIS", "time": '00:00', "opened": null, "content": lines, };
             mcdu.clearUserInput();

@@ -1,8 +1,8 @@
 import './style.scss';
 import React, { useEffect, useState } from 'react';
-import { render } from '../Common';
-import { useSimVar, useSplitSimVar } from '../Common/simVars';
-import { useInteractionEvent, useUpdate } from '../Common/hooks';
+import { useSimVar, useSplitSimVar } from '@instruments/common/simVars';
+import { useInteractionEvent, useUpdate } from '@instruments/common/hooks';
+import { render } from '@instruments/common/index';
 
 const getDigitsFromBco16 = (code: number): number[] => {
     let codeCopy = code;
@@ -26,7 +26,7 @@ const PoweredXpdrDisplay = () => {
     const [newDigits, setNewDigits] = useState<null | number[]>(null);
     const [clrPressed, setClrPressed] = useState(false);
     const [displayResetTimer, setDisplayResetTimer] = useState(-1);
-    const [ltsTest] = useSimVar('L:XMLVAR_LTS_Test', 'Bool', 250);
+    const [ltsTest] = useSimVar('L:A32NX_OVHD_INTLT_ANN', 'Number', 250);
 
     const [transponderCode, setTransponderCode] = useSplitSimVar('TRANSPONDER CODE:1', 'Bco16', 'K:XPNDR_SET', 'Bco16', 500);
     const codeInDisplay = newDigits !== null ? newDigits : getDigitsFromBco16(transponderCode);
@@ -89,15 +89,17 @@ const PoweredXpdrDisplay = () => {
 
     return (
         <svg className="atc-svg">
-            <text x="15%" y="45%">{ltsTest ? '8888' : codeInDisplay.join('')}</text>
+            <text x="15%" y="45%">{ltsTest === 0 ? '8888' : codeInDisplay.join('')}</text>
         </svg>
     );
 };
 
 const XpdrRootDisplay = () => {
-    const [powerAvailable] = useSimVar('L:DCPowerAvailable', 'Boolean', 250);
+    // XPDR 1 is powered by the AC ESS SHED bus.
+    // When XPDR 2 is added, it should be powered by the AC 2 bus.
+    const [acEssShedIsPowered] = useSimVar('L:A32NX_ELEC_AC_ESS_SHED_BUS_IS_POWERED', 'Bool', 250);
 
-    if (!powerAvailable) return null;
+    if (!acEssShedIsPowered) return null;
     return <PoweredXpdrDisplay />;
 };
 

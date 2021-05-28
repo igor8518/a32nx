@@ -1,8 +1,8 @@
 import React from 'react';
+import { useSimVar, useInteractionSimVar } from '@instruments/common/simVars';
+import { useInteractionEvent } from '@instruments/common/hooks';
 import { VhfRadioPanel } from './VhfRadioPanel';
 import { RadioPanelDisplay } from './RadioPanelDisplay';
-import { useSimVar, useInteractionSimVar } from '../../Common/simVars';
-import { useInteractionEvent } from '../../Common/hooks';
 
 interface Props {
     /**
@@ -19,7 +19,8 @@ interface Props {
 export const RootRadioPanel = (props: Props) => {
     const toggleSwitchName = `A32NX_RMP_${props.side}_TOGGLE_SWITCH`;
     const [panelSwitch] = useInteractionSimVar(`L:${toggleSwitchName}`, 'Boolean', toggleSwitchName);
-    const [powerAvailable] = useSimVar(`L:${props.side === 'L' ? 'D' : 'A'}CPowerAvailable`, 'Boolean', 250);
+    // On the A320 the captain's RMP is powered by the DC ESS BUS. The F/O's RMP by the DC 2 BUS.
+    const [powerAvailable] = useSimVar(`L:A32NX_ELEC_${props.side === 'L' ? 'DC_ESS' : 'DC_2'}_BUS_IS_POWERED`, 'Boolean', 250);
     const powered = powerAvailable && panelSwitch;
 
     if (!powered) return <UnpoweredRadioPanel />;

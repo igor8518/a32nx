@@ -1120,6 +1120,11 @@ class A320_Neo_SAI_Brightness extends NavSystemElement {
     init(root) {
         this.brightnessElement = this.gps.getChildById("Brightness");
         this.bugsElement = this.gps.getChildById("Bugs");
+        this.plus_state = false;
+        this.minus_state = false;
+        this.maximum = 0.99;
+        this.minimum = 0.15;
+        this.bright_gran = 0.05;
     }
     onEnter() {
     }
@@ -1130,24 +1135,53 @@ class A320_Neo_SAI_Brightness extends NavSystemElement {
     }
     onExit() {
     }
+    getBrightness() {
+        return SimVar.GetSimVarValue("L:A32NX_BARO_BRIGHTNESS","number");
+    }
+    setBrightness(b) {
+        SimVar.SetSimVarValue("L:A32NX_BARO_BRIGHTNESS","number", b);
+        this.brightnessElement.updateBrightness(b); //TODO: Remove line on model update
+    }
+    brightnessUp() {
+        const brightness = this.getBrightness();
+        if (this.bugsElement.getDisplay() === "none" && brightness < this.maximum) {
+            this.setBrightness(brightness + this.bright_gran);
+        }
+    }
+    brightnessDown() {
+        const brightness = this.getBrightness();
+        if (this.bugsElement.getDisplay() === "none" && brightness > this.minimum) {
+            this.setBrightness(brightness - this.bright_gran);
+        }
+    }
     onEvent(_event) {
-        const brightness = SimVar.GetSimVarValue("L:A32NX_BARO_BRIGHTNESS","number");
-        const bright_gran = 0.05;
-        const minimum = 0.15;
         switch (_event) {
             case "BTN_BARO_PLUS":
-                if (this.bugsElement.getDisplay() === "none" && brightness < 1) {
-                    const new_brightness = brightness + bright_gran;
-                    SimVar.SetSimVarValue("L:A32NX_BARO_BRIGHTNESS","number", new_brightness);
-                    this.brightnessElement.updateBrightness(new_brightness); //TODO: Remove line on model update
+                this.plus_state = !this.plus_state;
+                if (this.plus_state) {
+                    this.brightnessUp();
+                    const bright_up_cont = setInterval(() => {
+                        if (this.plus_state) {
+                            this.brightnessUp();
+                        } else {
+                            clearInterval(bright_up_cont);
+                        }
+                    }, 150);
                 }
                 break;
             case "BTN_BARO_MINUS":
-                if (this.bugsElement.getDisplay() === "none" && brightness > minimum) {
-                    const new_brightness = brightness - bright_gran;
-                    SimVar.SetSimVarValue("L:A32NX_BARO_BRIGHTNESS","number", new_brightness);
-                    this.brightnessElement.updateBrightness(new_brightness); //TODO: Remove line on model update
+                this.minus_state = !this.minus_state;
+                if (this.minus_state) {
+                    this.brightnessDown();
+                    const bright_down_cont = setInterval(() => {
+                        if (this.minus_state) {
+                            this.brightnessDown();
+                        } else {
+                            clearInterval(bright_down_cont);
+                        }
+                    }, 150);
                 }
+
                 break;
         }
     }
@@ -1200,14 +1234,12 @@ class A320_Neo_SAI_BrightnessBox extends HTMLElement {
 customElements.define('a320-neo-sai-brightness', A320_Neo_SAI_BrightnessBox);
 
 class A320_Neo_SAI_SelfTest extends NavSystemElement {
-    init(root) {
+    init() {
         this.selfTestElement = this.gps.getChildById("SelfTest");
         this.getDeltaTime = A32NX_Util.createDeltaTimeCalculator();
         const interval = 5;
         this.getFrameCounter = A32NX_Util.createFrameCounter(interval);
         const cold_dark = SimVar.GetSimVarValue('L:A32NX_COLD_AND_DARK_SPAWN', 'Bool');
-        const ac_pwr = SimVar.GetSimVarValue("L:ACPowerAvailable", "bool");
-        const dc_pwr = SimVar.GetSimVarValue("L:DCPowerAvailable", "bool");
         this.state = A32NX_Util.createMachine(sai_state_machine);
 
         if (!cold_dark) {
@@ -1217,11 +1249,7 @@ class A320_Neo_SAI_SelfTest extends NavSystemElement {
             this.state.setState("off");
             this.selfTestElement.offDisplay();
         }
-        /*
-        if ((!ac_pwr && !dc_pwr)) {
-            this.selfTestElement.offDisplay();
-        }
-        */
+
         this.updateThrottler = new UpdateThrottler(500);
     }
     onEnter() {
@@ -1231,10 +1259,7 @@ class A320_Neo_SAI_SelfTest extends NavSystemElement {
     }
 
     checkShutdown() {
-        const ac_pwr = SimVar.GetSimVarValue("L:ACPowerAvailable", "bool");
-        const dc_pwr = SimVar.GetSimVarValue("L:DCPowerAvailable", "bool");
-
-        if (ac_pwr || dc_pwr) {
+        if (this.isPowered()) {
             return;
         } else {
             const _updateF = this.getFrameCounter();
@@ -1248,19 +1273,17 @@ class A320_Neo_SAI_SelfTest extends NavSystemElement {
             }
         }
     }
-    onUpdate(_deltaTime) {
-        if (this.updateThrottler.canUpdate(_deltaTime) === -1) {
+    onUpdate(deltaTime) {
+        if (this.updateThrottler.canUpdate(deltaTime) === -1) {
             return;
         }
-        const _dTime = this.getDeltaTime();
+        deltaTime = this.getDeltaTime();
 
         const complete = this.selfTestElement.complete;
-        const ac_pwr = SimVar.GetSimVarValue("L:ACPowerAvailable", "bool");
-        const dc_pwr = SimVar.GetSimVarValue("L:DCPowerAvailable", "bool");
 
         switch (this.state.value) {
             case "off":
-                if ((ac_pwr || dc_pwr)) {
+                if (this.isPowered()) {
                     this.selfTestElement.onDisplay();
                     this.state.action("next");
                 }
@@ -1268,7 +1291,7 @@ class A320_Neo_SAI_SelfTest extends NavSystemElement {
             case "test":
                 this.checkShutdown();
                 if (!complete) {
-                    this.selfTestElement.update(_dTime);
+                    this.selfTestElement.update(deltaTime);
                 } else if (complete) {
                     this.state.action("next");
                 }
@@ -1277,13 +1300,18 @@ class A320_Neo_SAI_SelfTest extends NavSystemElement {
                 this.checkShutdown();
                 break;
             case "spawn":
-                if (ac_pwr || dc_pwr) {
+                if (this.isPowered()) {
                     this.state.action("next");
                 }
                 break;
         }
     }
     onEvent(_event) {
+    }
+
+    isPowered() {
+        return SimVar.GetSimVarValue("L:A32NX_ELEC_DC_ESS_BUS_IS_POWERED", "Bool") ||
+            (SimVar.GetSimVarValue("A:AIRSPEED INDICATED", "Knots") >= 50 && SimVar.GetSimVarValue("L:A32NX_ELEC_DC_HOT_1_BUS_IS_POWERED", "Bool"));
     }
 }
 
@@ -1502,7 +1530,7 @@ class A320_Neo_SAI_AttResetIndicator extends HTMLElement {
 
         const att_x = 33.5;
         const boxHeight = 7;
-        const boxWidth = 30;
+        const boxWidth = 33;
         const boxRow = 64;
         const txt_off_x = 2.5;
         const txt_off_y = 6;
@@ -1595,6 +1623,8 @@ class A320_Neo_SAI_Bugs extends NavSystemElement {
         this.blink_status = false;
         this.current_bug = 0;
         this.getFrameCounter = A32NX_Util.createFrameCounter(check_interval);
+        this.plus_state = false;
+        this.minus_state = false;
     }
 
     onEnter() {
@@ -1620,17 +1650,23 @@ class A320_Neo_SAI_Bugs extends NavSystemElement {
                 this.bugsElement.togglePage();
                 break;
             case "BTN_BARO_PLUS":
-                this.blink_status = true;
-                if (this.bugsElement.getDisplay() !== "none") {
-                    this.bugsElement.freezeBugBox(this.current_bug);
-                    this.current_bug = (this.current_bug + 5) % 6;
+                this.plus_state = !this.plus_state;
+                if (this.plus_state) {
+                    this.blink_status = true;
+                    if (this.bugsElement.getDisplay() !== "none") {
+                        this.bugsElement.freezeBugBox(this.current_bug);
+                        this.current_bug = (this.current_bug + 5) % 6;
+                    }
                 }
                 break;
             case "BTN_BARO_MINUS":
-                this.blink_status = true;
-                if (this.bugsElement.getDisplay() !== "none") {
-                    this.bugsElement.freezeBugBox(this.current_bug);
-                    this.current_bug = (this.current_bug + 1) % 6;
+                this.minus_state = !this.minus_state;
+                if (this.minus_state) {
+                    this.blink_status = true;
+                    if (this.bugsElement.getDisplay() !== "none") {
+                        this.bugsElement.freezeBugBox(this.current_bug);
+                        this.current_bug = (this.current_bug + 1) % 6;
+                    }
                 }
                 break;
             case "KNOB_BARO_C":
