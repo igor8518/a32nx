@@ -1,3 +1,5 @@
+import { getSmallestAngle } from "@instruments/common/utils";
+
 /* eslint-disable max-classes-per-file */
 export const calculateHorizonOffsetFromPitch = (pitch) => {
     if (pitch > -5 && pitch <= 20) {
@@ -19,22 +21,6 @@ export const calculateVerticalOffsetFromRoll = (roll) => {
         offset = Math.max(0, 41 - 35.87 / Math.sin(Math.abs(roll) / 180 * Math.PI));
     }
     return offset;
-};
-
-/**
- * Gets the smallest angle between two angles
- * @param angle1 First angle in degrees
- * @param angle2 Second angle in degrees
- * @returns {number} Smallest angle between angle1 and angle2 in degrees
- */
-export const getSmallestAngle = (angle1, angle2) => {
-    let smallestAngle = angle1 - angle2;
-    if (smallestAngle > 180) {
-        smallestAngle -= 360;
-    } else if (smallestAngle < -180) {
-        smallestAngle += 360;
-    }
-    return smallestAngle;
 };
 
 export const HorizontalTape = ({ displayRange, valueSpacing, distanceSpacing, graduationElementFunction, bugs, heading, yOffset = 0 }) => {
@@ -171,13 +157,15 @@ export class LagFilter {
      * @returns {number} Filtered output
      */
     step(input, deltaTime) {
+        const filteredInput = !Number.isNaN(input) ? input : 0;
+
         const scaledDeltaTime = deltaTime * this.TimeConstant;
         const sum0 = scaledDeltaTime + 2;
 
-        const output = (input + this.PreviousInput) * scaledDeltaTime / sum0
+        const output = (filteredInput + this.PreviousInput) * scaledDeltaTime / sum0
             + (2 - scaledDeltaTime) / sum0 * this.PreviousOutput;
 
-        this.PreviousInput = input;
+        this.PreviousInput = filteredInput;
         if (Number.isFinite(output)) {
             this.PreviousOutput = output;
             return output;
@@ -195,7 +183,9 @@ export class RateLimiter {
     }
 
     step(input, deltaTime) {
-        const subInput = input - this.PreviousOutput;
+        const filteredInput = !Number.isNaN(input) ? input : 0;
+
+        const subInput = filteredInput - this.PreviousOutput;
 
         const scaledUpper = deltaTime * this.RisingRate;
         const scaledLower = deltaTime * this.FallingRate;

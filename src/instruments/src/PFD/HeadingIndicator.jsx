@@ -1,4 +1,5 @@
-import { HorizontalTape, getSmallestAngle } from './PFDUtils.jsx';
+import { getSmallestAngle } from '@instruments/common/utils.js';
+import { HorizontalTape } from './PFDUtils.jsx';
 import { getSimVar } from '../util.js';
 
 const DisplayRange = 24;
@@ -38,7 +39,7 @@ const GraduationElement = (heading, offset) => {
 };
 
 export const HeadingTape = ({ heading }) => {
-    if (getSimVar('L:A32NX_ADIRS_STATE', 'Enum') !== 2) {
+    if (Number.isNaN(heading)) {
         return null;
     }
 
@@ -54,7 +55,7 @@ export const HeadingTape = ({ heading }) => {
 };
 
 export const HeadingOfftape = ({ selectedHeading, heading, ILSCourse, groundTrack }) => {
-    if (getSimVar('L:A32NX_ADIRS_STATE', 'Enum') !== 2) {
+    if (Number.isNaN(heading)) {
         return (
             <>
                 <path id="HeadingTapeBackground" d="m32.138 145.34h73.536v10.382h-73.536z" className="TapeBackground" />
@@ -70,7 +71,7 @@ export const HeadingOfftape = ({ selectedHeading, heading, ILSCourse, groundTrac
             <SelectedHeading heading={heading} selectedHeading={selectedHeading} />
             <QFUIndicator heading={heading} ILSCourse={ILSCourse} />
             <path className="Fill Yellow" d="m69.61 147.31h-1.5119v-8.0635h1.5119z" />
-            <GroundTrackBug groundTrack={groundTrack} heading={heading} />
+            { !Number.isNaN(groundTrack) ? <GroundTrackBug groundTrack={groundTrack} heading={heading} /> : null }
         </g>
     );
 };

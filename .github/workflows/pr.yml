@@ -35,15 +35,22 @@ jobs:
     if: github.event.pull_request.draft == false
     env:
       A32NX_PRODUCTION_BUILD: 1
+      A32NX_INSTRUMENTS_BUILD_WORKERS: 2
       ZIP_NAME: A32NX.zip
       BUILD_DIR_NAME: zip-build
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
+      - name: Create .env file
+        run: |
+          echo A32NX_PRODUCTION_BUILD=1 >> .env
+          echo CLIENT_ID=${{ secrets.NAVIGRAPH_CLIENT_ID }} >> .env
+          echo CLIENT_SECRET=${{ secrets.NAVIGRAPH_CLIENT_SECRET }} >> .env
+          echo CHARTFOX_SECRET=${{ secrets.CHARTFOX_SECRET }} >> .env
       - name: Build A32NX
         run: |
           ./scripts/dev-env/run.sh ./scripts/setup.sh
-          ./scripts/dev-env/run.sh ./scripts/build.sh --no-tty
+          ./scripts/dev-env/run.sh ./scripts/build.sh --no-tty -j 4
       - name: Generate ZIP file
         run: |
           mkdir ./${{ env.BUILD_DIR_NAME }}

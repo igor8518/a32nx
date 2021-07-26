@@ -96,7 +96,6 @@ Pump.9=True
 BatterySwitch=True
 StructuralDeiceSwitch=False
 PropDeiceSwitch=False
-Autobrakes=1
 StandbyVacuum=False
 PropSync=False
 AutoFeatherSwitch=False
@@ -113,7 +112,14 @@ FoldingWingsState=0, 0
 XMLVAR_RMP_L_On=1
 XMLVAR_RMP_R_On=1
 XMLVAR_Baro1_Mode=1
-A320_Neo_MFD_NAV_MODE=3
+A32NX_EFIS_L_ND_MODE=3
+A32NX_EFIS_R_ND_MODE=3
+A32NX_EFIS_L_ND_RANGE=1
+A32NX_EFIS_R_ND_RANGE=1
+A32NX_EFIS_L_NAVAID_1_MODE=2
+A32NX_EFIS_L_NAVAID_2_MODE=2
+A32NX_EFIS_R_NAVAID_1_MODE=2
+A32NX_EFIS_R_NAVAID_2_MODE=2
 
 [Gauges.0]
 KollsmanSetting=29.921342849731445313
@@ -141,7 +147,7 @@ TaxiLights=False
 WingLights=True
 CabinLights=True
 GlareshieldLights=True
-PedestalLights=False
+PedestalLights=True
 Potentiometer.7=0.5
 Potentiometer.10=0
 Potentiometer.11=0
@@ -153,6 +159,7 @@ Potentiometer.18=0.5
 Potentiometer.19=0.5
 Potentiometer.20=0.5
 Potentiometer.21=0.5
+Potentiometer.76=0
 Potentiometer.83=0
 
 [AutoPilot.0]

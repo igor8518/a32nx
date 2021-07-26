@@ -1,3 +1,21 @@
+/*
+ * A32NX
+ * Copyright (C) 2020-2021 FlyByWire Simulations and its contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 class CDUAvailableArrivalsPage {
     static ShowPage(mcdu, airport, pageCurrent = 0, starSelection = false, selectedStarIndex = -1) {
         const airportInfo = airport.infos;
@@ -18,7 +36,7 @@ class CDUAvailableArrivalsPage {
                 selectedApproachCellColor = mcdu.flightPlanManager.getCurrentFlightPlanIndex() === 1 ? "yellow" : "green";
                 const selectedApproachTransition = selectedApproach.transitions[mcdu.flightPlanManager.getApproachTransitionIndex()];
                 if (selectedApproachTransition) {
-                    selectedViasCell = selectedApproachTransition.waypoints[0].infos.icao.substr(7);
+                    selectedViasCell = selectedApproachTransition.name;
                 } else {
                     selectedViasCell = "NONE";
                 }
@@ -26,7 +44,7 @@ class CDUAvailableArrivalsPage {
             }
             let selectedStarCell = "------";
             let selectedStarCellColor = "white";
-            let selectedArrival = airportInfo.arrivals[mcdu.flightPlanManager.getArrivalProcIndex()];
+            let selectedArrival = mcdu.flightPlanManager.getArrival();
             if (!selectedArrival) {
                 selectedArrival = airportInfo.arrivals[selectedStarIndex];
             }
@@ -124,6 +142,13 @@ class CDUAvailableArrivalsPage {
                             }
                             rows[2 * i] = ["{" + star.name + "[color]" + color];
                             mcdu.onLeftInput[i + 2] = () => {
+                                const approachRunway = mcdu.flightPlanManager.getApproachRunway();
+                                const arrivalRunwayIndex = star.runwayTransitions.findIndex(t => {
+                                    return t.name.indexOf("RW" + approachRunway.designation) != -1;
+                                });
+                                if (arrivalRunwayIndex !== -1) {
+                                    mcdu.flightPlanManager.setArrivalRunwayIndex(arrivalRunwayIndex);
+                                }
                                 mcdu.setArrivalProcIndex(starIndex, () => {
                                     if (mcdu.flightPlanManager.getApproachIndex() > -1) {
                                         CDUAvailableArrivalsPage.ShowViasPage(mcdu, airport);
@@ -249,7 +274,7 @@ class CDUAvailableArrivalsPage {
                 selectedApproachCellColor = mcdu.flightPlanManager.getCurrentFlightPlanIndex() === 1 ? "yellow" : "green";
                 const selectedApproachTransition = selectedApproach.transitions[mcdu.flightPlanManager.getApproachTransitionIndex()];
                 if (selectedApproachTransition) {
-                    selectedViasCell = selectedApproachTransition.waypoints[0].infos.icao.substr(7);
+                    selectedViasCell = selectedApproachTransition.name;
                     selectedViasCellColor = mcdu.flightPlanManager.getCurrentFlightPlanIndex() === 1 ? "yellow" : "green";
                 }
             }
@@ -269,12 +294,11 @@ class CDUAvailableArrivalsPage {
                 if (selectedApproach) {
                     const approachTransition = selectedApproach.transitions[index];
                     if (approachTransition) {
-                        const name = approachTransition.waypoints[0].infos.icao.substr(7);
                         let color = "cyan";
                         if (index === mcdu.flightPlanManager.getApproachTransitionIndex()) {
                             color = "green";
                         }
-                        rows[2 * i + 1][0] = "{" + name + "[color]" + color;
+                        rows[2 * i + 1][0] = "{" + approachTransition.name + "[color]" + color;
                         mcdu.onLeftInput[i + 2] = () => {
                             mcdu.setApproachTransitionIndex(index, () => {
                                 CDUAvailableArrivalsPage.ShowPage(mcdu, airport, 0, true);
