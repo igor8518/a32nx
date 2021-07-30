@@ -12,6 +12,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "main.h"
+
 
 #ifdef _MSC_VER
 #define snprintf _snprintf_s
@@ -20,20 +22,25 @@
 #endif
 
 
-#define A32NX_LOCAL_DATA_NAME			"A32NX_Local_Data"
-#define A32NX_LOCAL_DATA_ID			0x4E877779
+#define A32NX_LOCAL_DATA_NAME			  "A32NX_Local_Data"
+#define A32NX_LOCAL_DATA_ID			    0x4E877779
 #define A32NX_LOCAL_DATA_DEFINITION	0x4E877780
 
-#define A32NX_CONTROL_NAME		"A32NX_Control"
-#define A32NX_CONTROL_ID			0x4E877781
-#define A32NX_CONTROL_DEFINITION	0x4E877782
+#define A32NX_CONTROL_NAME		      "A32NX_Control"
+#define A32NX_CONTROL_ID			      0x4E877781
+#define A32NX_CONTROL_DEFINITION	  0x4E877782
 
-#define A32NX_ALLDATA_NAME		"A32NX_AllData"
-#define A32NX_ALLDATA_ID			0x4E877783
-#define A32NX_ALLDATA_DEFINITION	0x4E877784
+#define A32NX_ALLDATA_NAME		      "A32NX_AllData"
+#define A32NX_ALLDATA_ID			      0x4E877783
+#define A32NX_ALLDATA_DEFINITION	  0x4E877784
 
-std::unique_ptr<LocalVariable> ExportVars[1000];
-double ExportVarsSet[1001];
+
+#define MAX_OUTPUT_VARS             1001
+#define MAX_IDS_VARS                2000
+
+
+std::unique_ptr<LocalVariable> ExportVars[MAX_OUTPUT_VARS-1];
+double ExportVarsSet[MAX_OUTPUT_VARS];
 
 
 std::vector<std::string> VarNames;
@@ -41,22 +48,14 @@ std::vector<std::string> VarNames;
 
 using namespace mINI;
 
-extern class BaseAirliners {};
-
-extern class FMCMainDisplay : public BaseAirliners {
-public:
-	static void tryUpdateCostIndex(DWORD ci) {};
-};
-
-extern void setCRZ(DWORD);
-
 enum EVENT_ID {
 	EVENT_4SEC,
-	SAVE_VARS,
+	SAVE_VARS, 
+  MIN_VAR_REQ_ID //Allways last
 };
 
 enum DATA_REQUEST_ID {
-	REQ_CONTROL, //Запрос контроля A32NX
+	REQ_CONTROL, 
 	REQ_ALLDATA,
 };
 
@@ -73,13 +72,13 @@ struct sExportData
 
 
 char* LVars[100][1000];
-int i = 100;
-int max = 2000;
+int LVarsRequestID = MIN_VAR_REQ_ID;
+int MaxLVars = 0;
 const char* PreCust = "Autoflight.";
 
 HANDLE hSimConnect = 0;
 HRESULT hr;
-// NG3 Control Structure
+
 struct A32NX_Control
 {
 	unsigned int id;
@@ -114,6 +113,37 @@ std::pair<bool, int > findInVector(const std::vector<T>& vecOfElements, const T&
 		result.second = -1;
 	}
 	return result;
+}
+
+void AddVars() {
+  LVarsRequestID = MaxLVars + MIN_VAR_REQ_ID;
+  for (; LVarsRequestID < MAX_IDS_VARS; LVarsRequestID++) {
+    LVar = get_name_of_named_variable(LVarsRequestID - MIN_VAR_REQ_ID);
+    if (LVar[0] != '\0') {
+      strcpy(P, PreCust);
+      sstr = strcat(P, LVar);
+      strcpy(ssstr, sstr);
+      strcpy(Lssstr, LVar);
+      std::pair<bool, int> result = findInVector<std::string>(VarNames, Lssstr);
+      if (result.first) {
+        ExportVars[result.second] = std::make_unique<LocalVariable>(std::string(Lssstr), ID(LVarsRequestID - MIN_VAR_REQ_ID), ID(result.second), ExportVarsSet);
+      } else {
+        sstr = "";
+      }
+      hr = SimConnect_MapClientEventToSimEvent(hSimConnect, LVarsRequestID, ssstr);
+      hr = SimConnect_AddClientEventToNotificationGroup(hSimConnect, GROUP_LOCAL_VARS, LVarsRequestID);
+      hr = SimConnect_SetNotificationGroupPriority(hSimConnect, GROUP_LOCAL_VARS, SIMCONNECT_GROUP_PRIORITY_HIGHEST);
+
+      sstr = "";
+      LVar = "";
+      P[0] = '\0';
+      ssstr[0] = '\0';
+    } 
+    else {
+      MaxLVars = LVarsRequestID - MIN_VAR_REQ_ID;
+      break;
+    }
+  }
 }
 
 // Callbacks
@@ -154,66 +184,31 @@ void CALLBACK ProcessVars(SIMCONNECT_RECV* pData, DWORD cbData, void* pContext)
 		{
 		case EVENT_4SEC:	
 		{
-
-			i = max+100;
-
-			for (; i < 2000; i++) {
-				LVar = get_name_of_named_variable(i - 100);
-				if (LVar[0] != '\0') {
-					strcpy(P, PreCust);
-					sstr = strcat(P, LVar);
-					strcpy(ssstr, sstr);
-					strcpy(Lssstr, LVar);
-					
-					std::pair<bool, int> result = findInVector<std::string>(VarNames, Lssstr);
-					if (result.first) {
-						ExportVars[result.second] = std::make_unique<LocalVariable>(std::string(Lssstr), i-100, ID(result.second), ExportVarsSet);
-					}
-					else {
-						sstr = "";
-					}
-					hr = SimConnect_MapClientEventToSimEvent(hSimConnect, i, ssstr);
-					hr = SimConnect_AddClientEventToNotificationGroup(hSimConnect, GROUP_LOCAL_VARS, i);
-          hr = SimConnect_SetNotificationGroupPriority(hSimConnect, GROUP_LOCAL_VARS, SIMCONNECT_GROUP_PRIORITY_HIGHEST);
-                                                                                     
-					sstr = "";
-					LVar = "";
-					P[0] = '\0';
-					ssstr[0] = '\0';
-				}
-				else {
-					max = i - 100;
-					break;
-				}
-			}
-
+			AddVars();
 			break;
 		}
     case SAVE_VARS: {
       INIStructure iniStructure;
       INIFile iniFile(std::__2::string("\\LVARS\\LVars.ini"));
-      for (int mmm = 0; mmm < 2000; mmm++) {
-        LVar = get_name_of_named_variable(mmm);
+      for (int i = 0; i < MAX_IDS_VARS; i++) {
+        LVar = get_name_of_named_variable(i);
         if (LVar[0] != '\0') {
-          iniStructure["A32NX"]["VAR_" + std::to_string(mmm)] = LVar;
-        } else {
+          iniStructure["A32NX"]["VAR_" + std::to_string(i)] = LVar;
+        } 
+        else {
           break;
         }
       }
       iniFile.write(iniStructure, true);
 
-      hr = SimConnect_SetNotificationGroupPriority(hSimConnect, GROUP_LOCAL_VARS, SIMCONNECT_GROUP_PRIORITY_HIGHEST);
       break;
     }
 		default:
 		{
-			if (evt->uEventID >= 100) {
-				ExportData.id = evt->uEventID - 100;
+        ExportData.id = evt->uEventID - MIN_VAR_REQ_ID;
 				ExportData.version = evt->dwData;
-				ExportData.Data = get_named_variable_value(evt->uEventID - 100);
+        ExportData.Data = get_named_variable_value(evt->uEventID - MIN_VAR_REQ_ID);
 				hr = SimConnect_SetClientData(hSimConnect, A32NX_LOCAL_DATA_ID, A32NX_LOCAL_DATA_DEFINITION, 0, 0, sizeof(ExportData), &ExportData);
-				break;
-			}
 			break;
 		}
 		}
@@ -235,9 +230,7 @@ char* to_string1(PCSTRINGZ cs) {
 
 
 
-extern "C" {
-
-	MSFS_CALLBACK bool LVarsWrapper_gauge_callback(FsContext ctx, int service_id, void* pData)
+__attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVarsWrapper_gauge_callback(FsContext ctx, int service_id, void* pData)
 	{
 		
 		switch (service_id)
@@ -1180,8 +1173,7 @@ extern "C" {
                               VarNames.push_back("A32NX_ADIRS_ADIRU_2_STATE");
                               VarNames.push_back("A32NX_ADIRS_ADIRU_3_STATE");
                             }
-					//char ssstr[100];
-					FMCMainDisplay::tryUpdateCostIndex(25);
+
           hr = SimConnect_CallDispatch(hSimConnect, ProcessVars, 0);
 					hr = SimConnect_MapClientDataNameToID(hSimConnect, A32NX_LOCAL_DATA_NAME, A32NX_LOCAL_DATA_ID);
 					hr = SimConnect_CreateClientData(hSimConnect, A32NX_LOCAL_DATA_ID, sizeof(ExportData), SIMCONNECT_CREATE_CLIENT_DATA_FLAG_DEFAULT);
@@ -1190,50 +1182,22 @@ extern "C" {
 
 					Control.id = 0;
 					Control.Parameter = 0.0;
+
 					hr = SimConnect_MapClientDataNameToID(hSimConnect, A32NX_CONTROL_NAME, A32NX_CONTROL_ID);
 					hr = SimConnect_CreateClientData(hSimConnect, A32NX_CONTROL_ID, sizeof(A32NX_Control), SIMCONNECT_CREATE_CLIENT_DATA_FLAG_DEFAULT);
 					hr = SimConnect_AddToClientDataDefinition(hSimConnect, A32NX_CONTROL_DEFINITION, 0, sizeof(A32NX_Control), 0, 0);
-					hr = SimConnect_RequestClientData(hSimConnect, A32NX_CONTROL_ID, REQ_CONTROL, A32NX_CONTROL_DEFINITION,
-						SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_DEFAULT, 0, 0, 0);
+					hr = SimConnect_RequestClientData(hSimConnect, A32NX_CONTROL_ID, REQ_CONTROL, A32NX_CONTROL_DEFINITION, SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_DEFAULT, 0, 0, 0);
 
 					hr = SimConnect_MapClientDataNameToID(hSimConnect, A32NX_ALLDATA_NAME, A32NX_ALLDATA_ID);
 					hr = SimConnect_CreateClientData(hSimConnect, A32NX_ALLDATA_ID, sizeof(double[1000]) + sizeof(INT64), SIMCONNECT_CREATE_CLIENT_DATA_FLAG_DEFAULT);
-					for (int ooo = 0; ooo < 1001; ooo++) {
-						HRESULT result = SimConnect_AddToClientDataDefinition(hSimConnect, A32NX_ALLDATA_DEFINITION, SIMCONNECT_CLIENTDATAOFFSET_AUTO,
-							SIMCONNECT_CLIENTDATATYPE_FLOAT64);
-					}
-					hr = SimConnect_RequestClientData(hSimConnect, A32NX_ALLDATA_ID, REQ_ALLDATA, A32NX_ALLDATA_DEFINITION,
-						SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_DEFAULT, 0, 0, 0);
 
-					for (; i < max; i++) {
-						LVar = get_name_of_named_variable(i - 100);
-						if (LVar[0] != '\0') {
-	
-							strcpy(P, PreCust);
-							sstr = strcat(P, LVar);
-							strcpy(ssstr, sstr);
-							strcpy(Lssstr, LVar);
-							std::pair<bool, int> result = findInVector<std::string>(VarNames, Lssstr);
-							if (result.first) {
-								ExportVars[result.second] = std::make_unique<LocalVariable>(std::string(Lssstr), ID(i-100), ID(result.second), ExportVarsSet);
-							}
-							else {
-								sstr = "";
-							}
-							hr = SimConnect_MapClientEventToSimEvent(hSimConnect, i, ssstr);
-							hr = SimConnect_AddClientEventToNotificationGroup(hSimConnect, GROUP_LOCAL_VARS, i);
-               hr = SimConnect_SetNotificationGroupPriority(hSimConnect, GROUP_LOCAL_VARS, SIMCONNECT_GROUP_PRIORITY_HIGHEST);
-                                                                                                     
-							sstr = "";
-							LVar = "";
-							P[0] = '\0';
-							ssstr[0] = '\0';
-						}
-						else {
-							max = i - 100;
-							break;
-						}
+					for (int i = 0; i < MAX_OUTPUT_VARS; i++) {
+						HRESULT result = SimConnect_AddToClientDataDefinition(hSimConnect, A32NX_ALLDATA_DEFINITION, SIMCONNECT_CLIENTDATAOFFSET_AUTO, SIMCONNECT_CLIENTDATATYPE_FLOAT64);
 					}
+					hr = SimConnect_RequestClientData(hSimConnect, A32NX_ALLDATA_ID, REQ_ALLDATA, A32NX_ALLDATA_DEFINITION, SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_DEFAULT, 0, 0, 0);
+
+          AddVars();
+					
           hr = SimConnect_MapClientEventToSimEvent(hSimConnect, SAVE_VARS, "LVarsWrapper.SAVE_VARS");
           hr = SimConnect_AddClientEventToNotificationGroup(hSimConnect, GROUP_LOCAL_VARS, SAVE_VARS);
 					hr = SimConnect_SetNotificationGroupPriority(hSimConnect, GROUP_LOCAL_VARS, SIMCONNECT_GROUP_PRIORITY_HIGHEST);
@@ -1249,8 +1213,8 @@ extern "C" {
 		case PANEL_SERVICE_PRE_DRAW:
 		{
 			LocalVariable::readAll();
-			ExportVarsSet[1000]++;
-			hr = SimConnect_SetClientData(hSimConnect, A32NX_ALLDATA_ID, A32NX_ALLDATA_DEFINITION, 0, 0, sizeof(double[1000]) + sizeof(INT64), ExportVarsSet);
+      ExportVarsSet[MAX_OUTPUT_VARS-1]++;
+      hr = SimConnect_SetClientData(hSimConnect, A32NX_ALLDATA_ID, A32NX_ALLDATA_DEFINITION, 0, 0, sizeof(double[MAX_OUTPUT_VARS-1]) + sizeof(INT64), ExportVarsSet);
 			
 			return true;
 		}
@@ -1265,5 +1229,5 @@ extern "C" {
 		return false;
 	}
 
-}
+
 
