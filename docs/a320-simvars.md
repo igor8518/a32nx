@@ -3,6 +3,7 @@
 ## Contents
 
 1. [Uncategorized](#uncategorized)
+1. [EIS Display System](#eis-display-system)
 1. [Fly-By-Wire System](#fly-by-wire-system)
 1. [ADIRS](#adirs)
 1. [Autopilot System](#autopilot-system)
@@ -976,6 +977,60 @@
 - A32NX_MCDU_MASK_OPACITY
     - Number
     - Current LCD mask opacity for MCDU, used for driving MCDU display pixels effect
+## EIS Display System
+
+- A32NX_EFIS_{side}_ND_MODE
+    - Enum
+    - Provides the selected navigation display mode for the captain side EFIS
+      Value | Meaning
+      --- | ---
+      0 | ROSE ILS
+      1 | ROSE VOR
+      2 | ROSE NAV
+      3 | ARC
+      4 | PLAN
+    - {side}
+        - L
+        - R
+
+- A32NX_EFIS_{side}_ND_RANGE
+    - Enum
+    - Provides the selected navigation display range for the captain side EFIS
+      Value | Meaning
+      --- | ---
+      0 | 10
+      1 | 20
+      2 | 40
+      3 | 80
+      4 | 160
+      5 | 320
+    - {side}
+        - L
+        - R
+
+- A32NX_EFIS_{side}_ND_FM_MESSAGE_FLAGS
+    - Flag
+    - Provides a bitfield of the active FM messages to the NDs
+      Bit | Meaning
+      --- | ---
+      0  | SelectTrueRef
+      1  | CheckNorthRef
+      2  | NavAccuracyDowngrade
+      3  | NavAccuracyUpgradeNoGps
+      4  | SpecifiedVorDmeUnavailble
+      5  | NavAccuracyUpgradeGps
+      6  | GpsPrimary
+      7  | MapPartlyDisplayed
+      8  | SetOffsideRangeMode
+      9  | OffsideFmControl
+      10 | OffsideFmWxrControl
+      11 | OffsideWxrControl
+      12 | GpsPrimaryLost
+      13 | RtaMissed
+      14 | BackupNav
+    - {side}
+        - L
+        - R
 
 - A32NX_ISIS_LS_ACTIVE
 	- Bool
@@ -1201,7 +1256,7 @@ In the variables below, {number} should be replaced with one item in the set: { 
     - The direction of the wind. Approximately -1000000 when unavailable.
 
 - A32NX_ADIRS_IR_{number}_WIND_VELOCITY
-    - Degrees
+    - Knots
     - The velocity of the wind. Approximately -1000000 when unavailable.
 
 - A32NX_ADIRS_IR_{number}_LATITUDE
