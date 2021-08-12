@@ -1,5 +1,7 @@
 class CDULateralRevisionPage {
     static ShowPage(mcdu, waypoint, waypointIndexFP) {
+        console.log("CDULateralRevisionPage.ShowPage");
+        console.log(waypoint);
         mcdu.clearDisplay();
         mcdu.page.Current = mcdu.page.LateralRevisionPage;
 
@@ -108,16 +110,8 @@ class CDULateralRevisionPage {
         let newDestLabel = "";
         let newDestCell = "";
         if (!isDestination) {
-            newDestLabel = "NEW DEST{sp}";
-            newDestCell = "[{sp}{sp}][color]cyan";
-
-            mcdu.onRightInput[3] = (value) => {
-                mcdu.setDestinationAfterWaypoint(value, waypointIndexFP + 1, (result) => {
-                    if (result) {
-                        CDUFlightPlanPage.ShowPage(mcdu);
-                    }
-                });
-            };
+            newDestLabel = "NEW DEST{sp}[color]inop";
+            newDestCell = "[{sp}{sp}][color]inop";
         }
 
         let airwaysCell = "";

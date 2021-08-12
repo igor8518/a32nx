@@ -29,8 +29,6 @@ class A320_Neo_CDU_MainDisplay extends FMCMainDisplay {
             Prog: 2000,
             Dyn: 1500
         };
-        this.fmgcMesssagesListener = RegisterViewListener('JS_LISTENER_SIMVARS');
-        this.setupFmgcTriggers();
         this.page = {
             SelfPtr: false,
             Current: 0,
@@ -86,21 +84,6 @@ class A320_Neo_CDU_MainDisplay extends FMCMainDisplay {
             DescentWind: 49,
         };
     }
-
-    setupFmgcTriggers() {
-        Coherent.on('A32NX_FMGC_SEND_MESSAGE_TO_MCDU', (message) => {
-            this.addNewMessage(new McduMessage(message.text, message.color === 'Amber', true), undefined, () => {
-                if (message.clearable) {
-                    Fmgc.FmsMessages.instance.recallId(message.id);
-                }
-            });
-        });
-
-        Coherent.on('A32NX_FMGC_RECALL_MESSAGE_FROM_MCDU_WITH_ID', (text) => {
-            this.tryRemoveMessage(text);
-        });
-    }
-
     get templateID() {
         return "A320_Neo_CDU";
     }
@@ -183,10 +166,6 @@ class A320_Neo_CDU_MainDisplay extends FMCMainDisplay {
         this.onDot = () => {
             this.handlePreviousInputState();
             this.inOut += ".";
-        };
-        this.onOvfy = () => {
-            this.handlePreviousInputState();
-            this.inOut = FMCMainDisplay.ovfyValue;
         };
         this.onClr = () => {
             if (this.inOut === "") {

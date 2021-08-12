@@ -29,6 +29,8 @@ class A320_Neo_CDU_AirwaysFromWaypointPage {
             }
         });
         let showInput = false;
+        const departureWaypoints = mcdu.flightPlanManager.getDepartureWaypoints();
+        const routeWaypoints = mcdu.flightPlanManager.getEnRouteWaypoints();
         for (let i = 0; i < rows.length; i++) {
             if (allRows[i + offset]) {
                 rows[i] = allRows[i + offset];
@@ -124,7 +126,7 @@ class A320_Neo_CDU_AirwaysFromWaypointPage {
         const allRows = [];
         const flightPlan = mcdu.flightPlanManager;
         if (flightPlan) {
-            const routeWaypoints = flightPlan.getEnRouteWaypoints([]);
+            const routeWaypoints = flightPlan.getEnRouteWaypoints();
             let indexOfWP = 0;
             routeWaypoints.forEach((wyp, idx) => {
                 if (wyp.ident === currentWP.ident) {
@@ -133,6 +135,7 @@ class A320_Neo_CDU_AirwaysFromWaypointPage {
             });
             let inx = indexOfWP === -1 ? 1 : indexOfWP + 1;
             inx = mcdu.flightPlanManager.getDepartureWaypoints().length ? inx - 1 : inx;
+            const lastWaypoint = mcdu.flightPlanManager.getWaypoints()[mcdu.flightPlanManager.getEnRouteWaypointsLastIndex()];
             for (let i = inx; i < routeWaypoints.length; i++) {
                 const wp = routeWaypoints[i];
                 if (wp) {

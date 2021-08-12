@@ -974,13 +974,9 @@ class CDUPerformancePage {
             bottomRowCells,
         ]);
     }
-    static async UpdateThrRedAccFromOrigin(mcdu, updateThrRedAlt = true, updateAccAlt = true) {
+    static UpdateThrRedAccFromOrigin(mcdu, updateThrRedAlt = true, updateAccAlt = true) {
         const origin = mcdu.flightPlanManager.getOrigin();
-
-        let elevation = SimVar.GetSimVarValue("GROUND ALTITUDE", "feet");
-        if (origin) {
-            elevation = await mcdu.facilityLoader.GetAirportFieldElevation(origin.icao);
-        }
+        const elevation = origin ? origin.altitudeinFP : SimVar.GetSimVarValue("GROUND ALTITUDE", "feet");
 
         if (updateThrRedAlt && !mcdu.thrustReductionAltitudeIsPilotEntered) {
             const thrRedOffset = +NXDataStore.get("CONFIG_THR_RED_ALT", "1500");
