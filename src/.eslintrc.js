@@ -3,11 +3,7 @@
 module.exports = {
     root: true,
     env: { browser: true },
-    extends: [
-        '@flybywiresim/eslint-config',
-        'plugin:jest/recommended',
-        'plugin:jest/style',
-    ],
+    extends: '@flybywiresim/eslint-config',
     plugins: ['@typescript-eslint'],
     parser: '@typescript-eslint/parser',
     parserOptions: {

@@ -58,8 +58,6 @@ bool SimConnectInterface::connect(bool autopilotStateMachineEnabled,
       // failed to connect
       return false;
     }
-    // send initial event to FCU to force HDG mode
-    execute_calculator_code("(>H:A320_Neo_FCU_HDG_PULL)", nullptr, nullptr, nullptr);
     // success
     return true;
   }

@@ -1,7 +1,5 @@
 #![cfg(any(target_arch = "wasm32", doc))]
 pub mod electrical;
-pub mod failures;
-use failures::Failures;
 use msfs::{
     legacy::{AircraftVariable, NamedVariable},
     sim_connect::{SimConnect, SimConnectRecv},
@@ -46,11 +44,10 @@ pub trait SimulatorAspect {
 /// Used to orchestrate the simulation combined with Microsoft Flight Simulator.
 pub struct MsfsSimulationHandler {
     aspects: Vec<Box<dyn SimulatorAspect>>,
-    failures: Failures,
 }
 impl MsfsSimulationHandler {
-    pub fn new(aspects: Vec<Box<dyn SimulatorAspect>>, failures: Failures) -> Self {
-        Self { aspects, failures }
+    pub fn new(aspects: Vec<Box<dyn SimulatorAspect>>) -> Self {
+        Self { aspects }
     }
 
     pub fn handle<T: Aircraft>(
@@ -62,7 +59,6 @@ impl MsfsSimulationHandler {
         match event {
             MSFSEvent::PreDraw(d) => {
                 self.pre_tick(d.delta_time());
-                self.read_failures_into(simulation);
                 simulation.tick(d.delta_time(), self);
                 self.post_tick(&mut sim_connect.as_mut())?;
             }
@@ -101,16 +97,6 @@ impl MsfsSimulationHandler {
         }
 
         Ok(())
-    }
-
-    fn read_failures_into<T: Aircraft>(&mut self, simulation: &mut Simulation<T>) {
-        if let Some(failure_type) = self.failures.read_failure_activate() {
-            simulation.activate_failure(failure_type);
-        }
-
-        if let Some(failure_type) = self.failures.read_failure_deactivate() {
-            simulation.deactivate_failure(failure_type);
-        }
     }
 }
 impl SimulatorReaderWriter for MsfsSimulationHandler {

@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
     "baseUrl": ".",
-    "typeRoots": ["../typings", "../node_modules/@types"],
+    "allowJs": true,
     "paths": {
       "@shared/*": ["./shared/src/*"],
       "@instruments/common/*": ["./instruments/src/Common/*"],
       "@fmgc/*": ["./fmgc/src/*"],
-      "@flybywiresim/failures": ["failures"]
+      "@typings/*": ["../typings/*"]
     }
   }
 }

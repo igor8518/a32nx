@@ -142,6 +142,16 @@ impl A320Electrical {
     }
 
     #[cfg(test)]
+    fn fail_tr_1(&mut self) {
+        self.alternating_current.fail_tr_1();
+    }
+
+    #[cfg(test)]
+    fn fail_tr_2(&mut self) {
+        self.alternating_current.fail_tr_2();
+    }
+
+    #[cfg(test)]
     fn attempt_emergency_gen_start(&mut self) {
         self.emergency_gen.start();
     }
@@ -413,7 +423,6 @@ mod a320_electrical_circuit_tests {
             ExternalPowerSource, Potential,
             INTEGRATED_DRIVE_GENERATOR_STABILIZATION_TIME_IN_MILLISECONDS,
         },
-        failures::FailureType,
         shared::{
             ApuAvailable, ContactorSignal, ControllerSignal, ElectricalBusType, ElectricalBuses,
             PotentialOrigin,
@@ -2273,6 +2282,14 @@ mod a320_electrical_circuit_tests {
             self.elec.empty_battery_2();
         }
 
+        fn failed_tr_1(&mut self) {
+            self.elec.fail_tr_1();
+        }
+
+        fn failed_tr_2(&mut self) {
+            self.elec.fail_tr_2();
+        }
+
         fn running_emergency_generator(&mut self) {
             self.elec.attempt_emergency_gen_start();
         }
@@ -2427,12 +2444,12 @@ mod a320_electrical_circuit_tests {
         }
 
         fn failed_tr_1(mut self) -> Self {
-            self.test_bed.fail(FailureType::TransformerRectifier(1));
+            self.command(|a| a.failed_tr_1());
             self
         }
 
         fn failed_tr_2(mut self) -> Self {
-            self.test_bed.fail(FailureType::TransformerRectifier(2));
+            self.command(|a| a.failed_tr_2());
             self
         }
 

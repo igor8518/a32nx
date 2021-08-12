@@ -8,7 +8,6 @@
 /flybywire-aircraft-a320-neo/manifest.json
 /flybywire-aircraft-a320-neo/build_info.json
 /flybywire-aircraft-a320-neo/html_ui/Pages/VCockpit/Instruments/A32NX
-/flybywire-aircraft-a320-neo/html_ui/JS/generated/**
 /flybywire-aircraft-a320-neo/ModelBehaviorDefs/A32NX/generated
 !/docs/**
 !/src/**
@@ -28,8 +27,6 @@
 !Cargo.lock
 !Cargo.toml
 !/.cargo/config.toml
-!jest.config.js
-!/jest/**
 .DS_Store
 node_modules
 /src/sound/.cache
