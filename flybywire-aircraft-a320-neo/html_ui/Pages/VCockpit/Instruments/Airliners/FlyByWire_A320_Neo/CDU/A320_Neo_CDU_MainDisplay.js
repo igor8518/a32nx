@@ -281,7 +281,7 @@ class A320_Neo_CDU_MainDisplay extends FMCMainDisplay {
             }, this.getDelaySwitchPage());
         };
 
-        CDUMenuPage.ShowPage(this);
+        CDUMenuPage.ShowPage(this, false);
 
         // If the consent is not set, show telex page
         const onlineFeaturesStatus = NXDataStore.get("CONFIG_ONLINE_FEATURES_STATUS", "UNKNOWN");
