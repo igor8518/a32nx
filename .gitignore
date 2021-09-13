@@ -50,3 +50,8 @@ node_modules
 /src/fbw/obj/
 /src/fdr2csv/build/
 .env
+*.blend
+*.blend1
+flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/model/untitled.fbx
+src/model/hublots/hublots.bin
+src/model/hublots/hublots.gltf
