@@ -1191,8 +1191,8 @@ export class ManagedFlightPlan {
     // TODO: Deprecate
     public getDestinationRunway(): OneWayRunway | null{
         if (this.destinationAirfield) {
-            if (this.procedureDetails.destinationRunwayIndex !== -1) {
-                return this.destinationAirfield.infos.oneWayRunways[this.procedureDetails.destinationRunwayIndex];
+            if (this.procedureDetails.arrivalRunwayIndex !== -1) {
+                return this.destinationAirfield.infos.oneWayRunways[this.procedureDetails.arrivalRunwayIndex];
             } /* else if (this.procedureDetails.approachIndex !== -1) {
                 // TODO: Remove
                 //return this.getRunway(this.destinationAirfield.infos.oneWayRunways, this.destinationAirfield.infos.approaches[this.procedureDetails.approachIndex].runway);
