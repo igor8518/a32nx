@@ -39,13 +39,13 @@ export const ArcMode: React.FC<ArcModeProps> = ({ symbols, adirsAlign, rangeSett
     const [fmaLatArmed] = useSimVar('L:A32NX_FMA_LATERAL_ARMED', 'enum', 200);
     const [groundSpeed] = useSimVar('GPS GROUND SPEED', 'Meters per second', 200);
 
-    const heading = Math.round(Number(MathUtils.fastToFixed(magHeading, 1)) * 1000) / 1000;
-    let track = Math.round(Number(MathUtils.fastToFixed(magTrack, 1)) * 1000) / 1000;
+    const heading = Number(MathUtils.fastToFixed(magHeading, 2));
+    let track = Number(MathUtils.fastToFixed(magTrack, 2));
 
     // Workaround for bug with gps ground track simvar
     if (groundSpeed < 40) {
         track = (0.025 * groundSpeed + 0.00005) * track + (1 - (0.025 * groundSpeed + 0.00005)) * heading;
-        track = Math.round(track * 1000) / 1000;
+        track = Number(MathUtils.fastToFixed(track, 2));
     }
 
     const [mapParams] = useState(() => {
