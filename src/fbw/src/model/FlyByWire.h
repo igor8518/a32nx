@@ -63,6 +63,7 @@ class FlyByWireModelClass {
     real_T Delay_DSTATE_f1;
     real_T Delay_DSTATE_h;
     real_T Delay_DSTATE_ea;
+    real_T Delay_DSTATE_i5;
     real_T Delay_DSTATE_ho;
     real_T Delay_DSTATE_gt;
     real_T Delay_DSTATE_j5;
@@ -490,6 +491,7 @@ class FlyByWireModelClass {
     real_T Switch3_Threshold;
     real_T Saturation_UpperSat_n;
     real_T Saturation_LowerSat_o;
+    real_T Delay_InitialCondition_o;
     real_T Saturation_UpperSat_f;
     real_T Saturation_LowerSat_f;
     real_T Switch_Threshold_p;
