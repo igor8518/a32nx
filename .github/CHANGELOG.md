@@ -62,6 +62,7 @@
 1. [FBW/AP/ATHR] Added local variables to enable logging of flight controls and/or throttle events - @aguther (Andreas Guther)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add menu item for automatic init flight, and prepare mcdu - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
