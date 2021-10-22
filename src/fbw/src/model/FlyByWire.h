@@ -152,8 +152,8 @@ class FlyByWireModelClass {
   struct Parameters_FlyByWire_T {
     fbw_output fbw_output_MATLABStruct;
     real_T ScheduledGain_BreakpointsForDimension1[5];
-    real_T ScheduledGain_BreakpointsForDimension1_k[5];
-    real_T ScheduledGain_BreakpointsForDimension1_k0[7];
+    real_T ScheduledGain_BreakpointsForDimension1_f[5];
+    real_T ScheduledGain_BreakpointsForDimension1_k[7];
     real_T ScheduledGain1_BreakpointsForDimension1[7];
     real_T LagFilter_C1;
     real_T LagFilter_C1_a;
@@ -230,7 +230,7 @@ class FlyByWireModelClass {
     real_T DiscreteTimeIntegratorVariableTs1_LowerLimit;
     real_T DiscreteTimeIntegratorVariableTs1_LowerLimit_o;
     real_T ScheduledGain_Table[5];
-    real_T ScheduledGain_Table_i[5];
+    real_T ScheduledGain_Table_l[5];
     real_T ScheduledGain_Table_k[7];
     real_T ScheduledGain1_Table[7];
     real_T DiscreteTimeIntegratorVariableTs_UpperLimit;
@@ -495,6 +495,10 @@ class FlyByWireModelClass {
     real_T Saturation_UpperSat_f;
     real_T Saturation_LowerSat_f;
     real_T Switch_Threshold_p;
+    real_T Gain1_Gain_be;
+    real_T Gain1_Gain_d;
+    real_T Gain1_Gain_mu;
+    real_T Gain_Gain_j;
     real_T Constant2_Value_li;
     real_T Gain1_Gain_br;
     real_T Gain1_Gain_cq;

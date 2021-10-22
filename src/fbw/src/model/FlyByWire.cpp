@@ -172,11 +172,11 @@ void FlyByWireModelClass::step()
   real_T rtb_Gain1_o;
   real_T rtb_GainPhi;
   real_T rtb_GainTheta;
-  real_T rtb_Gain_g;
-  real_T rtb_Gain_i;
-  real_T rtb_Gain_iw;
+  real_T rtb_Gain_d;
   real_T rtb_Gain_kh;
-  real_T rtb_Gain_oj;
+  real_T rtb_Gain_ly;
+  real_T rtb_Gain_mv;
+  real_T rtb_Gain_ob;
   real_T rtb_Gainpk;
   real_T rtb_Gainpk4;
   real_T rtb_Gainqk;
@@ -194,6 +194,7 @@ void FlyByWireModelClass::step()
   real_T rtb_Sum1_c;
   real_T rtb_Sum1_d5;
   real_T rtb_Switch;
+  real_T rtb_Switch_c;
   real_T rtb_Y;
   real_T rtb_Y_c;
   real_T rtb_Y_dd;
@@ -204,22 +205,27 @@ void FlyByWireModelClass::step()
   real_T rtb_eta_trim_deg_rate_limit_lo_deg_s;
   real_T rtb_nz_limit_up_g;
   real_T rtb_v_target;
-  real_T rtb_y_i;
   real_T u0;
   real_T u0_0;
+  int32_T high_i;
   int32_T l_down;
   int32_T l_up;
+  int32_T mid_i;
   int32_T rtb_alpha_floor_inhib;
   int32_T rtb_ap_special_disc;
   int32_T rtb_in_flare;
   int32_T rtb_nz_limit_lo_g;
   int32_T rtb_on_ground;
-  boolean_T guard1 = false;
   boolean_T rtb_AND;
   boolean_T rtb_NOT2;
   boolean_T rtb_eta_trim_deg_reset;
   boolean_T rtb_eta_trim_deg_should_freeze;
   boolean_T rtb_eta_trim_deg_should_write;
+  static const int16_T b[4] = { 0, 120, 320, 400 };
+
+  static const int8_T c[4] = { 1, 2, 3, 3 };
+
+  boolean_T guard1 = false;
   FlyByWire_DWork.Delay_DSTATE += FlyByWire_U.in.time.dt;
   rtb_GainTheta = FlyByWire_P.GainTheta_Gain * FlyByWire_U.in.data.Theta_deg;
   rtb_GainPhi = FlyByWire_P.GainPhi_Gain * FlyByWire_U.in.data.Phi_deg;
@@ -901,24 +907,24 @@ void FlyByWireModelClass::step()
                         FlyByWire_P.RateLimiterVariableTs_InitialCondition_n, &rtb_Y_dd,
                         &FlyByWire_DWork.sf_RateLimiter_l);
   if (rtb_Y_dd > FlyByWire_P.Saturation3_UpperSat) {
-    rtb_Gain_i = FlyByWire_P.Saturation3_UpperSat;
+    rtb_Gain_ob = FlyByWire_P.Saturation3_UpperSat;
   } else if (rtb_Y_dd < FlyByWire_P.Saturation3_LowerSat) {
-    rtb_Gain_i = FlyByWire_P.Saturation3_LowerSat;
+    rtb_Gain_ob = FlyByWire_P.Saturation3_LowerSat;
   } else {
-    rtb_Gain_i = rtb_Y_dd;
+    rtb_Gain_ob = rtb_Y_dd;
   }
 
   rtb_LimiteriH = look1_binlxpw(static_cast<real_T>(FlyByWire_U.in.data.tailstrike_protection_on) * look2_binlxpw
     (rtb_GainTheta, FlyByWire_U.in.data.H_radio_ft, FlyByWire_P.uDLookupTable_bp01Data_l,
      FlyByWire_P.uDLookupTable_bp02Data, FlyByWire_P.uDLookupTable_tableData_d, FlyByWire_P.uDLookupTable_maxIndex, 5U) *
-    rtb_Gain_i + rtb_Y_dd, FlyByWire_P.PitchRateDemand_bp01Data, FlyByWire_P.PitchRateDemand_tableData, 2U);
-  rtb_Gain_i = FlyByWire_P.DiscreteDerivativeVariableTs_Gain_c * rtb_LimiteriH;
+    rtb_Gain_ob + rtb_Y_dd, FlyByWire_P.PitchRateDemand_bp01Data, FlyByWire_P.PitchRateDemand_tableData, 2U);
+  rtb_Gain_ob = FlyByWire_P.DiscreteDerivativeVariableTs_Gain_c * rtb_LimiteriH;
   rtb_Limiterxi = rtb_Y_o - rtb_LimiteriH;
-  rtb_Gain_g = FlyByWire_P.Gain1_Gain_i * rtb_Limiterxi * FlyByWire_P.DiscreteDerivativeVariableTs_Gain_b;
+  rtb_Gain_ly = FlyByWire_P.Gain1_Gain_i * rtb_Limiterxi * FlyByWire_P.DiscreteDerivativeVariableTs_Gain_b;
   FlyByWire_LagFilter(rtb_Y_o + FlyByWire_P.Gain5_Gain * rtb_BusAssignment_a_sim_data_qk_dot_deg_s2,
                       FlyByWire_P.LagFilter_C1_i, FlyByWire_U.in.time.dt, &rtb_Y_dd, &FlyByWire_DWork.sf_LagFilter_p);
-  rtb_Gain1_b = (((((rtb_Gain_g - FlyByWire_DWork.Delay_DSTATE_dd) / FlyByWire_U.in.time.dt + FlyByWire_P.Gain_Gain_h *
-                    rtb_Limiterxi) * FlyByWire_P.Gain1_Gain_a + (rtb_Gain_i - FlyByWire_DWork.Delay_DSTATE_f) /
+  rtb_Gain1_b = (((((rtb_Gain_ly - FlyByWire_DWork.Delay_DSTATE_dd) / FlyByWire_U.in.time.dt + FlyByWire_P.Gain_Gain_h *
+                    rtb_Limiterxi) * FlyByWire_P.Gain1_Gain_a + (rtb_Gain_ob - FlyByWire_DWork.Delay_DSTATE_f) /
                    FlyByWire_U.in.time.dt * FlyByWire_P.Gain3_Gain_p) + (rtb_Y_dd - rtb_LimiteriH) *
                   FlyByWire_P.Gain4_Gain_g) + FlyByWire_P.Gain6_Gain_f * rtb_BusAssignment_a_sim_data_qk_dot_deg_s2) *
     (FlyByWire_P.Constant2_Value_l - rtb_Y_n) * FlyByWire_P.DiscreteTimeIntegratorVariableTs_Gain *
@@ -973,14 +979,14 @@ void FlyByWireModelClass::step()
 
   rtb_v_target = rtb_Min3 + rtb_Sum1_d5;
   if (rtb_GainPhi > FlyByWire_P.Saturation_UpperSat_d) {
-    rtb_Gain_iw = FlyByWire_P.Saturation_UpperSat_d;
+    rtb_Gain_d = FlyByWire_P.Saturation_UpperSat_d;
   } else if (rtb_GainPhi < FlyByWire_P.Saturation_LowerSat_pr) {
-    rtb_Gain_iw = FlyByWire_P.Saturation_LowerSat_pr;
+    rtb_Gain_d = FlyByWire_P.Saturation_LowerSat_pr;
   } else {
-    rtb_Gain_iw = rtb_GainPhi;
+    rtb_Gain_d = rtb_GainPhi;
   }
 
-  rtb_Limiterxi2 = rtb_Gain1_b / std::cos(FlyByWire_P.Gain1_Gain_b * rtb_Gain_iw);
+  rtb_Limiterxi2 = rtb_Gain1_b / std::cos(FlyByWire_P.Gain1_Gain_b * rtb_Gain_d);
   FlyByWire_RateLimiter(FlyByWire_U.in.data.autopilot_custom_Theta_c_deg, FlyByWire_P.RateLimiterVariableTs1_up_k,
                         FlyByWire_P.RateLimiterVariableTs1_lo_h, FlyByWire_U.in.time.dt,
                         FlyByWire_P.RateLimiterVariableTs1_InitialCondition_hb, &rtb_Y_c,
@@ -1007,14 +1013,14 @@ void FlyByWireModelClass::step()
                         FlyByWire_P.RateLimiterVariableTs_lo_f, FlyByWire_U.in.time.dt,
                         FlyByWire_P.RateLimiterVariableTs_InitialCondition_c, &rtb_Y_o,
                         &FlyByWire_DWork.sf_RateLimiter_k);
-  rtb_Gain_iw = FlyByWire_P.Subsystem2_Gain * rtb_v_target;
-  rtb_Divide_m = (rtb_Gain_iw - FlyByWire_DWork.Delay_DSTATE_j) / FlyByWire_U.in.time.dt;
+  rtb_Gain_d = FlyByWire_P.Subsystem2_Gain * rtb_v_target;
+  rtb_Divide_m = (rtb_Gain_d - FlyByWire_DWork.Delay_DSTATE_j) / FlyByWire_U.in.time.dt;
   rtb_Gain1_b = FlyByWire_U.in.time.dt * FlyByWire_P.Subsystem2_C1;
   rtb_Limiterxi = rtb_Gain1_b + FlyByWire_P.Constant_Value_m3;
   FlyByWire_DWork.Delay1_DSTATE = 1.0 / rtb_Limiterxi * (FlyByWire_P.Constant_Value_m3 - rtb_Gain1_b) *
     FlyByWire_DWork.Delay1_DSTATE + (rtb_Divide_m + FlyByWire_DWork.Delay_DSTATE_c) * (rtb_Gain1_b / rtb_Limiterxi);
-  rtb_Gain_oj = FlyByWire_P.Subsystem_Gain * FlyByWire_U.in.data.V_ias_kn;
-  rtb_Divide_e = (rtb_Gain_oj - FlyByWire_DWork.Delay_DSTATE_p) / FlyByWire_U.in.time.dt;
+  rtb_Gain_mv = FlyByWire_P.Subsystem_Gain * FlyByWire_U.in.data.V_ias_kn;
+  rtb_Divide_e = (rtb_Gain_mv - FlyByWire_DWork.Delay_DSTATE_p) / FlyByWire_U.in.time.dt;
   rtb_Gain1_b = FlyByWire_U.in.time.dt * FlyByWire_P.Subsystem_C1;
   rtb_Limiterxi = rtb_Gain1_b + FlyByWire_P.Constant_Value_hz;
   FlyByWire_DWork.Delay1_DSTATE_i = 1.0 / rtb_Limiterxi * (FlyByWire_P.Constant_Value_hz - rtb_Gain1_b) *
@@ -1052,11 +1058,11 @@ void FlyByWireModelClass::step()
                       * rtb_Limitereta_d) + FlyByWire_P.qk_dot_gain1_Gain * rtb_BusAssignment_a_sim_data_qk_dot_deg_s2) *
         FlyByWire_P.HSP_gain_Gain;
       if (rtb_Loaddemand > FlyByWire_P.Saturation8_UpperSat) {
-        rtb_Limiterxi = FlyByWire_P.Saturation8_UpperSat;
+        rtb_Switch_c = FlyByWire_P.Saturation8_UpperSat;
       } else if (rtb_Loaddemand < FlyByWire_P.Saturation8_LowerSat) {
-        rtb_Limiterxi = FlyByWire_P.Saturation8_LowerSat;
+        rtb_Switch_c = FlyByWire_P.Saturation8_LowerSat;
       } else {
-        rtb_Limiterxi = rtb_Loaddemand;
+        rtb_Switch_c = rtb_Loaddemand;
       }
 
       if (rtb_Sum1_d5 > FlyByWire_P.Saturation4_UpperSat) {
@@ -1065,21 +1071,21 @@ void FlyByWireModelClass::step()
         rtb_Sum1_d5 = FlyByWire_P.Saturation4_LowerSat;
       }
 
-      rtb_Limiterxi += rtb_Sum1_d5;
+      rtb_Switch_c += rtb_Sum1_d5;
     } else {
-      rtb_Limiterxi = FlyByWire_P.Constant1_Value;
+      rtb_Switch_c = FlyByWire_P.Constant1_Value;
     }
 
-    rtb_Loaddemand = (FlyByWire_P.Constant_Value_k - rtb_Y_o) * rtb_Loaddemand + rtb_Limiterxi * rtb_Y_o;
+    rtb_Loaddemand = (FlyByWire_P.Constant_Value_k - rtb_Y_o) * rtb_Loaddemand + rtb_Switch_c * rtb_Y_o;
     if (rtb_in_flare > FlyByWire_P.Switch_Threshold) {
-      rtb_Limiterxi = (FlyByWire_DWork.Delay_DSTATE_dq - rtb_GainTheta) * FlyByWire_P.Gain_Gain;
-      if (rtb_Limiterxi > FlyByWire_P.Saturation_UpperSat) {
-        rtb_Limiterxi = FlyByWire_P.Saturation_UpperSat;
-      } else if (rtb_Limiterxi < FlyByWire_P.Saturation_LowerSat) {
-        rtb_Limiterxi = FlyByWire_P.Saturation_LowerSat;
+      rtb_Switch_c = (FlyByWire_DWork.Delay_DSTATE_dq - rtb_GainTheta) * FlyByWire_P.Gain_Gain;
+      if (rtb_Switch_c > FlyByWire_P.Saturation_UpperSat) {
+        rtb_Switch_c = FlyByWire_P.Saturation_UpperSat;
+      } else if (rtb_Switch_c < FlyByWire_P.Saturation_LowerSat) {
+        rtb_Switch_c = FlyByWire_P.Saturation_LowerSat;
       }
     } else {
-      rtb_Limiterxi = FlyByWire_P.Constant_Value_m;
+      rtb_Switch_c = FlyByWire_P.Constant_Value_m;
     }
 
     rtb_Sum1_d5 = FlyByWire_P.Gain2_Gain * rtb_Y - rtb_Gain1_b;
@@ -1106,7 +1112,7 @@ void FlyByWireModelClass::step()
       }
     }
 
-    rtb_Gain1_b = rtb_Y_o + rtb_Limiterxi;
+    rtb_Gain1_b = rtb_Y_o + rtb_Switch_c;
   }
 
   rtb_Gain1_b += rtb_Limiterxi2;
@@ -1120,7 +1126,7 @@ void FlyByWireModelClass::step()
                         FlyByWire_P.RateLimiterVariableTs2_lo_n, FlyByWire_U.in.time.dt,
                         FlyByWire_P.RateLimiterVariableTs2_InitialCondition_j, &rtb_Y_dd,
                         &FlyByWire_DWork.sf_RateLimiter_p);
-  rtb_y_i = (rtb_BusAssignment_c_sim_data_speeds_aoa_alpha_max_deg - rtb_Switch) * rtb_Y_dd;
+  rtb_Switch_c = (rtb_BusAssignment_c_sim_data_speeds_aoa_alpha_max_deg - rtb_Switch) * rtb_Y_dd;
   FlyByWire_LagFilter(FlyByWire_U.in.data.alpha_deg, FlyByWire_P.LagFilter1_C1, FlyByWire_U.in.time.dt, &rtb_Y_dd,
                       &FlyByWire_DWork.sf_LagFilter_h);
   rtb_Limiterxi = rtb_Y_dd - rtb_Switch;
@@ -1141,7 +1147,7 @@ void FlyByWireModelClass::step()
 
   FlyByWire_WashoutFilter(rtb_Sum1_c, FlyByWire_P.WashoutFilter_C1, FlyByWire_U.in.time.dt, &rtb_Y_dd,
     &FlyByWire_DWork.sf_WashoutFilter);
-  rtb_Limiterxi = (rtb_y_i - rtb_Limiterxi) - rtb_Y_dd;
+  rtb_Limiterxi = (rtb_Switch_c - rtb_Limiterxi) - rtb_Y_dd;
   rtb_Y = FlyByWire_P.Subsystem1_Gain * rtb_Limiterxi;
   rtb_Y_o = (rtb_Y - FlyByWire_DWork.Delay_DSTATE_ps) / FlyByWire_U.in.time.dt;
   rtb_Limiterxi1 = FlyByWire_U.in.time.dt * FlyByWire_P.Subsystem1_C1;
@@ -1436,12 +1442,40 @@ void FlyByWireModelClass::step()
 
   rtb_Y_h5 = rtb_Sum1_d5 * 0.5144;
   rtb_Limiterxi = rtb_Y_h5 * rtb_Y_h5 * 0.6125;
-  rtb_Y_h5 = rtb_Limiterxi / rtb_Y_h5 * 122.0 * 320.40999999999997 * -2.078 / 1.376155E+6;
-  rtb_Limiterxi = rtb_Limiterxi * 122.0 * 17.9 * -0.291 / 1.376155E+6;
-  rtb_Sum1_d5 = -(-rtb_Y_h5 * -rtb_Y_h5) / rtb_Limiterxi;
-  FlyByWire_DWork.Delay_DSTATE_i5 = ((-(2.0 * -rtb_Y_h5 + rtb_Y_h5) / rtb_Limiterxi *
-    rtb_BusAssignment_a_sim_data_pk_deg_s + rtb_Sum1_d5 * rtb_GainPhi) + -rtb_Sum1_d5 * rtb_LimiteriH) * look1_binlxpw
-    (FlyByWire_U.in.time.dt, FlyByWire_P.ScheduledGain_BreakpointsForDimension1_k, FlyByWire_P.ScheduledGain_Table_i, 4U);
+  rtb_Sum1_d5 = rtb_Limiterxi * 122.0 * 17.9 * -0.090320788790706555 / 1.0E+6;
+  rtb_Y_dd = 0.0;
+  if ((FlyByWire_U.in.data.V_ias_kn <= 400.0) && (FlyByWire_U.in.data.V_ias_kn >= 0.0)) {
+    l_up = 0;
+    l_down = 2;
+    high_i = 4;
+    while (high_i > l_down) {
+      mid_i = ((l_up + high_i) + 1) >> 1;
+      if (FlyByWire_U.in.data.V_ias_kn >= b[mid_i - 1]) {
+        l_up = mid_i - 1;
+        l_down = mid_i + 1;
+      } else {
+        high_i = mid_i;
+      }
+    }
+
+    rtb_Y_dd = (FlyByWire_U.in.data.V_ias_kn - static_cast<real_T>(b[l_up])) / static_cast<real_T>(b[l_up + 1] - b[l_up]);
+    if (rtb_Y_dd == 0.0) {
+      rtb_Y_dd = c[l_up];
+    } else if (rtb_Y_dd == 1.0) {
+      rtb_Y_dd = c[l_up + 1];
+    } else if (c[l_up + 1] == c[l_up]) {
+      rtb_Y_dd = c[l_up];
+    } else {
+      rtb_Y_dd = (1.0 - rtb_Y_dd) * static_cast<real_T>(c[l_up]) + static_cast<real_T>(c[l_up + 1]) * rtb_Y_dd;
+    }
+  }
+
+  rtb_Limiterxi1 = -(rtb_Y_dd * rtb_Y_dd) / rtb_Sum1_d5;
+  FlyByWire_DWork.Delay_DSTATE_i5 = ((-(rtb_Limiterxi / rtb_Y_h5 * 122.0 * 320.40999999999997 * -0.487 / 1.0E+6 + 1.414 *
+    rtb_Y_dd) / rtb_Sum1_d5 * (FlyByWire_P.Gain1_Gain_mu * rtb_BusAssignment_a_sim_data_pk_deg_s) +
+    FlyByWire_P.Gain1_Gain_d * rtb_GainPhi * rtb_Limiterxi1) + FlyByWire_P.Gain1_Gain_be * rtb_LimiteriH *
+    -rtb_Limiterxi1) * look1_binlxpw(FlyByWire_U.in.time.dt, FlyByWire_P.ScheduledGain_BreakpointsForDimension1_f,
+    FlyByWire_P.ScheduledGain_Table_l, 4U) * FlyByWire_P.Gain_Gain_j;
   FlyByWire_RateLimiter(rtb_Gain1_o, FlyByWire_P.RateLimiterVariableTs_up_mm, FlyByWire_P.RateLimiterVariableTs_lo_p,
                         FlyByWire_U.in.time.dt, FlyByWire_P.RateLimiterVariableTs_InitialCondition_fc, &rtb_Y_h5,
                         &FlyByWire_DWork.sf_RateLimiter_lp);
@@ -1458,7 +1492,7 @@ void FlyByWireModelClass::step()
   rtb_Sum1_d5 = (rtb_Y_dd - std::sin(FlyByWire_P.Gain1_Gain_br * rtb_LimiteriH) * FlyByWire_P.Constant2_Value_li * std::
                  cos(FlyByWire_P.Gain1_Gain_cq * rtb_GainTheta) / (FlyByWire_P.Gain6_Gain_j * rtb_Sum1_d5) *
                  FlyByWire_P.Gain_Gain_cd) * look1_binlxpw(FlyByWire_U.in.data.V_tas_kn,
-    FlyByWire_P.ScheduledGain_BreakpointsForDimension1_k0, FlyByWire_P.ScheduledGain_Table_k, 6U);
+    FlyByWire_P.ScheduledGain_BreakpointsForDimension1_k, FlyByWire_P.ScheduledGain_Table_k, 6U);
   FlyByWire_WashoutFilter(rtb_Gain, FlyByWire_P.WashoutFilter_C1_i, FlyByWire_U.in.time.dt, &rtb_Y_dd,
     &FlyByWire_DWork.sf_WashoutFilter_i);
   rtb_Limiterxi1 = rtb_Y_dd * look1_binlxpw(FlyByWire_U.in.data.V_tas_kn,
@@ -1723,7 +1757,7 @@ void FlyByWireModelClass::step()
   FlyByWire_Y.out.pitch.data_computed.flare_Theta_c_deg = FlyByWire_DWork.Delay_DSTATE_dq;
   FlyByWire_Y.out.pitch.data_computed.flare_Theta_c_rate_deg_s = FlyByWire_B.flare_Theta_c_rate_deg_s;
   FlyByWire_Y.out.pitch.law_rotation.eta_deg = rtb_Limitereta;
-  FlyByWire_Y.out.pitch.law_normal.protection_alpha_c_deg = rtb_Switch + rtb_y_i;
+  FlyByWire_Y.out.pitch.law_normal.protection_alpha_c_deg = rtb_Switch + rtb_Switch_c;
   FlyByWire_Y.out.pitch.law_normal.protection_V_c_kn = rtb_v_target;
   FlyByWire_Y.out.pitch.vote.eta_dot_deg_s = rtb_Limitereta_d;
   FlyByWire_Y.out.pitch.integrated.eta_deg = FlyByWire_DWork.Delay_DSTATE_f1;
@@ -1788,12 +1822,12 @@ void FlyByWireModelClass::step()
 
   FlyByWire_Y.out.output.zeta_trim_pos_should_write = (FlyByWire_U.in.data.autopilot_custom_on != 0.0);
   FlyByWire_DWork.Delay_DSTATE_d = rtb_Gain_kh;
-  FlyByWire_DWork.Delay_DSTATE_f = rtb_Gain_i;
-  FlyByWire_DWork.Delay_DSTATE_dd = rtb_Gain_g;
+  FlyByWire_DWork.Delay_DSTATE_f = rtb_Gain_ob;
+  FlyByWire_DWork.Delay_DSTATE_dd = rtb_Gain_ly;
   FlyByWire_DWork.icLoad = false;
-  FlyByWire_DWork.Delay_DSTATE_j = rtb_Gain_iw;
+  FlyByWire_DWork.Delay_DSTATE_j = rtb_Gain_d;
   FlyByWire_DWork.Delay_DSTATE_c = rtb_Divide_m;
-  FlyByWire_DWork.Delay_DSTATE_p = rtb_Gain_oj;
+  FlyByWire_DWork.Delay_DSTATE_p = rtb_Gain_mv;
   FlyByWire_DWork.Delay_DSTATE_m = rtb_Divide_e;
   FlyByWire_DWork.Delay_DSTATE_ps = rtb_Y;
   FlyByWire_DWork.Delay_DSTATE_c1 = rtb_Y_o;
