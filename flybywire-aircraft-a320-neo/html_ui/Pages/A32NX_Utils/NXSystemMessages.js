@@ -95,5 +95,12 @@ const NXFictionalMessages = {
     noRefWpt:               new TypeIMessage("NO REF WAYPOINT"),
     noWptInfos:             new TypeIMessage("NO WAYPOINT INFOS"),
     emptyMessage:           new TypeIMessage(""),
-    reloadPlaneApply:       new TypeIMessage("RELOAD A/C TO APPLY", true)
+    reloadPlaneApply:       new TypeIMessage("RELOAD A/C TO APPLY", true),
+    fetchSimbrief:          new TypeIMessage("FETCH SIMBRIEF"),
+    upLink:                 new TypeIMessage("UPLINK"),
+    loadFuel:               new TypeIMessage("LOAD FUEL"),
+    loadPayload:            new TypeIMessage("LOAD PAYLOAD"),
+    loadPax:                new TypeIMessage("LOAD PAX"),
+    prepareCDU:             new TypeIMessage("PREPARE CDU"),
+    done:                   new TypeIMessage("DONE")
 };
