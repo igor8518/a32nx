@@ -134,12 +134,17 @@ export class FlightPlanAsoboSync {
                               });
                           // set approach
                           //  rwy index
-                          await fpln.setDestinationRunwayIndex(data.arrivalRunwayIndex)
+                          /*
+                           * FIXME this is obviously bogus...
+                           * should be an index into the destination airport runway array...
+                           * but arrivalRunwayIndex is an index into the STAR runwayTransitions array
+                           */
+                          /*await fpln.setDestinationRunwayIndex(data.arrivalRunwayIndex)
                               // .then(() => console.log(`[FP LOAD] Setting Destination Runway ${data.arrivalRunwayIndex} ... SUCCESS`))
                               .catch((e) => {
                                   console.error(`[FP LOAD] Setting Destination Runway ${data.arrivalRunwayIndex} ... FAILED`);
                                   console.error(e);
-                              });
+                              });*/
                           await fpln.setArrivalRunwayIndex(data.arrivalRunwayIndex)
                               // .then(() => console.log(`[FP LOAD] Setting Arrival Runway ${data.arrivalRunwayIndex} ... SUCCESS`))
                               .catch((e) => {
