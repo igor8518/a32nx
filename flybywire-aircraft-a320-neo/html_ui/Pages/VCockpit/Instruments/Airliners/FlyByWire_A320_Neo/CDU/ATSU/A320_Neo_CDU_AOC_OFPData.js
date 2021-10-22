@@ -234,27 +234,6 @@ class CDUAocOfpData {
             );
         }
 
-        async function setTargetPax(numberOfPax) {
-
-            let paxRemaining = parseInt(numberOfPax);
-
-            async function fillStation(station, percent, paxToFill) {
-
-                const pax = Math.min(Math.round(percent * paxToFill), station.seats);
-                station.pax = pax;
-
-                await SimVar.SetSimVarValue(`L:${station.simVar}_DESIRED`, "Number", parseInt(pax));
-
-                paxRemaining -= pax;
-            }
-
-            await fillStation(paxStations['rows22_29'], .275 , numberOfPax);
-            await fillStation(paxStations['rows14_21'], .275, numberOfPax);
-            await fillStation(paxStations['rows7_13'], .240 , numberOfPax);
-            await fillStation(paxStations['rows1_6'], 1 , paxRemaining);
-            return;
-        }
-
         const currentZfwcg = getZfwcg();
         if (currentZfwcg !== undefined) {
             const cgColor = currentZfwcg >= 16 && currentZfwcg <= 40 ? 'green' : 'red';
@@ -335,7 +314,30 @@ class CDUAocOfpData {
     }
 }
 
+async function setTargetPax(numberOfPax) {
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 1);
+    let paxRemaining = parseInt(numberOfPax);
+
+    async function fillStation(station, percent, paxToFill) {
+
+        const pax = Math.min(Math.round(percent * paxToFill), station.seats);
+        station.pax = pax;
+
+        await SimVar.SetSimVarValue(`L:${station.simVar}_DESIRED`, "Number", parseInt(pax));
+
+        paxRemaining -= pax;
+    }
+
+    await fillStation(paxStations['rows22_29'], .275 , numberOfPax);
+    await fillStation(paxStations['rows14_21'], .275, numberOfPax);
+    await fillStation(paxStations['rows7_13'], .240 , numberOfPax);
+    await fillStation(paxStations['rows1_6'], 1 , paxRemaining);
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 2);
+    return;
+}
+
 async function loadFuel(mcdu, updateView) {
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_LOADFUEL", "Number", 1);
     const currentBlockFuel = mcdu.aocWeight.blockFuel || mcdu.simbrief.blockFuel;
 
     mcdu.aocWeight.loading = true;
