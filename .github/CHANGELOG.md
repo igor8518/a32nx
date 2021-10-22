@@ -102,6 +102,7 @@
 1. [MCDU] Added support for connecting MCDU to external devices - @tyler58546 (tyler58546)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add menu item for automatic init flight, and prepare mcdu - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
