@@ -53,7 +53,7 @@ const NXSystemMessages = {
     checkMinDestFob:        new TypeIIMessage("CHECK MIN DEST FOB", false),
     checkToData:            new TypeIIMessage("CHECK TAKE OFF DATA", false),
     destEfobBelowMin:       new TypeIIMessage("DEST EFOB BELOW MIN", true, "", (mcdu) => mcdu._EfobBelowMinClr, (mcdu) => mcdu._EfobBelowMinClr = true),
-    enterDestData:          new TypeIIMessage("ENTER DEST DATA", true, "", (mcdu) => () => isFinite(mcdu.perfApprQNH) && isFinite(mcdu.perfApprTemp) && isFinite(mcdu.perfApprWindHeading) && isFinite(mcdu.perfApprWindSpeed)),
+    enterDestData:          new TypeIIMessage("ENTER DEST DATA", true, "", (mcdu) => isFinite(mcdu.perfApprQNH) && isFinite(mcdu.perfApprTemp) && isFinite(mcdu.perfApprWindHeading) && isFinite(mcdu.perfApprWindSpeed)),
     entryOutOfRange:        new TypeIMessage("ENTRY OUT OF RANGE"),
     formatError:            new TypeIMessage("FORMAT ERROR"),
     gpsPrimary:             new EFISMessage("GPS PRIMARY", 0, false),
