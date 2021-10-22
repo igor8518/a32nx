@@ -23,6 +23,8 @@
  */
 
 import { WaypointStats } from '@fmgc/flightplanning/data/flightplan';
+import { AltitudeDescriptor } from '@fmgc/types/fstypes/FSEnums';
+import { OneWayRunway } from '@fmgc/types/fstypes/FSTypes';
 import { FlightPlanSegment, SegmentType } from './FlightPlanSegment';
 import { LegsProcedure } from './LegsProcedure';
 import { RawDataMapper } from './RawDataMapper';
@@ -31,7 +33,7 @@ import { ProcedureDetails } from './ProcedureDetails';
 import { DirectTo } from './DirectTo';
 import { GeoMath } from './GeoMath';
 import { WaypointBuilder } from './WaypointBuilder';
-import { OneWayRunway } from '@fmgc/types/fstypes/FSTypes';
+
 
 /**
  * A flight plan managed by the FlightPlanManager.
@@ -1171,10 +1173,20 @@ export class ManagedFlightPlan {
     }
 
     private addWaypointAvoidingDuplicates(waypoint: Waypoint, waypointIndex: number, segment: FlightPlanSegment): void {
-        const index = this.waypoints.findIndex((wp) => wp.ident === waypoint.ident);
+        const index = this.waypoints.findIndex((wp) => wp.ident === waypoint.ident); // FIXME this should really compare icaos...
 
+        // FIXME this should collapse any legs between the old position and the newly inserted position
         if (index !== -1 && (index === waypointIndex - 1 || index === waypointIndex + 1)) {
             // console.log('  -------> MFP: addWaypointAvoidingDuplicates: removing duplicate waypoint ', this.getWaypoint(index).ident);
+            const removedWp = this.getWaypoint(index);
+            if (waypoint.legAltitudeDescription === AltitudeDescriptor.Empty && removedWp.legAltitudeDescription !== AltitudeDescriptor.Empty) {
+                waypoint.legAltitudeDescription = removedWp.legAltitudeDescription;
+                waypoint.legAltitude1 = removedWp.legAltitude1;
+                waypoint.legAltitude2 = removedWp.legAltitude2;
+            }
+            if (waypoint.speedConstraint <= 0 && removedWp.speedConstraint > 0) {
+                waypoint.speedConstraint = removedWp.speedConstraint;
+            }
             this.removeWaypoint(index);
         }
         this.addWaypoint(waypoint, waypointIndex, segment.type);
