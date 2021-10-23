@@ -42,7 +42,7 @@ export class LnavDriver implements GuidanceComponent {
         const geometry = this.guidanceController.guidanceManager.getActiveLegPathGeometry();
 
         if (geometry !== null) {
-            // TODO FIXME: Use ADIRS
+            // TODO FIXME: Use FM position
             this.ppos.lat = SimVar.GetSimVarValue('PLANE LATITUDE', 'degree latitude');
             this.ppos.long = SimVar.GetSimVarValue('PLANE LONGITUDE', 'degree longitude');
 
