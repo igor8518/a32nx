@@ -4,6 +4,7 @@ import { TFLeg } from '@fmgc/guidance/lnav/legs/TF';
 import { VMLeg } from '@fmgc/guidance/lnav/legs/VM';
 import { Transition } from '@fmgc/guidance/lnav/transitions';
 import { ControlLaw, GuidanceParameters } from '@fmgc/guidance/ControlLaws';
+import { arcDistanceToGo } from '../CommonGeometry';
 
 const mod = (x: number, n: number) => x - Math.floor(x / n) * n;
 
@@ -135,8 +136,9 @@ export class Type1Transition extends Transition {
      *
      * @param _ppos
      */
-    getDistanceToGo(_ppos: LatLongAlt): NauticalMiles {
-        return 0;
+    getDistanceToGo(ppos: LatLongAlt): NauticalMiles {
+        const [itp] = this.getTurningPoints();
+        return arcDistanceToGo(ppos, itp, this.center, this.clockwise ? this.angle : -this.angle);
     }
 
     getTrackDistanceToTerminationPoint(ppos: LatLongAlt): NauticalMiles {

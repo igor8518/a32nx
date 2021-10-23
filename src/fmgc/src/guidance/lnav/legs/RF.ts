@@ -11,6 +11,7 @@ import {
 } from '@fmgc/guidance/lnav/legs';
 import { WayPoint } from '@fmgc/types/fstypes/FSTypes';
 import { SegmentType } from '@fmgc/wtsdk';
+import { arcDistanceToGo } from '../CommonGeometry';
 
 export class RFLeg implements Leg {
     // termination fix of the previous leg
@@ -151,13 +152,8 @@ export class RFLeg implements Leg {
      * @param ppos {LatLong} the current position of the aircraft
      */
     getDistanceToGo(ppos: LatLongData): NauticalMiles {
-        const bearingTo = Avionics.Utils.computeGreatCircleHeading(this.center, this.to.infos.coordinates);
-        const bearingPpos = Avionics.Utils.computeGreatCircleHeading(this.center, ppos);
-
-        const angleToGo = this.clockwise ? Avionics.Utils.diffAngle(bearingPpos, bearingTo) : Avionics.Utils.diffAngle(bearingTo, bearingPpos);
-
-        const circumference = 2 * Math.PI * this.radius;
-        return circumference / 360 * angleToGo;
+        // TODO geometry should be defined in terms of to...
+        return arcDistanceToGo(ppos, this.from.infos.coordinates, this.center, this.clockwise ? this.angle : -this.angle);
     }
 
     isAbeam(ppos: LatLongData): boolean {
