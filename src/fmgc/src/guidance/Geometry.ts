@@ -48,19 +48,37 @@ export class Geometry {
      * getGuidanceParameters(ppos, trueTrack, gs);
      */
     getGuidanceParameters(ppos, trueTrack, gs) {
+        const activeLeg = this.legs.get(1);
+        const nextLeg = this.legs.get(2);
+
         // first, check if we're abeam with one of the transitions (start or end)
         const fromTransition = this.transitions.get(0);
-        // TODO RAD
         if (fromTransition && fromTransition.isAbeam(ppos)) {
-            return fromTransition.getGuidanceParameters(ppos, trueTrack);
+            const rad = this.getRollAnticipationDistance(gs, fromTransition, activeLeg);
+            if (fromTransition.getDistanceToGo(ppos) <= rad) {
+                // console.log(`RAD for transition ${rad}`);
+                const params = fromTransition.getGuidanceParameters(ppos, trueTrack);
+                const toParams = activeLeg.getGuidanceParameters(ppos, trueTrack);
+                params.phiCommand = toParams.phiCommand ?? 0;
+                return params;
+            } else {
+                return fromTransition.getGuidanceParameters(ppos, trueTrack);
+            }
         }
-
-        const activeLeg = this.legs.get(1);
 
         const toTransition = this.transitions.get(1);
         if (toTransition) {
             if (toTransition.isAbeam(ppos)) {
-                return toTransition.getGuidanceParameters(ppos, trueTrack);
+                const rad = this.getRollAnticipationDistance(gs, toTransition, nextLeg);
+                if (toTransition.getDistanceToGo(ppos) <= rad) {
+                    // console.log(`RAD for transition ${rad}`);
+                    const params = toTransition.getGuidanceParameters(ppos, trueTrack);
+                    const toParams = nextLeg.getGuidanceParameters(ppos, trueTrack);
+                    params.phiCommand = toParams.phiCommand ?? 0;
+                    return params;
+                } else {
+                    return toTransition.getGuidanceParameters(ppos, trueTrack);;
+                }
             }
 
             if (activeLeg) {
@@ -79,7 +97,6 @@ export class Geometry {
         }
 
         if (activeLeg) {
-            const nextLeg = this.legs.get(2);
             if (nextLeg) {
                 const rad = this.getRollAnticipationDistance(gs, activeLeg, nextLeg);
                 if (activeLeg.getDistanceToGo(ppos) <= rad) {
