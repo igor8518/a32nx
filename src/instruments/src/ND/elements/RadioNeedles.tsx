@@ -36,7 +36,7 @@ const AdfNeedle: React.FC<Omit<RadioNavPointerProps, 'side'>> = ({ index, displa
             <path
                 d={paths[index - 1]}
                 strokeWidth={3.2}
-                className="Green' rounded"
+                className="Green rounded"
             />
         </g>
     );
