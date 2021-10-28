@@ -59,6 +59,7 @@ node_modules
 .igniter
 /src/fdr2csv/*.exe
 /src/fbw/obj/
+/src/lvarswrapper/obj/
 /src/fdr2csv/build/
 /src/presets/obj/
 .env
