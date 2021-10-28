@@ -142,6 +142,7 @@
 1. [HYD] Aileron hydraulic control (only visual and hydraulics) - @Crocket63
 1. [HYD] Elevator hydraulic control (only visual and hydraulics) - @Crocket63
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
