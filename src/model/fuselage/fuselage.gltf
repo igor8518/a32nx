@@ -1,0 +1,252 @@
+{
+    "accessors": [
+        {
+            "bufferView": 1,
+            "byteOffset": 28,
+            "componentType": 5123,
+            "count": 139080,
+            "type": "VEC4",
+            "name": "FUSELAGE_vertices#0_COLOR_0"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 16,
+            "componentType": 5120,
+            "count": 139080,
+            "type": "VEC4",
+            "name": "FUSELAGE_vertices#0_NORMAL"
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 139080,
+            "min": [
+                -2.4753217697143555,
+                -1.039292335510254,
+                -24.117769241333008
+            ],
+            "max": [
+                2.4761087894439697,
+                9.478660583496094,
+                13.561310768127441
+            ],
+            "type": "VEC3",
+            "name": "FUSELAGE_vertices#0_POSITION"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 12,
+            "componentType": 5120,
+            "count": 139080,
+            "type": "VEC4",
+            "name": "FUSELAGE_vertices#0_TANGENT"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 20,
+            "componentType": 5122,
+            "count": 139080,
+            "type": "VEC2",
+            "name": "FUSELAGE_vertices#0_TEXCOORD_0"
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 24,
+            "componentType": 5122,
+            "count": 139080,
+            "type": "VEC2",
+            "name": "FUSELAGE_vertices#0_TEXCOORD_1"
+        },
+        {
+            "bufferView": 0,
+            "componentType": 5123,
+            "count": 386829,
+            "type": "SCALAR",
+            "name": "FUSELAGE_indices#4"
+        }
+    ],
+    "asset": {
+        "generator": "Khronos glTF Blender I/O v1.7.5",
+        "version": "2.0",
+        "extensions": {
+            "ASOBO_asset_optimized": {
+                "BoundingBoxMax": [
+                    2.4761087894439697,
+                    9.478660583496094,
+                    13.561310768127441
+                ],
+                "BoundingBoxMin": [
+                    -2.4753217697143555,
+                    -1.039292335510254,
+                    -24.117769241333008
+                ],
+                "MajorVersion": 4,
+                "MinorVersion": 2
+            },
+            "ASOBO_normal_map_convention": {
+                "tangent_space_convention": "DirectX"
+            }
+        }
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 773660,
+            "byteOffset": 0,
+            "target": 34963,
+            "name": "BufferViewIndex"
+        },
+        {
+            "buffer": 0,
+            "byteLength": 5006880,
+            "byteStride": 36,
+            "byteOffset": 773660,
+            "target": 34962,
+            "name": "BufferViewVertexND"
+        }
+    ],
+    "extensionsUsed": [
+        "MSFT_texture_dds",
+        "ASOBO_asset_optimized",
+        "ASOBO_normal_map_convention"
+    ],
+    "extensionsRequired": [
+        "MSFT_texture_dds"
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "attributes": {
+                        "COLOR_0": 0,
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TANGENT": 3,
+                        "TEXCOORD_0": 4,
+                        "TEXCOORD_1": 5
+                    },
+                    "indices": 6,
+                    "material": 0,
+                    "mode": 4,
+                    "extras": {
+                        "ASOBO_primitive": {
+                            "PrimitiveCount": 74351,
+                            "VertexType": "VTX",
+                            "VertexVersion": 2
+                        }
+                    }
+                },
+                {
+                    "attributes": {
+                        "COLOR_0": 0,
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TANGENT": 3,
+                        "TEXCOORD_0": 4,
+                        "TEXCOORD_1": 5
+                    },
+                    "indices": 6,
+                    "material": 0,
+                    "mode": 4,
+                    "extras": {
+                        "ASOBO_primitive": {
+                            "BaseVertexIndex": 65501,
+                            "PrimitiveCount": 22272,
+                            "StartIndex": 223053,
+                            "VertexType": "VTX",
+                            "VertexVersion": 2
+                        }
+                    }
+                },
+                {
+                    "attributes": {
+                        "COLOR_0": 0,
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TANGENT": 3,
+                        "TEXCOORD_0": 4,
+                        "TEXCOORD_1": 5
+                    },
+                    "indices": 6,
+                    "material": 1,
+                    "mode": 4,
+                    "extras": {
+                        "ASOBO_primitive": {
+                            "BaseVertexIndex": 87994,
+                            "PrimitiveCount": 31704,
+                            "StartIndex": 289869,
+                            "VertexType": "VTX",
+                            "VertexVersion": 2
+                        }
+                    }
+                },
+                {
+                    "attributes": {
+                        "COLOR_0": 0,
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TANGENT": 3,
+                        "TEXCOORD_0": 4,
+                        "TEXCOORD_1": 5
+                    },
+                    "indices": 6,
+                    "material": 2,
+                    "mode": 4,
+                    "extras": {
+                        "ASOBO_primitive": {
+                            "BaseVertexIndex": 87994,
+                            "PrimitiveCount": 258,
+                            "StartIndex": 384981,
+                            "VertexType": "VTX",
+                            "VertexVersion": 2
+                        }
+                    }
+                },
+                {
+                    "attributes": {
+                        "COLOR_0": 0,
+                        "NORMAL": 1,
+                        "POSITION": 2,
+                        "TANGENT": 3,
+                        "TEXCOORD_0": 4,
+                        "TEXCOORD_1": 5
+                    },
+                    "indices": 6,
+                    "material": 3,
+                    "mode": 4,
+                    "extras": {
+                        "ASOBO_primitive": {
+                            "BaseVertexIndex": 87994,
+                            "PrimitiveCount": 358,
+                            "StartIndex": 385755,
+                            "VertexType": "VTX",
+                            "VertexVersion": 2
+                        }
+                    }
+                }
+            ],
+            "name": "FUSELAGE"
+        }
+    ],
+    "nodes": [
+        {
+            "mesh": 0,
+            "name": "FUSELAGE"
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "name": "Scene",
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 5780540,
+            "uri": "fuselage.bin"
+        }
+    ]
+}
