@@ -91,6 +91,7 @@
 1. [FMS] Implement vertical navigation functions - @BlueberryKing (BlueberryKing)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 1. [LIGHTS] Redid all cockpit interior lighting and fixed exterior wing lights - @FinalLightNL (FinalLight#2113)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
