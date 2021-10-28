@@ -102,6 +102,7 @@
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 1. [FAC] Move Speedscale computation to FAC - @lukecologne (luke)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
