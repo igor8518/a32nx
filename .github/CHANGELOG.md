@@ -57,6 +57,7 @@
 1. [MCDU] Hide POSITION UPDATE AT field on PROG page when GPS is available - @BlueberryKing (BlueberryKing)
 1. [MCDU] Sort approaches by type - @tracernz (Mike)
 1. [FCU] Autopilot button integ light brightness corrected - @tracernz (Mike)
+1. [FBW] Reduced rotation law maximum pitch rate from 12°/s to 8°/s - @aguther (Andreas Guther)
 
 ## 0.7.0
 
