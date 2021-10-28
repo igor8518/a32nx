@@ -62,6 +62,7 @@ node_modules
 /src/fdr2csv/*.exe
 /src/fbw_a320/obj/
 /src/fbw_a380/obj/
+/src/lvarswrapper/obj/
 /src/fdr2csv/build/
 /src/presets/obj/
 /src/flypad-backend/obj/
