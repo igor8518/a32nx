@@ -69,6 +69,7 @@
 1. [AP] Added support for events AP_MACH_INC/DEC and AP_ALT_INC/DEC - @aguther (Andreas Guther)
 1. [ATHR/FADEC] Improved CLB thrust limit adaption for mach on slow speed - @aguther (Andreas Guther)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
