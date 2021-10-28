@@ -101,6 +101,7 @@
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 1. [FAC] Move Speedscale computation to FAC - @lukecologne (luke)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
