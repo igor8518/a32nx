@@ -105,7 +105,14 @@ export default new TaskOfTasks("all", [
                     "fbw-a32nx/src/wasm/flypad-backend",
                     "fbw-common/src/wasm/fbw_common",
                     "fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/flypad-backend.wasm"
-                ])
+                ]),
+            new ExecTask('lvarswrapper',
+                "npm run build-a32nx:lvarswrapper",
+                [
+                    "fbw-a32nx/src/wasm/lvarswrapper",
+                    "fbw-common/src/wasm/fbw_common",
+                    "fbw-a32nx/out/flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/lvarswrapper.wasm"
+                ]),
         ], true),
 
         // Create final package meta files.
