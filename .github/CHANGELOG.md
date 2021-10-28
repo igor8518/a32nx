@@ -41,6 +41,7 @@
 1. [EWD] Updated EWD to use MSFS Avionics framework - @Eearslya (Eearslya#7831)
 1. [HYD] Realistic randomized yellow accumulator starting state - @Crocket63 (crocket)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
