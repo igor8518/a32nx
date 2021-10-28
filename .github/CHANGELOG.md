@@ -250,6 +250,7 @@
 1. [SOUND] Prevent autopilot disconnect from sounding on C+D spawn - @tricky_dicky (Richard Pilbery) and @saschl (saschl#9432)
 1. [EFB] Presets for Lighting and Aircraft states - @frankkopp (Frank Kopp)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
