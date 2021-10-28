@@ -84,6 +84,7 @@
 1. [MODEL] Fixed screens flickering in SU10 - @tyler58546 (tyler58546)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
