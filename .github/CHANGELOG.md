@@ -74,6 +74,7 @@
 1. [PFD] Fixed speed tape outline at low speeds - @beheh (Benedict Etzel)
 1. [FM] Fetch transition alt and level from SimBrief - @tracernz (Mike)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
