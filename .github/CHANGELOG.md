@@ -33,6 +33,7 @@
 1. [MCDU] Split subsystem scratchpads - @tracernz (Mike)
 1. [APU] APU can now consume fuel - @tracernz (Mike)
 1. [EFB] Added UI message on fuel/payload page when GSX is activated - @frankkopp (Frank Kopp)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.10.0
 
