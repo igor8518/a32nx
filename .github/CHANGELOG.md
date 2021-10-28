@@ -83,6 +83,7 @@
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 1. [FLIGHTMODEL] Improve flight handling characteristics, ground effect, and landing gear simulation - @donstim (donbikes#4084)
 1. [FLIGHTMODEL] Add SU10 crosswind parameters - @donstim (donbikes#4084)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
