@@ -33,6 +33,7 @@
 1. [COND] Add trim air valves to air conditioning system - @mjuhe (Miquel Juhe)
 1. [FBW] Added option to have two axis for rudder e.g. racing pedals - @frankkopp (Frank Kopp)
 1. [ENG] Adjust oil pressure table - @tracernz (Mike)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
