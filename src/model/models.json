@@ -1027,6 +1027,10 @@
             "name": "glass006"
           }
         ]
+      },
+      {
+        "gltf": "./salon/salon2.gltf",
+        "bin": "./salon/salon2.bin"
       }
     ],
     "modifications": [

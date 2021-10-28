@@ -1,0 +1,805 @@
+{
+	"accessors": [
+		{
+			"bufferView": 1,
+			"byteOffset": 28,
+			"componentType": 5123,
+			"count": 318051,
+			"type": "VEC4",
+			"name": "HublotsAll_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 16,
+			"componentType": 5120,
+			"count": 318051,
+			"type": "VEC4",
+			"name": "HublotsAll_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"componentType": 5126,
+			"count": 318051,
+			"min": [
+				-11.875533103942871,
+				-18.97549057006836,
+				-20.0939884185791
+			],
+			"max": [
+				397.45953369140627,
+				58.062469482421878,
+				2242.822509765625
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 12,
+			"componentType": 5120,
+			"count": 318051,
+			"type": "VEC4",
+			"name": "HublotsAll_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 20,
+			"componentType": 5122,
+			"count": 318051,
+			"type": "VEC2",
+			"name": "HublotsAll_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 24,
+			"componentType": 5122,
+			"count": 318051,
+			"type": "VEC2",
+			"name": "HublotsAll_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"componentType": 5123,
+			"count": 1120320,
+			"type": "SCALAR",
+			"name": "HublotsAll_indices#4"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11449864,
+			"componentType": 5123,
+			"count": 8310,
+			"type": "VEC4",
+			"name": "Glasses_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11449852,
+			"componentType": 5120,
+			"count": 8310,
+			"type": "VEC4",
+			"name": "Glasses_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11449836,
+			"componentType": 5126,
+			"count": 8310,
+			"min": [
+				-21.541141510009767,
+				-0.044902682304382327,
+				-0.16465125977993012
+			],
+			"max": [
+				0.09436893463134766,
+				3.884666919708252,
+				0.15346276760101319
+			],
+			"type": "VEC3",
+			"name": "Glasses_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11449848,
+			"componentType": 5120,
+			"count": 8310,
+			"type": "VEC4",
+			"name": "Glasses_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11449856,
+			"componentType": 5122,
+			"count": 8310,
+			"type": "VEC2",
+			"name": "Glasses_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11449860,
+			"componentType": 5122,
+			"count": 8310,
+			"type": "VEC2",
+			"name": "Glasses_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 2240640,
+			"componentType": 5123,
+			"count": 19680,
+			"type": "SCALAR",
+			"name": "Glasses_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11749024,
+			"componentType": 5123,
+			"count": 418326,
+			"type": "VEC4",
+			"name": "SALON_A320_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11749012,
+			"componentType": 5120,
+			"count": 418326,
+			"type": "VEC4",
+			"name": "SALON_A320_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11748996,
+			"componentType": 5126,
+			"count": 418326,
+			"min": [
+				-2.0168349742889406,
+				-1.8299942016601563,
+				-13.223349571228028
+			],
+			"max": [
+				1.9624937772750855,
+				0.5792005062103272,
+				13.902946472167969
+			],
+			"type": "VEC3",
+			"name": "SALON_A320_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11749008,
+			"componentType": 5120,
+			"count": 418326,
+			"type": "VEC4",
+			"name": "SALON_A320_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11749016,
+			"componentType": 5122,
+			"count": 418326,
+			"type": "VEC2",
+			"name": "SALON_A320_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11749020,
+			"componentType": 5122,
+			"count": 418326,
+			"type": "VEC2",
+			"name": "SALON_A320_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 2280000,
+			"componentType": 5123,
+			"count": 441657,
+			"type": "SCALAR",
+			"name": "SALON_A320_indices#6"
+		}
+	],
+	"asset": {
+		"generator": "Khronos glTF Blender I/O v1.7.5",
+		"version": "2.0",
+		"extensions": {
+			"ASOBO_asset_optimized": {
+				"BoundingBoxMax": [
+					397.45953369140627,
+					58.062469482421878,
+					2242.822509765625
+				],
+				"BoundingBoxMin": [
+					-21.541141510009767,
+					-18.97549057006836,
+					-20.0939884185791
+				],
+				"MajorVersion": 4,
+				"MinorVersion": 2
+			},
+			"ASOBO_normal_map_convention": {
+				"tangent_space_convention": "DirectX"
+			}
+		}
+	},
+	"bufferViews": [
+		{
+			"buffer": 0,
+			"byteLength": 3163316,
+			"byteOffset": 0,
+			"target": 34963,
+			"name": "BufferViewIndex"
+		},
+		{
+			"buffer": 0,
+			"byteLength": 26808732,
+			"byteStride": 36,
+			"byteOffset": 3163316,
+			"target": 34962,
+			"name": "BufferViewVertexND"
+		}
+	],
+	"extensionsUsed": [
+		"ASOBO_asset_optimized",
+		"ASOBO_normal_map_convention",
+		"MSFT_texture_dds",
+		"ASOBO_material_windshield"
+	],
+	"extensionsRequired": [
+		"MSFT_texture_dds"
+	],
+	"meshes": [
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 0,
+						"NORMAL": 1,
+						"POSITION": 2,
+						"TANGENT": 3,
+						"TEXCOORD_0": 4,
+						"TEXCOORD_1": 5
+					},
+					"indices": 6,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 73872,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 0,
+						"NORMAL": 1,
+						"POSITION": 2,
+						"TANGENT": 3,
+						"TEXCOORD_0": 4,
+						"TEXCOORD_1": 5
+					},
+					"indices": 6,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 65240,
+							"PrimitiveCount": 72392,
+							"StartIndex": 221616,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 0,
+						"NORMAL": 1,
+						"POSITION": 2,
+						"TANGENT": 3,
+						"TEXCOORD_0": 4,
+						"TEXCOORD_1": 5
+					},
+					"indices": 6,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 130506,
+							"PrimitiveCount": 73223,
+							"StartIndex": 438792,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 0,
+						"NORMAL": 1,
+						"POSITION": 2,
+						"TANGENT": 3,
+						"TEXCOORD_0": 4,
+						"TEXCOORD_1": 5
+					},
+					"indices": 6,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 194883,
+							"PrimitiveCount": 73470,
+							"StartIndex": 658461,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 0,
+						"NORMAL": 1,
+						"POSITION": 2,
+						"TANGENT": 3,
+						"TEXCOORD_0": 4,
+						"TEXCOORD_1": 5
+					},
+					"indices": 6,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 260391,
+							"PrimitiveCount": 80483,
+							"StartIndex": 878871,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 7,
+						"NORMAL": 8,
+						"POSITION": 9,
+						"TANGENT": 10,
+						"TEXCOORD_0": 11,
+						"TEXCOORD_1": 12
+					},
+					"indices": 13,
+					"material": 1,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 6560,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "Glasses"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 23061,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 65527,
+							"PrimitiveCount": 22870,
+							"StartIndex": 69183,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 131056,
+							"PrimitiveCount": 22356,
+							"StartIndex": 137793,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 190210,
+							"PrimitiveCount": 20828,
+							"StartIndex": 204861,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 247390,
+							"PrimitiveCount": 19723,
+							"StartIndex": 267345,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 306606,
+							"PrimitiveCount": 20997,
+							"StartIndex": 326514,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				},
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": 2,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"BaseVertexIndex": 372054,
+							"PrimitiveCount": 17384,
+							"StartIndex": 389505,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "SALON_A320"
+		}
+	],
+	"nodes": [
+		{
+			"translation": [
+				-1.8516886234283448,
+				1.9833831787109376,
+				-14.021506309509278
+			],
+			"rotation": [
+				0.0017227951902896166,
+				-0.000007517162885051221,
+				-0.004363304004073143,
+				0.9999890327453613
+			],
+			"scale": [
+				0.0095998831268787,
+				0.0095998809084751,
+				0.0095902746181008
+			],
+			"mesh": 0,
+			"name": "HublotsAll"
+		},
+		{
+			"translation": [
+				-1.9198650121688843,
+				2.0445663928985597,
+				-14.064970970153809
+			],
+			"rotation": [
+				-0.5008631944656372,
+				-0.500863254070282,
+				0.49913549423217776,
+				-0.49913519620895388
+			],
+			"scale": [
+				0.9989994764328003,
+				1,
+				1
+			],
+			"mesh": 1,
+			"name": "Glasses"
+		},
+		{
+			"translation": [
+				0,
+				2.8223016262054445,
+				-3.4795825481414797
+			],
+			"rotation": [
+				0,
+				-0.9999985098838806,
+				-0.001723765511997044,
+				-7.549779468263296e-8
+			],
+			"scale": [
+				0.9990000128746033,
+				0.999000072479248,
+				0.999000072479248
+			],
+			"mesh": 2,
+			"name": "SALON_A320"
+		}
+	],
+	"scene": 0,
+	"scenes": [
+		{
+			"name": "Scene",
+			"nodes": [
+				0,
+				1,
+				2
+			]
+		}
+	],
+	"buffers": [
+		{
+			"byteLength": 29972048,
+			"uri": "salon3.bin"
+		}
+	],
+	"materials": [
+		{
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 5
+				},
+				"metallicRoughnessTexture": {
+					"index": 6
+				}
+			},
+			"normalTexture": {
+				"index": 7
+			},
+			"occlusionTexture": {
+				"index": 6
+			},
+			"name": "HUBLOTSIN"
+		},
+		{
+			"pbrMetallicRoughness": {
+				"baseColorFactor": [
+					1,
+					1,
+					1,
+					0.01
+				],
+				"metallicFactor": 0,
+				"roughnessFactor": 0,
+				"metallicRoughnessTexture": {
+					"index": 0
+				}
+			},
+			"normalTexture": {
+				"index": 1
+			},
+			"occlusionTexture": {
+				"index": 0
+			},
+			"emissiveTexture": {
+				"index": 2
+			},
+			"alphaMode": "BLEND",
+			"doubleSides": true,
+			"name": "GLASSES",
+			"extensions": {
+				"ASOBO_material_detail_map": {
+					"UVScale": 6.07,
+					"detailColorTexture": {
+						"index": 3
+					},
+					"detailNormalTexture": {
+						"index": 4
+					}
+				},
+				"ASOBO_material_windshield": {
+					"rainDropScale": 1,
+					"wiper1State": 0,
+					"wiper2State": 0,
+					"wiper3State": 0,
+					"wiper4State": 0
+				}
+			},
+			"extras": {
+				"ASOBO_material_code": "Windshield"
+			}
+		},
+		{
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 8
+				},
+				"metallicFactor": 0,
+				"roughnessFactor": 0.8
+			},
+			"name": "INTERIOR"
+		}
+	],
+	"textures": [
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 0
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 1
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 2
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 3
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 4
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 5
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 6
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 7
+				}
+			}
+		},
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 8
+				}
+			}
+		}
+	],
+	"images": [
+		{
+			"uri": "GLASS_DefaultDirt_Comp.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "A320NEO_AIRFRAME_GLASS_NORM.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "GLASS_DETAILMAP02_MASK.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "GLASS_DETAILMAP01_MASK.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "FROST_DETAIL_NORM.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "A320NEO_AIRFRAME_HUBLOTIN_ALBD.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "A320NEO_AIRFRAME_HUBLOTIN_COMP.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "A320NEO_AIRFRAME_HUBLOTIN_NORM.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		},
+		{
+			"uri": "SALON.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		}
+	]
+}
