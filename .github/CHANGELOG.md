@@ -32,6 +32,7 @@
 1. [FMGC] Basic RNP at or below 0.3 support - @tracernz (Mike)
 1. [SD] Improve F/CTL and WHEEL SD pages visuals - @lukecologne (luke)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
