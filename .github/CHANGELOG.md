@@ -99,6 +99,7 @@
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 1. [FLIGHTMODEL] Flight Model update - @donstim (donbikes#4084)
 1. [HYD] Fix incorrect gain in down pitch commands - @Crocket63 (crocket)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
