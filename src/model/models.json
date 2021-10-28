@@ -797,6 +797,10 @@
       {
         "gltf": "./fx_exhaust_apu/fx_exhaust_apu.gltf",
         "bin": "./fx_exhaust_apu/fx_exhaust_apu.bin"
+      },
+      {
+        "gltf": "./salon/salon2.gltf",
+        "bin": "./salon/salon2.bin"
       }
     ],
     "modifications": [

@@ -65,7 +65,7 @@
 1. [AP] Reduced speed margin of speed protection to 5 kn - @aguther (Andreas Guther)
 1. [MODEL] Removed glass due to issues with brightness in clouds since SU6 - @aguther (Andreas Guther)
 1. [FBW] Reduced rotation law maximum pitch rate from 12°/s to 8°/s - @aguther (Andreas Guther)
-1. [MODEL] Add four portholes. Two opposite the existing ones, and two under the wing. - @igor8518 (Igor Milovidov)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
