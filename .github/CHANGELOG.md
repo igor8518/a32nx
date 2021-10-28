@@ -194,6 +194,7 @@
 1. [MCDU] Update init/fuel prediction pages to H3 - @tracernz (Mike)
 1. [FMGC] Updates flight model info for FMGC guidance - @donstim (donbikes#4084)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
