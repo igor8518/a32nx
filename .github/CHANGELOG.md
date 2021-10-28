@@ -13,6 +13,7 @@
 1. [ENGINE] Fuel persistency between each flight - @juliansebline (Julian Sebline#8476)
 1. [HYD] Now allowing reverting gravity gear extension - @Crocket63 (crocket)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
