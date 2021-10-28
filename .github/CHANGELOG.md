@@ -17,6 +17,7 @@
 1. [HYD] Added hydraulic reverser actuators - @Crocket63 (crocket)
 1. [EIS] Added > character to the font - @KiloEchoVictor (Kevin)
 1. [ND] Mask the map below the TCAS/WXR and FM messages - @tracernz (Mike)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.10.0
 
