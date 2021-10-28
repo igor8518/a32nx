@@ -24,7 +24,8 @@
 1. [MISC] Added aircraft version check and uer notification - @frankkopp (Frank Kopp)
 1. [EFB] Added boarding time indication to Payload page - @ChristianLutzCL (Christian Lutz) @frankkopp (Frank Kopp)
 1. [ADIRU/ND/PFD] Initial support for polar navigation - @tracernz (Mike)
-1. [MISC] Added aircraft version check and uer notification - @frankkopp (Frank Kopp) 
+1. [MISC] Added aircraft version check and uer notification - @frankkopp (Frank Kopp)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
