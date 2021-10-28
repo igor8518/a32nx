@@ -32,6 +32,7 @@
 1. [EWD] Use FPPU angles for flaps/slats display  - @lukecologne (luke)
 1. [ELEC] Make battery voltmeters update one digit at a time - @beheh (Benedict Etzel)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
+1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
