@@ -88,6 +88,7 @@
 1. [FLIGHTMODEL/FUEL] Reinstate updated outer fuel tank position from updated CG for ELAC 103 -  @donstim (donbikes#4084)
 1. [FMS] Implement vertical navigation functions - @BlueberryKing (BlueberryKing)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
