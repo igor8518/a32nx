@@ -30,7 +30,11 @@ export default new TaskOfTasks('a32nx', [
             new ExecTask('client', ['npm run build:mcdu-client'], ['src/mcdu-server/client', 'src/mcdu-server/client/build']),
             new ExecTask('server', ['npm run build:mcdu-server'], ['src/mcdu-server', 'flybywire-aircraft-a320-neo/MCDU SERVER/server.exe']),
         ]),
-    ], true),
+        new ExecTask('lvarswrapper', [
+            'src/lvarswrapper/build.sh',
+            'wasm-opt -O1 -o flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/lvarswrapper.wasm flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/lvarswrapper.wasm'
+        ], ['src/lvarswrapper', 'flybywire-aircraft-a320-neo/SimObjects/AirPlanes/FlyByWire_A320_NEO/panel/lvarswrapper.wasm']),
+    ],true),
 
     new TaskOfTasks('dist', [
         new ExecTask('metadata', 'bash scripts/metadata.sh'),
