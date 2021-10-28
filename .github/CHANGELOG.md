@@ -38,6 +38,7 @@
 1. [COND] Add trim air valves to air conditioning system - @mjuhe (Miquel Juhe)
 1. [EFB] GSX Integration - Lucky38i (Lucky38#3550)
 1. [FMGC] Constraints for waypoints behind the aircraft are no longer sent - @tracernz (Mike)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
