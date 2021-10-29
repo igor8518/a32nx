@@ -1,10 +1,10 @@
 <img src="https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg" placeholder="FlyByWire" width="400"/>
 
-# FlyByWire Simulations A32NX
+# FlyByWire Simulations A32NX (Igor version)
 
-[![GitHub latest release version](https://img.shields.io/github/v/release/flybywiresim/a32nx.svg?style=flat)](https://github.com/flybywiresim/a32nx/releases/latest)
-[![Github All Releases download count](https://img.shields.io/github/downloads/flybywiresim/a32nx/total.svg?style=flat)](https://github.com/flybywiresim/a32nx/releases/latest)
-[![GitHub contributors](https://img.shields.io/github/contributors/flybywiresim/a32nx.svg?style=flat)](https://github.com/flybywiresim/a32nx/graphs/contributors)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/igor8518/a32nx?include_prereleases&style=plastic)
+![GitHub all releases](https://img.shields.io/github/downloads/igor8518/a32nx/total?style=plastic)
+![GitHub contributors](https://img.shields.io/github/contributors/igor8518/a32nx?style=plastic)
 
 [![Discord](https://img.shields.io/discord/738864299392630914.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/UjzuHMU)
 [![Twitter](https://img.shields.io/badge/-@FlyByWireSim-e84393?label=&logo=twitter&logoColor=ffffff&color=6399AE&labelColor=00C2CB)](https://twitter.com/FlybywireSim)
