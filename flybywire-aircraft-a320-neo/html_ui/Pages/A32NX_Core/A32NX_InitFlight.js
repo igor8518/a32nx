@@ -113,7 +113,7 @@ class A32NX_InitFlight {
         if (initFlightState === 10) {
             await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 11);
             if (A32NX_InitFlight.MCDU._zeroFuelWeightZFWCGEntered && !A32NX_InitFlight.MCDU._blockFuelEntered) {
-                A32NX_InitFlight.MCDU.scratchpad.setText("SET PLANNING");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("SET PLANNING");
                 Planning1();
 
             } else {
@@ -122,18 +122,18 @@ class A32NX_InitFlight {
                 return;
             }
             if (A32NX_InitFlight.MCDU._fuelPlanningPhase === A32NX_InitFlight.MCDU._fuelPlanningPhases.IN_PROGRESS) {
-                A32NX_InitFlight.MCDU.scratchpad.setText("SET BLOCK");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("SET BLOCK");
                 Planning2();
 
-                A32NX_InitFlight.MCDU.scratchpad.setText("SET FLAPS");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("SET FLAPS");
                 A32NX_InitFlight.MCDU.trySetFlapsTHS("2");
-                A32NX_InitFlight.MCDU.scratchpad.setText("SET V1");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("SET V1");
                 A32NX_InitFlight.MCDU.trySetV1Speed(A32NX_InitFlight.MCDU._getV1Speed().toString());
-                A32NX_InitFlight.MCDU.scratchpad.setText("SET VR");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("SET VR");
                 A32NX_InitFlight.MCDU.trySetVRSpeed(A32NX_InitFlight.MCDU._getVRSpeed().toString());
-                A32NX_InitFlight.MCDU.scratchpad.setText("SET V2");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("SET V2");
                 A32NX_InitFlight.MCDU.trySetV2Speed(A32NX_InitFlight.MCDU._getV2Speed().toString());
-                A32NX_InitFlight.MCDU.scratchpad.setText("INIT DONE");
+                A32NX_InitFlight.MCDU.sendDataToScratchpad("INIT DONE");
 
                 const cur = A32NX_InitFlight.MCDU.page.Current;
                 setTimeout(() => {
