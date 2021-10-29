@@ -60,6 +60,7 @@
 1. [FBW] Reduced rotation law maximum pitch rate from 12°/s to 8°/s - @aguther (Andreas Guther)
 1. [FBW/AP/ATHR] Only enable client data section when a model runs externally - @aguther (Andreas Guther)
 1. [FBW/AP/ATHR] Added local variables to enable logging of flight controls and/or throttle events - @aguther (Andreas Guther)
+1. [MODEL] Add four portholes. Two opposite the existing ones, and two under the wing. - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
