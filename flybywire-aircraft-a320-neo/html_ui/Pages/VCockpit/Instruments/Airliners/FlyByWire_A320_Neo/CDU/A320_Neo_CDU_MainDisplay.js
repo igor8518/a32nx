@@ -130,9 +130,6 @@ class A320_Neo_CDU_MainDisplay extends FMCMainDisplay {
             console.error(e);
         }
 
-        // LCD OVERLAY
-        this.lcdOverlay = document.querySelector("#LcdOverlay");
-
         this.minPageUpdateThrottler = new UpdateThrottler(100);
 
         this.generateHTMLLayout(this.getChildById("Mainframe") || this);
@@ -300,9 +297,6 @@ class A320_Neo_CDU_MainDisplay extends FMCMainDisplay {
 
     onUpdate(_deltaTime) {
         super.onUpdate(_deltaTime);
-
-        const opacityValue = SimVar.GetSimVarValue("L:A32NX_MFD_MASK_OPACITY", "number");
-        this.lcdOverlay.style.opacity = opacityValue.toFixed(2);
 
         if (this.minPageUpdateThrottler.canUpdate(_deltaTime) !== -1 && this.updateRequest) {
             this.updateRequest = false;

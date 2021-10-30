@@ -957,13 +957,6 @@
       0 | inactive
       1 | active
 
-- A32NX_MFD_MASK_OPACITY
-    - Number
-    - Current LCD mask opacity for MFDs, used for driving LCD display pixels effect
-
-- A32NX_MCDU_MASK_OPACITY
-    - Number
-    - Current LCD mask opacity for MCDU, used for driving MCDU display pixels effect
 ## EIS Display System
 
 - A32NX_EFIS_{side}_NAVAID_{1|2}_MODE
