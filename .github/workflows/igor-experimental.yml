@@ -1,8 +1,9 @@
-name: igor-experimental
+#02.11.2021
+name: igor-experimental-21-11-02
 on:
   push:
     branches:
-      - igor-experimental
+      - igor-experimental-21-11-02
 
 jobs:
   build:
@@ -11,10 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       A32NX_PRODUCTION_BUILD: 1
-      MASTER_ZIP_NAME: A32NX-igor-experimental.zip
-      BUILD_DIR_NAME: igor-experimental
-      MASTER_PRE_RELEASE_ID: 52299420
-      MASTER_PRE_RELEASE_TAG: vexperimental
+      A32NX_INSTRUMENTS_BUILD_WORKERS: 2
+      MASTER_ZIP_NAME: A32NX-igor-ex-v21.11.02.0.zip
+      BUILD_DIR_NAME: experimental
+      MASTER_PRE_RELEASE_ID: 52581986
+      MASTER_PRE_RELEASE_TAG: v21.11.02.0
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
