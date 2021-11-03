@@ -13,7 +13,7 @@ jobs:
       A32NX_PRODUCTION_BUILD: 1
       MASTER_ZIP_NAME: A32NX-igor-experimental.zip
       BUILD_DIR_NAME: igor-experimental
-      MASTER_PRE_RELEASE_ID: 52299420
+      MASTER_PRE_RELEASE_ID: 52583991
       MASTER_PRE_RELEASE_TAG: vexperimental
     steps:
       - name: Checkout source
