@@ -142,7 +142,7 @@ void FlyByWireInterface::loadConfiguration() {
 
   // --------------------------------------------------------------------------
   // load values - autopilot
-  customFlightGuidanceEnabled = INITypeConversion::getBoolean(iniStructure, "AUTOPILOT", "CUSTOM_FLIGHT_GUIDANCE_ENABLED", true);
+  customFlightGuidanceEnabled = INITypeConversion::getBoolean(iniStructure, "AUTOPILOT", "CUSTOM_FLIGHT_GUIDANCE_ENABLED", false);
   gpsCourseToSteerEnabled = INITypeConversion::getBoolean(iniStructure, "AUTOPILOT", "GPS_COURSE_TO_STEER_ENABLED", true);
   flightDirectorSmoothingEnabled = INITypeConversion::getBoolean(iniStructure, "AUTOPILOT", "FLIGHT_DIRECTOR_SMOOTHING_ENABLED", true);
   flightDirectorSmoothingFactor = INITypeConversion::getDouble(iniStructure, "AUTOPILOT", "FLIGHT_DIRECTOR_SMOOTHING_FACTOR", 2.5);
@@ -314,11 +314,6 @@ void FlyByWireInterface::setupLocalVariables() {
 
   idAutothrustThrustLimitType = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT_TYPE");
   idAutothrustThrustLimit = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT");
-  idAutothrustThrustLimitIDLE = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT_IDLE");
-  idAutothrustThrustLimitCLB = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT_CLB");
-  idAutothrustThrustLimitMCT = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT_MCT");
-  idAutothrustThrustLimitFLX = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT_FLX");
-  idAutothrustThrustLimitTOGA = make_unique<LocalVariable>("A32NX_AUTOTHRUST_THRUST_LIMIT_TOGA");
   thrustLeverAngle_1 = make_unique<LocalVariable>("A32NX_AUTOTHRUST_TLA:1");
   thrustLeverAngle_2 = make_unique<LocalVariable>("A32NX_AUTOTHRUST_TLA:2");
   idAutothrustN1_TLA_1 = make_unique<LocalVariable>("A32NX_AUTOTHRUST_TLA_N1:1");
@@ -1446,19 +1441,6 @@ bool FlyByWireInterface::updateAutothrust(double sampleTime) {
     // set autothrust disabled state (when ATHR disconnect is pressed longer than 15s)
     idAutothrustDisabled->set(autoThrust.getExternalOutputs().out.data_computed.ATHR_disabled);
 
-    // write thrust limits
-    auto autoThrustInput = autoThrust.getExternalOutputs().out.input;
-    auto autoThrustDataComputed = autoThrust.getExternalOutputs().out.data_computed;
-    idAutothrustThrustLimitIDLE->set(autoThrustInput.thrust_limit_IDLE_percent);
-    idAutothrustThrustLimitCLB->set(autoThrustInput.thrust_limit_CLB_percent);
-    idAutothrustThrustLimitMCT->set(autoThrustInput.thrust_limit_MCT_percent);
-    if (autoThrustDataComputed.is_FLX_active) {
-      idAutothrustThrustLimitFLX->set(autoThrustInput.thrust_limit_FLEX_percent);
-    } else {
-      idAutothrustThrustLimitFLX->set(0);
-    }
-    idAutothrustThrustLimitTOGA->set(autoThrustInput.thrust_limit_TOGA_percent);
-
     // write output to sim --------------------------------------------------------------------------------------------
     SimOutputThrottles simOutputThrottles = {autoThrustOutput.sim_throttle_lever_1_pos, autoThrustOutput.sim_throttle_lever_2_pos,
                                              autoThrustOutput.sim_thrust_mode_1, autoThrustOutput.sim_thrust_mode_2};
@@ -1480,13 +1462,6 @@ bool FlyByWireInterface::updateAutothrust(double sampleTime) {
     autoThrustOutput.status = static_cast<athr_status>(clientData.status);
     autoThrustOutput.mode = static_cast<athr_mode>(clientData.mode);
     autoThrustOutput.mode_message = static_cast<athr_mode_message>(clientData.mode_message);
-
-    // TODO: thrust limits are currently not available when model is running externally
-    idAutothrustThrustLimitIDLE->set(0);
-    idAutothrustThrustLimitCLB->set(0);
-    idAutothrustThrustLimitMCT->set(0);
-    idAutothrustThrustLimitFLX->set(0);
-    idAutothrustThrustLimitTOGA->set(0);
   }
 
   // update local variables
