@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { Geometry } from '@fmgc/guidance/Geometry';
-import { PseudoWaypoint } from '@fmgc/guidance/PsuedoWaypoint';
+import { PseudoWaypoint } from '@fmgc/guidance/PseudoWaypoint';
 import { PseudoWaypoints } from '@fmgc/guidance/lnav/PseudoWaypoints';
 import { EfisVectors } from '@fmgc/efis/EfisVectors';
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
@@ -13,6 +13,10 @@ import { EfisSide, Mode, rangeSettings } from '@shared/NavigationDisplay';
 import { TaskCategory, TaskQueue } from '@fmgc/guidance/TaskQueue';
 import { HMLeg } from '@fmgc/guidance/lnav/legs/HX';
 import { LnavConfig } from '@fmgc/guidance/LnavConfig';
+import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
+import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
+import { FlapConf } from '@fmgc/guidance/vnav/common';
+import { FmgcFlightPhase } from '@shared/flightphase';
 import { LnavDriver } from './lnav/LnavDriver';
 import { FlightPlanManager, FlightPlans } from '../flightplanning/FlightPlanManager';
 import { GuidanceManager } from './GuidanceManager';
@@ -20,6 +24,31 @@ import { VnavDriver } from './vnav/VnavDriver';
 
 // How often the (milliseconds)
 const GEOMETRY_RECOMPUTATION_TIMER = 5_000;
+
+export interface Fmgc {
+    getZeroFuelWeight(): number;
+    getFOB(): number;
+    getV2Speed(): Knots;
+    getTropoPause(): Feet;
+    getManagedClimbSpeed(): Knots;
+    getManagedClimbSpeedMach(): Mach;
+    getAccelerationAltitude(): Feet,
+    getThrustReductionAltitude(): Feet,
+    getCruiseAltitude(): Feet,
+    getFlightPhase(): FmgcFlightPhase,
+    getManagedCruiseSpeed(): Knots,
+    getManagedCruiseSpeedMach(): Mach,
+    getClimbSpeedLimit(): SpeedLimit,
+    getDescentSpeedLimit(): SpeedLimit,
+    getPreSelectedClbSpeed(): Knots,
+    getTakeoffFlapsSetting(): FlapConf | undefined
+    getManagedDescentSpeed(): Knots,
+    getManagedDescentSpeedMach(): Mach,
+    getApproachSpeed(): Knots,
+    getFlapRetractionSpeed(): Knots,
+    getSlatRetractionSpeed(): Knots,
+    getCleanSpeed(): Knots,
+}
 
 export class GuidanceController {
     flightPlanManager: FlightPlanManager;
@@ -61,6 +90,8 @@ export class GuidanceController {
     efisStateForSide: { L: EfisState, R: EfisState }
 
     taskQueue = new TaskQueue();
+
+    verticalProfileComputationParametersObserver: VerticalProfileComputationParametersObserver;
 
     private listener = RegisterViewListener('JS_LISTENER_SIMVARS', null, true);
 
@@ -128,12 +159,14 @@ export class GuidanceController {
         this.listener.triggerToAllSubscribers('A32NX_EFIS_R_TO_WPT_IDENT', efisIdent ?? '');
     }
 
-    constructor(flightPlanManager: FlightPlanManager, guidanceManager: GuidanceManager) {
+    constructor(flightPlanManager: FlightPlanManager, guidanceManager: GuidanceManager, fmgc: Fmgc) {
         this.flightPlanManager = flightPlanManager;
         this.guidanceManager = guidanceManager;
 
+        this.verticalProfileComputationParametersObserver = new VerticalProfileComputationParametersObserver(fmgc);
+
         this.lnavDriver = new LnavDriver(this);
-        this.vnavDriver = new VnavDriver(this);
+        this.vnavDriver = new VnavDriver(this, this.verticalProfileComputationParametersObserver, flightPlanManager);
         this.pseudoWaypoints = new PseudoWaypoints(this);
         this.efisVectors = new EfisVectors(this);
     }
@@ -187,6 +220,8 @@ export class GuidanceController {
 
         this.updateEfisState('L', this.leftEfisState);
         this.updateEfisState('R', this.rightEfisState);
+
+        this.verticalProfileComputationParametersObserver.update();
 
         try {
             // Generate new geometry when flight plan changes
@@ -331,5 +366,9 @@ export class GuidanceController {
         if (holdLeg) {
             holdLeg.setPredictedTas(tas);
         }
+    }
+
+    getPresentPosition(): LatLongAlt {
+        return this.verticalProfileComputationParametersObserver.getPresentPosition();
     }
 }
