@@ -2,6 +2,7 @@ import { Geometry } from '@fmgc/guidance/Geometry';
 import { GeometricPath } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
 import { Predictions, StepResults } from '@fmgc/guidance/vnav/Predictions';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
+import { FlapConf } from '@fmgc/guidance/vnav/common';
 
 export class GeomtricPathBuilder {
     static buildGeometricPath(
@@ -64,6 +65,8 @@ export class GeomtricPathBuilder {
             72_750,
             0,
             36_000,
+            false,
+            FlapConf.CLEAN,
         );
 
         return geometricalStepResult;

@@ -1,14 +1,18 @@
 import { TheoreticalDescentPathCharacteristics } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
-import { Geometry } from '@fmgc/guidance/Geometry';
-import { DecelPathCharacteristics } from '@fmgc/guidance/vnav/descent/DecelPathBuilder';
+import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 
-export class DescentBuilder {
-    static computeDescentPath(
-        geometry: Geometry,
-        decelPath: DecelPathCharacteristics,
-    ): TheoreticalDescentPathCharacteristics {
+export class DescentPathBuilder {
+    computeDescentPath(profile: NavGeometryProfile): TheoreticalDescentPathCharacteristics {
+        const TEMP_FUEL_BURN = 2000;
+
+        const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);
+
+        if (!decelCheckpoint) {
+            return { tod: undefined, fuelBurnedDuringDescent: undefined, remainingFuelOnBoardAtTopOfDescent: undefined };
+        }
+
         const cruiseAlt = SimVar.GetSimVarValue('L:AIRLINER_CRUISE_ALTITUDE', 'number');
-        const verticalDistance = cruiseAlt - decelPath.top;
+        const verticalDistance = cruiseAlt - decelCheckpoint.altitude;
         const fpa = 3;
 
         if (DEBUG) {
@@ -16,13 +20,21 @@ export class DescentBuilder {
             console.log(verticalDistance);
         }
 
-        const tod = decelPath.decel + (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
+        const tod = decelCheckpoint.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
 
         if (DEBUG) {
             console.log(`[FMS/VNAV] T/D: ${tod.toFixed(1)}nm`);
         }
 
-        return { tod };
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.TopOfDescent,
+            distanceFromStart: tod,
+            speed: 290,
+            remainingFuelOnBoard: decelCheckpoint.remainingFuelOnBoard + TEMP_FUEL_BURN,
+            altitude: cruiseAlt,
+        });
+
+        return { tod, fuelBurnedDuringDescent: TEMP_FUEL_BURN, remainingFuelOnBoardAtTopOfDescent: decelCheckpoint.remainingFuelOnBoard + TEMP_FUEL_BURN };
 
         //     const decelPointDistance = DecelPathBuilder.computeDecelPath(geometry);
         //
