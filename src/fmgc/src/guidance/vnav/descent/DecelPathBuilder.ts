@@ -5,6 +5,7 @@ import { Geometry } from '@fmgc/guidance/Geometry';
 import { TFLeg } from '@fmgc/guidance/lnav/legs/TF';
 import { Predictions, StepResults, VnavStepError } from '@fmgc/guidance/vnav/Predictions';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
+import { GeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/GeometryProfile';
 
 const ALTITUDE_ADJUSTMENT_FACTOR = 1.4;
 
@@ -29,9 +30,7 @@ export interface DecelPathCharacteristics {
 }
 
 export class DecelPathBuilder {
-    static computeDecelPath(
-        geometry: Geometry,
-    ): DecelPathCharacteristics {
+    static computeDecelPath(profile: GeometryProfile) {
         // TO GET FPA:
         // If approach exists, use approach alt constraints to get FPA and glidepath
         // If no approach but arrival, use arrival alt constraints, if any
@@ -50,9 +49,10 @@ export class DecelPathBuilder {
         const S = 184;
         const F = 143;
 
-        const vappSegment = DecelPathBuilder.computeVappSegment(geometry);
+        const vappSegment = DecelPathBuilder.computeVappSegment(profile.geometry);
 
         let fuelWeight = TEMP_FUEL_WEIGHT;
+        let distance = vappSegment.distanceTraveled;
 
         const cFullTo3Segment = DecelPathBuilder.computeConfigurationChangeSegment(
             ApproachPathSegmentType.CONSTANT_SLOPE,
@@ -66,6 +66,14 @@ export class DecelPathBuilder {
             TEMP_TROPO,
         );
         fuelWeight += cFullTo3Segment.fuelBurned;
+        distance += cFullTo3Segment.distanceTraveled;
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.FlapsFull,
+            distanceFromStart: profile.totalDistance() - distance,
+            speed: F,
+            altitude: cFullTo3Segment.initialAltitude,
+            remainingFuelOnBoard: fuelWeight,
+        });
 
         const c3to2Segment = DecelPathBuilder.computeConfigurationChangeSegment(
             ApproachPathSegmentType.CONSTANT_SLOPE,
@@ -79,6 +87,14 @@ export class DecelPathBuilder {
             TEMP_TROPO,
         );
         fuelWeight += c3to2Segment.fuelBurned;
+        distance += c3to2Segment.distanceTraveled;
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.Flaps3,
+            distanceFromStart: profile.totalDistance() - distance,
+            speed: F + (S - F) / 2,
+            altitude: c3to2Segment.initialAltitude,
+            remainingFuelOnBoard: fuelWeight,
+        });
 
         const c2to1Segment = DecelPathBuilder.computeConfigurationChangeSegment(
             ApproachPathSegmentType.CONSTANT_SLOPE,
@@ -92,6 +108,14 @@ export class DecelPathBuilder {
             TEMP_TROPO,
         );
         fuelWeight += c2to1Segment.fuelBurned;
+        distance += c2to1Segment.distanceTraveled;
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.Flaps2,
+            distanceFromStart: profile.totalDistance() - distance,
+            speed: S,
+            altitude: c2to1Segment.initialAltitude,
+            remainingFuelOnBoard: fuelWeight,
+        });
 
         const c1toCleanSegment = DecelPathBuilder.computeConfigurationChangeSegment(
             ApproachPathSegmentType.CONSTANT_SLOPE,
@@ -105,6 +129,14 @@ export class DecelPathBuilder {
             TEMP_TROPO,
         );
         fuelWeight += c1toCleanSegment.fuelBurned;
+        distance += c1toCleanSegment.distanceTraveled;
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.Flaps1,
+            distanceFromStart: profile.totalDistance() - distance,
+            speed: O,
+            altitude: c1toCleanSegment.initialAltitude,
+            remainingFuelOnBoard: fuelWeight,
+        });
 
         let cleanToDesSpeedSegment = DecelPathBuilder.computeConfigurationChangeSegment(
             ApproachPathSegmentType.CONSTANT_SLOPE,
@@ -142,24 +174,15 @@ export class DecelPathBuilder {
             // }
         }
 
-        return {
-            flap1: vappSegment.distanceTraveled
-                + cFullTo3Segment.distanceTraveled
-                + c3to2Segment.distanceTraveled
-                + c2to1Segment.distanceTraveled
-                + c1toCleanSegment.distanceTraveled,
-            flap2: vappSegment.distanceTraveled
-                + cFullTo3Segment.distanceTraveled
-                + c3to2Segment.distanceTraveled
-                + c2to1Segment.distanceTraveled,
-            decel: vappSegment.distanceTraveled
-                + cFullTo3Segment.distanceTraveled
-                + c3to2Segment.distanceTraveled
-                + c2to1Segment.distanceTraveled
-                + c1toCleanSegment.distanceTraveled
-                + cleanToDesSpeedSegment.distanceTraveled,
-            top: cleanToDesSpeedSegment.finalAltitude,
-        };
+        fuelWeight += cleanToDesSpeedSegment.fuelBurned;
+        distance += cleanToDesSpeedSegment.distanceTraveled;
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.Decel,
+            distanceFromStart: profile.totalDistance() - distance,
+            speed: DES,
+            altitude: cleanToDesSpeedSegment.initialAltitude,
+            remainingFuelOnBoard: fuelWeight,
+        });
     }
 
     /**

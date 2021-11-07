@@ -84,6 +84,12 @@ class CDUFlightPlanPage {
 
         // PWPs
         const fmsPseudoWaypoints = mcdu.guidanceController.currentPseudoWaypoints;
+        const fmsGeometryProfile = mcdu.guidanceController.vnavDriver.currentGeometryProfile;
+
+        let vnavPredictionsMapByWaypoint = null;
+        if (fmsGeometryProfile) {
+            vnavPredictionsMapByWaypoint = fmsGeometryProfile.computePredictionsAtWaypoints();
+        }
 
         // Primary F-PLAN
         for (let i = first; i < fpm.getWaypointsCount(); i++) {
@@ -282,14 +288,31 @@ class CDUFlightPlanPage {
                 }
                 distance = distance.toString();
 
-                let speedConstraint = "---";
-                if (wp.speedConstraint > 10 && ident !== "MANUAL") {
-                    speedConstraint = `{magenta}*{end}${wp.speedConstraint.toFixed(0)}`;
-                }
-
                 let altColor = color;
                 let spdColor = color;
                 let timeColor = color;
+                let slashColor = color;
+
+                let speedConstraint = "---";
+                let speedPrefix = "";
+
+                let verticalWaypoint = null;
+                if (vnavPredictionsMapByWaypoint) {
+                    verticalWaypoint = vnavPredictionsMapByWaypoint.get(fpIndex);
+                }
+
+                if (verticalWaypoint && verticalWaypoint.speed) {
+                    speedConstraint = Math.round(verticalWaypoint.speed);
+
+                    if (wp.speedConstraint > 10 && ident !== "MANUAL") {
+                        speedPrefix = verticalWaypoint.isSpeedConstraintMet ? "{magenta}*{end}" : "{amber}*{end}";
+                    }
+                } else if (wp.speedConstraint > 10 && ident !== "MANUAL") {
+                    spdColor = "magenta";
+                    slashColor = "magenta";
+                    speedConstraint = wp.speedConstraint;
+                }
+                speedConstraint = speedPrefix + speedConstraint;
 
                 // Altitude
                 let altitudeConstraint = "-----";
@@ -319,22 +342,28 @@ class CDUFlightPlanPage {
                     const firstRouteIndex = 1 + fpm.getDepartureWaypointsCount();
                     const lastRouteIndex = fpm.getLastIndexBeforeApproach();
                     //const departureWp = firstRouteIndex > 1 && fpm.getDepartureWaypoints().indexOf(wp) !== -1;
-
-                    if (mcdu.flightPlanManager.getOriginTransitionAltitude() >= 100 && wp.legAltitude1 > mcdu.flightPlanManager.getOriginTransitionAltitude()) {
-                        altitudeConstraint = (wp.legAltitude1 / 100).toFixed(0).toString();
-                        altitudeConstraint = `FL${altitudeConstraint.padStart(3,"0")}`;
-                    } else {
-                        altitudeConstraint = wp.legAltitude1.toFixed(0).toString().padStart(5,"\xa0");
-                    }
+                    let altitudeToFormat = wp.legAltitude1;
 
                     if (wp.legAltitudeDescription !== 0 && ident !== "(DECEL)") {
-                        altPrefix = "{magenta}*{end}";
-                        if (wp.legAltitudeDescription === 4) {
-                            altitudeConstraint = ((wp.legAltitude1 + wp.legAltitude2) * 0.5).toFixed(0).toString();
-                            altitudeConstraint = altitudeConstraint.padStart(5,"\xa0");
+                        if (verticalWaypoint && verticalWaypoint.altitude) {
+                            altitudeToFormat = verticalWaypoint.altitude;
                         }
-                        // TODO FIXME: remove this and replace with proper altitude constraint implementation
-                        // Predict altitude for STAR when constraints are missing
+
+                        if (mcdu.flightPlanManager.getOriginTransitionAltitude() >= 100 && altitudeToFormat > mcdu.flightPlanManager.getOriginTransitionAltitude()) {
+                            altitudeConstraint = (altitudeToFormat / 100).toFixed(0).toString();
+                            altitudeConstraint = `FL${altitudeConstraint.padStart(3,"0")}`;
+                        } else {
+                            altitudeConstraint = (10 * Math.round(altitudeToFormat / 10)).toFixed(0).toString().padStart(5,"\xa0");
+                        }
+
+                        if (verticalWaypoint) {
+                            altPrefix = verticalWaypoint.isAltitudeConstraintMet ? "{magenta}*{end}" : "{amber}*{end}";
+                        } else {
+                            altColor = "magenta";
+                            slashColor = "magenta";
+                            console.log(`No predictions found for waypoint ${wp.ident} with alt constraint`);
+                        }
+
                         /*
                     } else if (departureWp) {
                         altitudeConstraint = Math.floor(wp.cumulativeDistanceInFP * 0.14 * 6076.118 / 10).toString();
@@ -390,9 +419,22 @@ class CDUFlightPlanPage {
                         } else {
                             altitudeConstraint = `FL${mcdu.cruiseFlightLevel.toString().padStart(3,"0")}`;
                         }
-                    // Waypoint with no alt constraint
-                    } else if (!wp.legAltitude1 && !wp.legAltitudeDescription) {
-                        altitudeConstraint = "-----";
+                    // Waypoint with no alt constraint.
+                    // In this case `altitudeConstraint is actually just the predictedAltitude`
+                    } else if (vnavPredictionsMapByWaypoint && !wp.legAltitude1 && !wp.legAltitudeDescription) {
+                        if (verticalWaypoint && verticalWaypoint.altitude) {
+                            altitudeConstraint = verticalWaypoint.altitude;
+
+                            if (mcdu.transitionAltitude >= 100 && altitudeConstraint > mcdu.transitionAltitude) {
+                                altitudeConstraint = (altitudeConstraint / 100).toFixed(0).toString();
+                                altitudeConstraint = `FL${altitudeConstraint.padStart(3,"0")}`;
+                            } else {
+                                altitudeConstraint = (10 * Math.round(altitudeConstraint / 10)).toFixed(0).toString();
+                            }
+                        } else {
+                            console.log(`No predictions found for waypoint without alt constraint ${wp.ident}`);
+                            altitudeConstraint = "-----";
+                        }
                     }
                 }
 
@@ -425,6 +467,7 @@ class CDUFlightPlanPage {
                     fixAnnotation: fixAnnotation,
                     bearingTrack: bearingTrack,
                     isOverfly: isOverfly,
+                    slashColor: slashColor
                 };
 
                 if (fpIndex !== fpm.getDestinationIndex()) {
@@ -519,9 +562,10 @@ class CDUFlightPlanPage {
                     altitudeConstraint: { alt: "-----", altPrefix: "\xa0" },
                     timeCell: "----[s-text]",
                     timeColor: "white",
-                    fixAnnotation: "",
+                    fixAnnotation: pwp.ident === "(LIM)" ? "{green}(SPD){end}" : "",
                     bearingTrack: pwp.stats.bearingInFp,
                     isOverfly: false,
+                    slashColor: "green"
                 };
             } else if (marker) {
 
@@ -713,11 +757,11 @@ function renderFixHeader(rowObj, showNm = false, showDist = true, showFix = true
 }
 
 function renderFixContent(rowObj, spdRepeat = false, altRepeat = false) {
-    const {ident, isOverfly, color, spdColor, speedConstraint, altColor, altitudeConstraint, timeCell, timeColor} = rowObj;
+    const {ident, isOverfly, color, spdColor, speedConstraint, altColor, altitudeConstraint, timeCell, timeColor, slashColor} = rowObj;
 
     return [
         `${ident}${isOverfly ? FMCMainDisplay.ovfyValue : ""}[color]${color}`,
-        `{${spdColor}}${spdRepeat ? "\xa0\"\xa0" : speedConstraint}{end}{${altColor}}/${altRepeat ? "\xa0\xa0\xa0\"\xa0\xa0" : altitudeConstraint.altPrefix + altitudeConstraint.alt}{end}[s-text]`,
+        `{${spdColor}}${spdRepeat ? "\xa0\"\xa0" : speedConstraint}{end}{${altColor}}{${slashColor}}/{end}${altRepeat ? "\xa0\xa0\xa0\"\xa0\xa0" : altitudeConstraint.altPrefix + altitudeConstraint.alt}{end}[s-text]`,
         `${timeCell}{sp}{sp}[color]${timeColor}`
     ];
 }

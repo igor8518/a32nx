@@ -281,6 +281,8 @@ export class EfisSymbols {
                 }
             }
 
+            const waypointPredictions = this.guidanceController.vnavDriver.currentGeometryProfile?.computePredictionsAtWaypoints();
+
             // TODO don't send the waypoint before active once FP sequencing is properly implemented
             // (currently sequences with guidance which is too early)
             {
@@ -314,9 +316,16 @@ export class EfisSymbols {
                     }
 
                     if (wp.legAltitudeDescription !== 0) {
-                    // TODO vnav to predict
+                    const predictionAtWaypoint = waypointPredictions?.get(i);
+
+                    if (!predictionAtWaypoint) {
                         type |= NdSymbolTypeFlags.ConstraintUnknown;
+                    } else if (predictionAtWaypoint.isAltitudeConstraintMet) {
+                        type |= NdSymbolTypeFlags.ConstraintMet;
+                    } else {
+                        type |= NdSymbolTypeFlags.ConstraintMissed;
                     }
+                }
 
                     if (efisOption === EfisOption.Constraints) {
                         const descent = wp.constraintType === WaypointConstraintType.DES;

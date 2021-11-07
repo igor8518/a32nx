@@ -9,7 +9,10 @@ import { GuidanceController } from '@fmgc/guidance/GuidanceController';
 import { LateralMode } from '@shared/autopilot';
 import { FixedRadiusTransition } from '@fmgc/guidance/lnav/transitions/FixedRadiusTransition';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
+import { VerticalCheckpointReason } from '@fmgc/guidance/vnav/GeometryProfile';
 
+const PWP_IDENT_TOC = '(T/C)';
+const PWP_IDENT_SPD_LIM = '(LIM)';
 const PWP_IDENT_TOD = '(T/D)';
 const PWP_IDENT_DECEL = '(DECEL)';
 const PWP_IDENT_FLAP1 = '(FLAP1)';
@@ -44,6 +47,104 @@ export class PseudoWaypoints implements GuidanceComponent {
         }
 
         const newPseudoWaypoints: PseudoWaypoint[] = [];
+        const totalDistance = this.guidanceController.vnavDriver.currentGeometryProfile.totalDistance();
+
+        if (VnavConfig.VNAV_CALCULATE_CLIMB_PROFILE) {
+            const geometryProfile = this.guidanceController.vnavDriver.currentGeometryProfile;
+
+            const toc = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, geometryProfile.findDistanceToTopOfClimbFromEnd());
+
+            if (toc) {
+                const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = toc;
+
+                newPseudoWaypoints.push({
+                    ident: PWP_IDENT_TOC,
+                    alongLegIndex,
+                    distanceFromLegTermination,
+                    efisSymbolFlag: NdSymbolTypeFlags.PwpTopOfClimb,
+                    efisSymbolLla,
+                    displayedOnMcdu: true,
+                    stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_TOC, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                });
+            }
+
+            const distanceToRestrictionLevelOffFromEnd = geometryProfile.findDistanceFromEndToEarliestLevelOffForRestriction();
+            if (distanceToRestrictionLevelOffFromEnd) {
+                const levelOff = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, distanceToRestrictionLevelOffFromEnd);
+                if (levelOff) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = levelOff;
+
+                    newPseudoWaypoints.push({
+                        ident: 'Level off',
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.PwpLevelOffForRestriction,
+                        efisSymbolLla,
+                        displayedOnMcdu: false,
+                        stats: PseudoWaypoints.computePseudoWaypointStats('Level off', geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
+            }
+
+            const distanceToContinueClimbFromEnd = geometryProfile.findDistanceFromEndToEarliestContinueClimb();
+            if (distanceToContinueClimbFromEnd) {
+                const continueClimb = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, distanceToContinueClimbFromEnd);
+                if (continueClimb) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = continueClimb;
+
+                    newPseudoWaypoints.push({
+                        ident: 'Continue Climb',
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.PwpContinueClimb,
+                        efisSymbolLla,
+                        displayedOnMcdu: false,
+                        stats: PseudoWaypoints.computePseudoWaypointStats('Continue Climb', geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
+            }
+
+            const speedChanges = geometryProfile.findDistancesFromEndToSpeedChanges();
+            console.log(`speedChanges: ${JSON.stringify(speedChanges)}`);
+
+            for (let i = 0; i < speedChanges.length; i++) {
+                const speedChange = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, speedChanges[i]);
+
+                if (speedChange) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = speedChange;
+
+                    newPseudoWaypoints.push({
+                        ident: `Speed change ${i}`,
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.SpeedChange,
+                        efisSymbolLla,
+                        displayedOnMcdu: false,
+                        stats: PseudoWaypoints.computePseudoWaypointStats(`Speed change ${i}`, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
+            }
+
+            const distanceFromEndToSpeedLimit = geometryProfile.findDistanceFromEndToSpeedLimit();
+
+            if (distanceFromEndToSpeedLimit) {
+                const speedLimit = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, distanceFromEndToSpeedLimit);
+
+                if (speedLimit) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = speedLimit;
+
+                    newPseudoWaypoints.push({
+                        ident: PWP_IDENT_SPD_LIM,
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.PwpSpeedLimit,
+                        efisSymbolLla,
+                        displayedOnMcdu: true,
+                        stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_SPD_LIM, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
+            }
+        }
 
         if (VnavConfig.VNAV_EMIT_TOD) {
             const tod = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, this.guidanceController.vnavDriver.currentDescentProfile.tod, DEBUG && PWP_IDENT_TOD);
@@ -65,21 +166,25 @@ export class PseudoWaypoints implements GuidanceComponent {
         }
 
         if (VnavConfig.VNAV_EMIT_DECEL) {
-            const decel = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, this.guidanceController.vnavDriver.currentApproachProfile.decel, DEBUG && PWP_IDENT_DECEL);
+            const decelCheckpoint = this.guidanceController.vnavDriver.currentGeometryProfile.checkpoints.find((it) => it.reason === VerticalCheckpointReason.Decel);
 
-            if (decel) {
-                const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = decel;
+            if (decelCheckpoint) {
+                const decel = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - decelCheckpoint.distanceFromStart, DEBUG && PWP_IDENT_DECEL);
 
-                newPseudoWaypoints.push({
-                    ident: PWP_IDENT_DECEL,
-                    sequencingType: PseudoWaypointSequencingAction.APPROACH_PHASE_AUTO_ENGAGE,
-                    alongLegIndex,
-                    distanceFromLegTermination,
-                    efisSymbolFlag: NdSymbolTypeFlags.PwpDecel,
-                    efisSymbolLla,
-                    displayedOnMcdu: true,
-                    stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_DECEL, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
-                });
+                if (decel) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = decel;
+
+                    newPseudoWaypoints.push({
+                        ident: PWP_IDENT_DECEL,
+                        sequencingType: PseudoWaypointSequencingAction.APPROACH_PHASE_AUTO_ENGAGE,
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.PwpDecel,
+                        efisSymbolLla,
+                        displayedOnMcdu: true,
+                        stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_DECEL, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
             }
 
             // for (let i = 0; i < 75; i++) {
@@ -103,36 +208,44 @@ export class PseudoWaypoints implements GuidanceComponent {
         }
 
         if (VnavConfig.VNAV_DESCENT_MODE === VnavDescentMode.CDA && VnavConfig.VNAV_EMIT_CDA_FLAP_PWP) {
-            const flap1 = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, this.guidanceController.vnavDriver.currentApproachProfile.flap1, DEBUG && PWP_IDENT_FLAP1);
+            const flap1Checkpoint = this.guidanceController.vnavDriver.currentGeometryProfile.checkpoints.find((it) => it.reason === VerticalCheckpointReason.Flaps1);
 
-            if (flap1) {
-                const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = flap1;
+            if (flap1Checkpoint) {
+                const flap1 = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - flap1Checkpoint.distanceFromStart, DEBUG && PWP_IDENT_FLAP1);
 
-                newPseudoWaypoints.push({
-                    ident: PWP_IDENT_FLAP1,
-                    alongLegIndex,
-                    distanceFromLegTermination,
-                    efisSymbolFlag: NdSymbolTypeFlags.PwpCdaFlap1,
-                    efisSymbolLla,
-                    displayedOnMcdu: true,
-                    stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_FLAP1, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
-                });
+                if (flap1) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = flap1;
+
+                    newPseudoWaypoints.push({
+                        ident: PWP_IDENT_FLAP1,
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.PwpCdaFlap1,
+                        efisSymbolLla,
+                        displayedOnMcdu: true,
+                        stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_FLAP1, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
             }
 
-            const flap2 = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, this.guidanceController.vnavDriver.currentApproachProfile.flap2, DEBUG && PWP_IDENT_FLAP2);
+            const flap2Checkpoint = this.guidanceController.vnavDriver.currentGeometryProfile.checkpoints.find((it) => it.reason === VerticalCheckpointReason.Flaps2);
 
-            if (flap2) {
-                const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = flap2;
+            if (flap2Checkpoint) {
+                const flap2 = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - flap2Checkpoint.distanceFromStart, DEBUG && PWP_IDENT_FLAP2);
 
-                newPseudoWaypoints.push({
-                    ident: PWP_IDENT_FLAP2,
-                    alongLegIndex,
-                    distanceFromLegTermination,
-                    efisSymbolFlag: NdSymbolTypeFlags.PwpCdaFlap2,
-                    efisSymbolLla,
-                    displayedOnMcdu: true,
-                    stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_FLAP2, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
-                });
+                if (flap2) {
+                    const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = flap2;
+
+                    newPseudoWaypoints.push({
+                        ident: PWP_IDENT_FLAP2,
+                        alongLegIndex,
+                        distanceFromLegTermination,
+                        efisSymbolFlag: NdSymbolTypeFlags.PwpCdaFlap2,
+                        efisSymbolLla,
+                        displayedOnMcdu: true,
+                        stats: PseudoWaypoints.computePseudoWaypointStats(PWP_IDENT_FLAP2, geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    });
+                }
             }
         }
 
@@ -230,13 +343,13 @@ export class PseudoWaypoints implements GuidanceComponent {
         distanceFromEnd: NauticalMiles,
         debugString?: string,
     ): [lla: Coordinates, distanceFromLegTermination: number, legIndex: number] | undefined {
-        if (distanceFromEnd < 0) {
-            throw new Error('[FMS/PWP](pointFromEndOfPath) distanceFromEnd was negative');
+        if (!distanceFromEnd || distanceFromEnd < 0) {
+            console.warn('[FMS/PWP](pointFromEndOfPath) distanceFromEnd was negative or undefined');
         }
 
         let accumulator = 0;
 
-        if (true) {
+        if (DEBUG) {
             console.log(`[FMS/PWP] Starting placement of PWP '${debugString}': dist: ${distanceFromEnd.toFixed(2)}nm`);
         }
 
