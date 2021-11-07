@@ -2,7 +2,6 @@
 //  SPDX-License-Identifier: GPL-3.0
 
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
-import { WaypointStats } from '@fmgc/flightplanning/data/flightplan';
 
 /**
  * Types that tie pseudo waypoints to sequencing actions
@@ -60,8 +59,29 @@ export interface PseudoWaypoint {
     displayedOnMcdu: boolean,
 
     /**
-     * Waypoint stats for the PWP
+     * THe MCDU F-PLN page ident, if different
      */
-    stats: WaypointStats,
+    mcduIdent?: string,
 
+    /**
+     * THe MCDU F-PLN page fix annotation, if applicable
+     */
+    mcduHeader?: string,
+
+    /**
+     * Additional information that is display if the waypoint is displayed on the MCDU (`displayedOnMcdu`)
+     */
+    flightPlanInfo?: PseudoWaypointFlightPlanInfo
+}
+
+export interface PseudoWaypointFlightPlanInfo {
+    distanceFromStart?: NauticalMiles,
+
+    altitude: Feet,
+
+    speed: Knots,
+
+    secondsFromPresent: Seconds,
+
+    distanceFromLastFix?: NauticalMiles,
 }

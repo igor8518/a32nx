@@ -3,6 +3,8 @@
  */
 export interface TheoreticalDescentPathCharacteristics {
     tod: number,
+    remainingFuelOnBoardAtTopOfDescent: number,
+    fuelBurnedDuringDescent: number,
 }
 
 export interface IdlePath {

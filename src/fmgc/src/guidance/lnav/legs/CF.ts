@@ -5,6 +5,7 @@ import { SegmentType } from '@fmgc/flightplanning/FlightPlanSegment';
 import { GuidanceParameters } from '@fmgc/guidance/ControlLaws';
 import { courseToFixDistanceToGo, courseToFixGuidance } from '@fmgc/guidance/lnav/CommonGeometry';
 import { XFLeg } from '@fmgc/guidance/lnav/legs/XF';
+import { getSpeedConstraintFromWaypoint } from '@fmgc/guidance/lnav/legs';
 import { LnavConfig } from '@fmgc/guidance/LnavConfig';
 import { PathVector, PathVectorType } from '../PathVector';
 
@@ -110,7 +111,7 @@ export class CFLeg extends XFLeg {
     }
 
     get speedConstraint(): SpeedConstraint | undefined {
-        return undefined;
+        return getSpeedConstraintFromWaypoint(this.fix);
     }
 
     get repr(): string {

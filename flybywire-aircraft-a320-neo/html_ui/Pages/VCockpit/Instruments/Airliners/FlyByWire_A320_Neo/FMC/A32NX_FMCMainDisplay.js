@@ -190,7 +190,7 @@ class FMCMainDisplay extends BaseAirliners {
 
         this.flightPhaseManager = new A32NX_FlightPhaseManager(this);
         this.guidanceManager = new Fmgc.GuidanceManager(this.flightPlanManager);
-        this.guidanceController = new Fmgc.GuidanceController(this.flightPlanManager, this.guidanceManager);
+        this.guidanceController = new Fmgc.GuidanceController(this.flightPlanManager, this.guidanceManager, this);
         this.navRadioManager = new Fmgc.NavRadioManager(this);
         this.efisSymbols = new Fmgc.EfisSymbols(this.flightPlanManager, this.guidanceController);
 
@@ -1097,6 +1097,17 @@ class FMCMainDisplay extends BaseAirliners {
 
     // TODO/VNAV: Speed constraint
     getSpeedConstraint() {
+        const climbPathBuilder = this.guidanceController.vnavDriver.climbPathBuilder;
+        const geometryProfile = this.guidanceController.vnavDriver.currentGeometryProfile;
+
+        if (climbPathBuilder && geometryProfile && geometryProfile.distanceToPresentPosition) {
+            return climbPathBuilder.findMaxSpeedAtDistanceAlongTrack(geometryProfile.distanceToPresentPosition);
+        }
+
+        if (DEBUG) {
+            console.warn("[FMS/VNAV] Falling back to default speed prediction");
+        }
+
         if (this.flightPlanManager.getIsDirectTo()) {
             return Infinity;
         }
@@ -4313,6 +4324,57 @@ class FMCMainDisplay extends BaseAirliners {
     //TODO: Can this be util?
     representsDecimalNumber(str) {
         return /^[+-]?\d*(?:\.\d+)?$/.test(str);
+    }
+
+    getZeroFuelWeight() {
+        return this.zeroFuelWeight;
+    }
+
+    getV2Speed() {
+        return SimVar.GetSimVarValue("L:AIRLINER_V2_SPEED", "knots");
+    }
+
+    getTropoPause() {
+        return this.tropo;
+    }
+
+    getManagedClimbSpeed() {
+        return this.managedSpeedClimb;
+    }
+
+    getManagedCruiseSpeed() {
+        return this.managedSpeedCruise;
+    }
+
+    getManagedCruiseSpeedMach() {
+        return this.managedSpeedCruiseMach;
+    }
+
+    getAccelerationAltitude() {
+        return this.accelerationAltitude;
+    }
+
+    getThrustReductionAltitude() {
+        return this.thrustReductionAltitude;
+    }
+
+    getCruiseAltitude() {
+        return this.cruiseFlightLevel * 100;
+    }
+
+    getFlightPhase() {
+        return this.currentFlightPhase;
+    }
+    getSpeedLimit() {
+        return {
+            speed: this.managedSpeedLimit,
+            underAltitude: this.managedSpeedLimitAlt,
+        };
+    }
+
+    setSpeedLimit(speedLimit, speedLimitAlt) {
+        this.managedSpeedLimit = speedLimit;
+        this.managedSpeedLimitAlt = speedLimitAlt;
     }
 }
 

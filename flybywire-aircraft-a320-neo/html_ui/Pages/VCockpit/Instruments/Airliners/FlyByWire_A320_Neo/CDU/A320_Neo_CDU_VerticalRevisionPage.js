@@ -12,16 +12,17 @@ class CDUVerticalRevisionPage {
             if (waypointInfo.coordinates) {
                 coordinates = waypointInfo.coordinates.toDegreeString();
             }
-            const efob = "--.-";
-            const extra = "--.-";
-            const climbSpeedLimit = "250";
-            const climbAltLimit = "FL100";
+            const transAltLevel = waypoint.constraintType === 2 /* DES */ ? mcdu.flightPlanManager.destinationTransitionLevel : mcdu.flightPlanManager.originTransitionAltitude;
+            let climbSpeedLimitCell = "*[][color]cyan";
+            if (isFinite(mcdu.managedSpeedLimit) && isFinite(mcdu.managedSpeedLimitAlt)) {
+                climbSpeedLimitCell = mcdu.managedSpeedLimit + "/" + this.formatFl(mcdu.managedSpeedLimitAlt, transAltLevel) + "[color]magenta";
+            }
+
             let speedConstraint = 0;
             if (waypoint.speedConstraint > 10) {
                 speedConstraint = waypoint.speedConstraint.toFixed(0);
             }
             let altitudeConstraint = "";
-            const transAltLevel = waypoint.constraintType === 2 /* DES */ ? mcdu.flightPlanManager.destinationTransitionLevel : mcdu.flightPlanManager.originTransitionAltitude;
             switch (waypoint.legAltitudeDescription) {
                 case 1: {
                     altitudeConstraint = this.formatFl(Math.round(waypoint.legAltitude1), transAltLevel);
@@ -48,10 +49,10 @@ class CDUVerticalRevisionPage {
             }
             mcdu.setTemplate([
                 ["VERT REV {small}AT{end}{green} " + waypointIdent + "{end}"],
-                ["\xa0EFOB={green}" + efob + "{end}", "EXTRA={green}" + (extra.length < 4 ? `${extra}\xa0` : extra) + "\xa0{end}"],
+                [""],
                 [""],
                 ["\xa0CLB SPD LIM", ""],
-                [climbSpeedLimit + "/" + climbAltLimit + "[color]magenta", "RTA>[color]inop"],
+                [climbSpeedLimitCell, "RTA>[color]inop"],
                 ["\xa0SPD CSTR", "ALT CSTR\xa0"],
                 [speedConstraint ? speedConstraint + "[color]magenta" : "*[\xa0\xa0\xa0][color]cyan", altitudeConstraint ? altitudeConstraint + "[color]magenta" : "[\xa0\xa0\xa0\xa0]*[color]cyan"],
                 ["MACH/START WPT[color]inop", ""],
@@ -63,7 +64,40 @@ class CDUVerticalRevisionPage {
             ]);
             mcdu.onLeftInput[0] = () => {}; // EFOB
             mcdu.onRightInput[0] = () => {}; // EXTRA
-            mcdu.onLeftInput[1] = () => {}; // CLB SPD LIM
+            mcdu.onLeftInput[1] = (value, scratchpadCallback) => {
+                if (value === FMCMainDisplay.clrValue) {
+                    mcdu.setSpeedLimit(undefined, undefined);
+                    this.ShowPage(mcdu, waypoint);
+
+                    return;
+                } else if (!value || !value.includes("/")) {
+                    mcdu.addNewMessage(NXSystemMessages.formatError);
+                    scratchpadCallback();
+
+                    return;
+                }
+
+                const [speedLimitInput, speedLimitAltInput] = value.split("/");
+                const speedLimit = parseInt(speedLimitInput);
+                const speedLimitAlt = speedLimitAltInput.startsWith("FL") ? 100 * parseInt(speedLimitAltInput.replace("FL", "")) : 10 * Math.round(parseInt(speedLimitAltInput) / 10);
+
+                if (!isFinite(speedLimit) || !isFinite(speedLimitAlt)) {
+                    mcdu.addNewMessage(NXSystemMessages.formatError);
+                    scratchpadCallback();
+
+                    return;
+                }
+
+                if (speedLimit < 90 || speedLimit > 350 || speedLimitAlt > 45000) {
+                    mcdu.addNewMessage(NXSystemMessages.entryOutOfRange);
+                    scratchpadCallback();
+
+                    return;
+                }
+
+                mcdu.setSpeedLimit(speedLimit, speedLimitAlt);
+                this.ShowPage(mcdu, waypoint);
+            }; // CLB SPD LIM
             mcdu.onRightInput[1] = () => {}; // RTA
             mcdu.onLeftInput[2] = async (value, scratchpadCallback) => {
                 const speed = (value !== FMCMainDisplay.clrValue) ? parseInt(value) : 0;

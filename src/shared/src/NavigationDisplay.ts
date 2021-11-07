@@ -50,6 +50,11 @@ export enum NdSymbolTypeFlags {
     FlightPlanVectorArc = 1 << 21,
     FlightPlanVectorDebugPoint = 1 << 22,
     ActiveFlightPlanVector = 1 << 23,
+    PwpTopOfClimb = 1 << 24,
+    PwpLevelOffForRestriction = 1 << 25,
+    PwpContinueClimb = 1 << 26,
+    PwpSpeedLimit = 1 << 27, // TODO: Figure out what to do with this. This allows me to put the SPD/LIM in the MCDU, but I might not want to show it on ND.
+    PwpTimeMarker = 1 << 28,
 }
 
 export interface NdSymbol {
