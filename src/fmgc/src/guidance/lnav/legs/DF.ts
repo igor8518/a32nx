@@ -1,8 +1,3 @@
-// Copyright (c) 2021-2022 FlyByWire Simulations
-// Copyright (c) 2021-2022 Synaptic Simulations
-//
-// SPDX-License-Identifier: GPL-3.0
-
 import { AltitudeConstraint, getAltitudeConstraintFromWaypoint, getSpeedConstraintFromWaypoint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { Guidable } from '@fmgc/guidance/Guidable';
@@ -94,7 +89,7 @@ export class DFLeg extends XFLeg {
     }
 
     get altitudeConstraint(): AltitudeConstraint | undefined {
-        return undefined;
+        return getAltitudeConstraintFromWaypoint(this.fix);
     }
 
     get inboundCourse(): Degrees {
@@ -122,7 +117,7 @@ export class DFLeg extends XFLeg {
     }
 
     get speedConstraint(): SpeedConstraint | undefined {
-        return undefined;
+        return getSpeedConstraintFromWaypoint(this.fix);
     }
 
     get repr(): string {
