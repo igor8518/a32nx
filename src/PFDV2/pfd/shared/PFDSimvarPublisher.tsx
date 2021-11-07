@@ -97,6 +97,12 @@ export interface PFDSimvars {
     groundSpeed: number,
     radioAltitude1: number,
     radioAltitude2: number,
+    linearDeviationActive: boolean;
+    linearDeviation: number;
+    verticalProfileLatched: boolean;
+    showSpeedMargins: boolean,
+    upperSpeedMargin: number,
+    lowerSpeedMargin: number,
   }
 
 export enum PFDVars {
@@ -197,6 +203,12 @@ export enum PFDVars {
     groundSpeed = 'L:A32NX_ADIRS_IR_1_GROUND_SPEED',
     radioAltitude1 = 'L:A32NX_RA_1_RADIO_ALTITUDE',
     radioAltitude2 = 'L:A32NX_RA_1_RADIO_ALTITUDE',
+    linearDeviationActive = 'L:A32NX_PFD_LINEAR_DEVIATION_ACTIVE',
+    linearDeviation = 'L:A32NX_PFD_LINEAR_DEVIATION',
+    verticalProfileLatched = 'L:A32NX_PFD_VERTICAL_PROFILE_LATCHED',
+    showSpeedMargins = 'L:A32NX_PFD_SHOW_SPEED_MARGINS',
+    upperSpeedMargin = 'L:A32NX_PFD_UPPER_SPEED_MARGIN',
+    lowerSpeedMargin = 'L:A32NX_PFD_LOWER_SPEED_MARGIN',
   }
 
 /** A publisher to poll and publish nav/com simvars. */
@@ -316,6 +328,13 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['radioAltitude1', { name: PFDVars.radioAltitude1, type: SimVarValueType.Number }],
         ['radioAltitude2', { name: PFDVars.radioAltitude2, type: SimVarValueType.Number }],
 
+        ['linearDeviationActive', { name: PFDVars.linearDeviationActive, type: SimVarValueType.Bool }],
+        ['linearDeviation', { name: PFDVars.linearDeviation, type: SimVarValueType.Feet }],
+        ['verticalProfileLatched', { name: PFDVars.verticalProfileLatched, type: SimVarValueType.Bool }],
+
+        ['showSpeedMargins', { name: PFDVars.showSpeedMargins, type: SimVarValueType.Bool }],
+        ['upperSpeedMargin', { name: PFDVars.upperSpeedMargin, type: SimVarValueType.Knots }],
+        ['lowerSpeedMargin', { name: PFDVars.lowerSpeedMargin, type: SimVarValueType.Knots }],
     ])
 
     /**

@@ -1,11 +1,11 @@
 import { AltitudeConstraint, SpeedConstraint } from '../lnav/legs';
 
 export enum FlapConf {
-    CLEAN,
-    CONF_1,
-    CONF_2,
-    CONF_3,
-    CONF_FULL
+    CLEAN = 0,
+    CONF_1 = 1,
+    CONF_2 = 2,
+    CONF_3 = 3,
+    CONF_FULL = 4,
 }
 
 export enum AccelFactorMode {
@@ -81,7 +81,7 @@ export class Common {
     }
 
     /**
-     * Get pressure ratio for a particular theta
+     * Get pressure ratio for a particular altitude
      * @param alt pressure altitude
      * @param aboveTropo whether the aircraft is above the tropopause
      * @returns pressure ratio
