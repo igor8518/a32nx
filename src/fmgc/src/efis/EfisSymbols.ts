@@ -12,6 +12,7 @@ import { GuidanceController } from '@fmgc/guidance/GuidanceController';
 import { PathVector, PathVectorType } from '@fmgc/guidance/lnav/PathVector';
 import { Geo } from '@fmgc/utils/Geo';
 import { SegmentType } from '@fmgc/wtsdk';
+import { NavGeometryProfile, VerticalWaypointPrediction } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { LegType, RunwaySurface, VorType } from '../types/fstypes/FSEnums';
 import { NearbyFacilities } from './NearbyFacilities';
 
@@ -45,6 +46,8 @@ export class EfisSymbols {
     private lastNearbyFacilitiesVersion;
 
     private lastFpVersion;
+
+    private lastVnavDriverVersion: number = -1;
 
     constructor(flightPlanManager: FlightPlanManager, guidanceController: GuidanceController) {
         this.flightPlanManager = flightPlanManager;
@@ -88,6 +91,8 @@ export class EfisSymbols {
         const planCentre = this.flightPlanManager.getWaypoint(planCentreIndex)?.infos.coordinates;
         const planCentreChanged = planCentre?.lat !== this.lastPlanCentre?.lat || planCentre?.long !== this.lastPlanCentre?.long;
         this.lastPlanCentre = planCentre;
+        const vnavPredictionsChanged = this.lastVnavDriverVersion !== this.guidanceController.vnavDriver.version;
+        this.lastVnavDriverVersion = this.guidanceController.vnavDriver.version;
 
         const activeFp = this.flightPlanManager.getCurrentFlightPlan();
         // TODO temp f-pln
@@ -110,6 +115,12 @@ export class EfisSymbols {
             return false;
         };
 
+        let waypointPredictions = new Map<number, VerticalWaypointPrediction>();
+        // Check we are in an AP mode where constraints are not ignored
+        if (this.guidanceController.vnavDriver.shouldObeyAltitudeConstraints() && this.guidanceController.vnavDriver.currentNdGeometryProfile instanceof NavGeometryProfile) {
+            waypointPredictions = this.guidanceController.vnavDriver.currentNdGeometryProfile?.waypointPredictions;
+        }
+
         for (const side of EfisSymbols.sides) {
             const range = rangeSettings[SimVar.GetSimVarValue(`L:A32NX_EFIS_${side}_ND_RANGE`, 'number')];
             const mode: Mode = SimVar.GetSimVarValue(`L:A32NX_EFIS_${side}_ND_MODE`, 'number');
@@ -123,7 +134,15 @@ export class EfisSymbols {
             this.lastEfisOption[side] = efisOption;
             const nearbyOverlayChanged = efisOption !== EfisOption.Constraints && efisOption !== EfisOption.None && nearbyFacilitiesChanged;
 
-            if (!pposChanged && !trueHeadingChanged && !rangeChange && !modeChange && !efisOptionChange && !nearbyOverlayChanged && !fpChanged && !planCentreChanged) {
+            if (!pposChanged
+                && !trueHeadingChanged
+                && !rangeChange
+                && !modeChange
+                && !efisOptionChange
+                && !nearbyOverlayChanged
+                && !fpChanged
+                && !planCentreChanged
+                && !vnavPredictionsChanged) {
                 continue;
             }
 
@@ -289,82 +308,87 @@ export class EfisSymbols {
 
             // TODO don't send the waypoint before active once FP sequencing is properly implemented
             // (currently sequences with guidance which is too early)
-            {
-                for (let i = activeFp.length - 1; i >= (activeFp.activeWaypointIndex - 1) && i >= 0; i--) {
-                    const wp = activeFp.getWaypoint(i);
+            for (let i = activeFp.length - 1; i >= (activeFp.activeWaypointIndex - 1) && i >= 0; i--) {
+                const wp = activeFp.getWaypoint(i);
 
-                    // Managed by legs
-                    const legType = wp.additionalData.legType;
-                    if (legType === LegType.CA || legType === LegType.CR || legType === LegType.CI || legType === LegType.FM || legType === LegType.VI || legType === LegType.VM) {
-                        continue;
-                    }
+                // Managed by legs
+                const legType = wp.additionalData.legType;
+                if (legType === LegType.CA || legType === LegType.CR || legType === LegType.CI || legType === LegType.FM || legType === LegType.VI || legType === LegType.VM) {
+                    continue;
+                }
 
-                    if (wp.type === 'A') {
+                if (wp.type === 'A') {
                     // we pick these up later
-                        continue;
-                    }
-                    // if range >= 160, don't include terminal waypoints, except at enroute boundary
-                    if (range >= 160) {
-                        const segment = activeFp.findSegmentByWaypointIndex(i);
-                        if (segment.type === SegmentType.Departure) {
-                            // keep the last waypoint from the SID as it is the enroute boundary
-                            if (!activeFp.isLastWaypointInSegment(i)) {
-                                continue;
-                            }
-                        } else if (segment.type !== SegmentType.Enroute) {
+                    continue;
+                }
+                // if range >= 160, don't include terminal waypoints, except at enroute boundary
+                if (range >= 160) {
+                    const segment = activeFp.findSegmentByWaypointIndex(i);
+                    if (segment.type === SegmentType.Departure) {
+                        // keep the last waypoint from the SID as it is the enroute boundary
+                        if (!activeFp.isLastWaypointInSegment(i)) {
                             continue;
                         }
-                    }
-
-                    if (!withinEditArea(wp.infos.coordinates)) {
+                    } else if (segment.type !== SegmentType.Enroute) {
                         continue;
                     }
-
-                    let type = NdSymbolTypeFlags.FlightPlan;
-                    const constraints = [];
-
-                    if (i === activeFp.activeWaypointIndex) {
-                        type |= NdSymbolTypeFlags.ActiveLegTermination;
-                    }
-
-                    if (wp.legAltitudeDescription !== 0) {
-                    // TODO vnav to predict
-                        type |= NdSymbolTypeFlags.ConstraintUnknown;
-                    }
-
-                    if (efisOption === EfisOption.Constraints) {
-                        const descent = wp.constraintType === WaypointConstraintType.DES;
-                        switch (wp.legAltitudeDescription) {
-                        case 1:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent));
-                            break;
-                        case 2:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '+'));
-                            break;
-                        case 3:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
-                            break;
-                        case 4:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
-                            constraints.push(formatConstraintAlt(wp.legAltitude2, descent, '+'));
-                            break;
-                        default:
-                            break;
-                        }
-
-                        if (wp.speedConstraint > 0) {
-                            constraints.push(formatConstraintSpeed(wp.speedConstraint));
-                        }
-                    }
-
-                    upsertSymbol({
-                        databaseId: wp.icao,
-                        ident: wp.ident,
-                        location: wp.infos.coordinates,
-                        type,
-                        constraints: constraints.length > 0 ? constraints : undefined,
-                    });
                 }
+
+                if (!withinEditArea(wp.infos.coordinates)) {
+                    continue;
+                }
+
+                let type = NdSymbolTypeFlags.FlightPlan;
+                const constraints = [];
+
+                if (i === activeFp.activeWaypointIndex) {
+                    type |= NdSymbolTypeFlags.ActiveLegTermination;
+                }
+
+                if (wp.legAltitudeDescription !== 0) {
+                    const predictionAtWaypoint = waypointPredictions.get(i);
+
+                    if (!predictionAtWaypoint) {
+                        type |= NdSymbolTypeFlags.ConstraintUnknown;
+                    } else if (predictionAtWaypoint.isAltitudeConstraintMet) {
+                        type |= NdSymbolTypeFlags.ConstraintMet;
+                    } else {
+                        type |= NdSymbolTypeFlags.ConstraintMissed;
+                    }
+                }
+
+                if (efisOption === EfisOption.Constraints) {
+                    const descent = wp.constraintType === WaypointConstraintType.DES;
+                    switch (wp.legAltitudeDescription) {
+                    case 1:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent));
+                        break;
+                    case 2:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '+'));
+                        break;
+                    case 3:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
+                        break;
+                    case 4:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
+                        constraints.push(formatConstraintAlt(wp.legAltitude2, descent, '+'));
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (wp.speedConstraint > 0) {
+                        constraints.push(formatConstraintSpeed(wp.speedConstraint));
+                    }
+                }
+
+                upsertSymbol({
+                    databaseId: wp.icao,
+                    ident: wp.ident,
+                    location: wp.infos.coordinates,
+                    type,
+                    constraints: constraints.length > 0 ? constraints : undefined,
+                });
             }
 
             const airports: [WayPoint, OneWayRunway][] = [
@@ -398,12 +422,13 @@ export class EfisSymbols {
 
             // Pseudo waypoints
 
-            for (const pwp of this.guidanceController.currentPseudoWaypoints.filter((it) => it)) {
+            for (const pwp of this.guidanceController.currentPseudoWaypoints.filter((it) => it && it.displayedOnNd)) {
                 upsertSymbol({
                     databaseId: `W      ${pwp.ident}`,
                     ident: pwp.ident,
-                    location: pwp.efisSymbolLla,
+                    location: this.guidanceController.vnavDriver.isInManagedNav() ? pwp.efisSymbolLla : undefined,
                     type: pwp.efisSymbolFlag,
+                    distanceFromAirplane: pwp.distanceFromStart,
                 });
             }
 

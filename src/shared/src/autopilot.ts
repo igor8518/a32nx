@@ -36,8 +36,24 @@ enum VerticalMode {
     SRS_GA = 41,
 }
 
+enum ArmedLateralMode {
+    NAV = 1 << 0,
+    LOC = 1 << 1,
+}
+
+enum ArmedVerticalMode {
+    ALT = 1 << 0,
+    ALT_CST = 1 << 1,
+    CLB = 1 << 2,
+    DES = 1 << 3,
+    GS = 1 << 4,
+    FINAL = 1 << 5,
+}
+
 export {
     ControlLaw,
     LateralMode,
     VerticalMode,
+    ArmedLateralMode,
+    ArmedVerticalMode,
 };

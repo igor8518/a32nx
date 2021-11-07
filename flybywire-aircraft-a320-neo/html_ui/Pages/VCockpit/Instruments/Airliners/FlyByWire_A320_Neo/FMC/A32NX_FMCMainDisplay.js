@@ -142,8 +142,8 @@ class FMCMainDisplay extends BaseAirliners {
         this.preSelectedDesSpeed = undefined;
         this.managedSpeedTarget = undefined;
         this.managedSpeedTargetIsMach = undefined;
-        this.managedSpeedLimit = undefined;
-        this.managedSpeedLimitAlt = undefined;
+        this.managedSpeedLimitClimb = undefined;
+        this.managedSpeedLimitAltClimb = undefined;
         this.managedSpeedClimb = undefined;
         this.managedSpeedClimbIsPilotEntered = undefined;
         this.managedSpeedClimbMach = undefined;
@@ -152,6 +152,8 @@ class FMCMainDisplay extends BaseAirliners {
         this.managedSpeedCruiseIsPilotEntered = undefined;
         this.managedSpeedCruiseMach = undefined;
         // this.managedSpeedCruiseMachIsPilotEntered = undefined;
+        this.managedSpeedLimitDescent = undefined;
+        this.managedSpeedLimitAltDescent = undefined;
         this.managedSpeedDescend = undefined;
         this.managedSpeedDescendIsPilotEntered = undefined;
         this.managedSpeedDescendMach = undefined;
@@ -190,7 +192,7 @@ class FMCMainDisplay extends BaseAirliners {
 
         this.flightPhaseManager = new A32NX_FlightPhaseManager(this);
         this.guidanceManager = new Fmgc.GuidanceManager(this.flightPlanManager);
-        this.guidanceController = new Fmgc.GuidanceController(this.flightPlanManager, this.guidanceManager);
+        this.guidanceController = new Fmgc.GuidanceController(this.flightPlanManager, this.guidanceManager, this);
         this.navRadioManager = new Fmgc.NavRadioManager(this);
         this.efisSymbols = new Fmgc.EfisSymbols(this.flightPlanManager, this.guidanceController);
 
@@ -468,8 +470,8 @@ class FMCMainDisplay extends BaseAirliners {
         this.preSelectedDesSpeed = undefined;
         this.managedSpeedTarget = NaN;
         this.managedSpeedTargetIsMach = false;
-        this.managedSpeedLimit = 250;
-        this.managedSpeedLimitAlt = 10000;
+        this.managedSpeedLimitClimb = 250;
+        this.managedSpeedLimitAltClimb = 10000;
         this.managedSpeedClimb = 290;
         this.managedSpeedClimbIsPilotEntered = false;
         this.managedSpeedClimbMach = .78;
@@ -478,6 +480,8 @@ class FMCMainDisplay extends BaseAirliners {
         this.managedSpeedCruiseIsPilotEntered = false;
         this.managedSpeedCruiseMach = .78;
         // this.managedSpeedCruiseMachIsPilotEntered = false;
+        this.managedSpeedLimitDescent = 250;
+        this.managedSpeedLimitAltDescent = 10000;
         this.managedSpeedDescend = 290;
         this.managedSpeedDescendIsPilotEntered = false;
         this.managedSpeedDescendMach = .78;
@@ -782,8 +786,8 @@ class FMCMainDisplay extends BaseAirliners {
                 case FmgcFlightPhases.CLIMB: {
                     let speed = this.managedSpeedClimb;
 
-                    if (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet") < this.managedSpeedLimitAlt) {
-                        speed = Math.min(speed, this.managedSpeedLimit);
+                    if (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet") < this.managedSpeedLimitAltClimb) {
+                        speed = Math.min(speed, this.managedSpeedLimitClimb);
                     }
 
                     speed = Math.min(speed, this.getSpeedConstraint());
@@ -795,8 +799,8 @@ class FMCMainDisplay extends BaseAirliners {
                 case FmgcFlightPhases.CRUISE: {
                     let speed = this.managedSpeedCruise;
 
-                    if (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet") < this.managedSpeedLimitAlt) {
-                        speed = Math.min(speed, this.managedSpeedLimit);
+                    if (SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet") < this.managedSpeedLimitAltClimb) {
+                        speed = Math.min(speed, this.managedSpeedLimitClimb);
                     }
 
                     [this.managedSpeedTarget, isMach] = this.getManagedTargets(speed, this.managedSpeedCruiseMach);
@@ -806,8 +810,8 @@ class FMCMainDisplay extends BaseAirliners {
                 case FmgcFlightPhases.DESCENT: {
                     let speed = this.managedSpeedDescend;
 
-                    if (Math.round(SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet") / 10) * 10 < 20 * (speed - this.managedSpeedLimit) + 300 + this.managedSpeedLimitAlt) {
-                        speed = Math.min(speed, this.managedSpeedLimit);
+                    if (Math.round(SimVar.GetSimVarValue("INDICATED ALTITUDE", "feet") / 10) * 10 < 20 * (speed - this.managedSpeedLimitDescent) + 300 + this.managedSpeedLimitAltDescent) {
+                        speed = Math.min(speed, this.managedSpeedLimitDescent);
                     }
 
                     // TODO we really need VNAV to predict where along the leg we should slow to the constraint
@@ -1097,14 +1101,7 @@ class FMCMainDisplay extends BaseAirliners {
 
     // TODO/VNAV: Speed constraint
     getSpeedConstraint() {
-        if (this.flightPlanManager.getIsDirectTo()) {
-            return Infinity;
-        }
-        const wpt = this.flightPlanManager.getActiveWaypoint();
-        if (typeof wpt === 'undefined' || !isFinite(wpt.speedConstraint) || wpt.speedConstraint < 100) {
-            return Infinity;
-        }
-        return wpt.speedConstraint;
+        return this.guidanceController.vnavDriver.getCurrentSpeedConstraint();
     }
 
     getClbManagedSpeedFromCostIndex() {
@@ -4313,6 +4310,82 @@ class FMCMainDisplay extends BaseAirliners {
     //TODO: Can this be util?
     representsDecimalNumber(str) {
         return /^[+-]?\d*(?:\.\d+)?$/.test(str);
+    }
+
+    getZeroFuelWeight() {
+        return this.zeroFuelWeight;
+    }
+
+    getV2Speed() {
+        return SimVar.GetSimVarValue("L:AIRLINER_V2_SPEED", "knots");
+    }
+
+    getTropoPause() {
+        return this.tropo;
+    }
+
+    getManagedClimbSpeed() {
+        return this.managedSpeedClimb;
+    }
+
+    getManagedClimbSpeedMach() {
+        return this.managedSpeedClimbMach;
+    }
+
+    getManagedCruiseSpeed() {
+        return this.managedSpeedCruise;
+    }
+
+    getManagedCruiseSpeedMach() {
+        return this.managedSpeedCruiseMach;
+    }
+
+    getAccelerationAltitude() {
+        return this.accelerationAltitude;
+    }
+
+    getThrustReductionAltitude() {
+        return this.thrustReductionAltitude;
+    }
+
+    getCruiseAltitude() {
+        return this.cruiseFlightLevel * 100;
+    }
+
+    getFlightPhase() {
+        return this.currentFlightPhase;
+    }
+    getClimbSpeedLimit() {
+        return {
+            speed: this.managedSpeedLimitClimb,
+            underAltitude: this.managedSpeedLimitAltClimb,
+        };
+    }
+    getDescentSpeedLimit() {
+        return {
+            speed: this.managedSpeedLimitDescent,
+            underAltitude: this.managedSpeedLimitAltDescent,
+        };
+    }
+    getPreSelectedClbSpeed() {
+        return this.preSelectedClbSpeed;
+    }
+    setClimbSpeedLimit(speedLimit, speedLimitAlt) {
+        this.managedSpeedLimitClimb = speedLimit;
+        this.managedSpeedLimitAltClimb = speedLimitAlt;
+    }
+    setDescentSpeedLimit(speedLimit, speedLimitAlt) {
+        this.managedSpeedLimitDescent = speedLimit;
+        this.managedSpeedLimitAltDescent = speedLimitAlt;
+    }
+    getTakeoffFlapsSetting() {
+        return this.flaps;
+    }
+    getManagedDescentSpeed() {
+        return this.managedSpeedDescend;
+    }
+    getManagedDescentSpeedMach() {
+        return this.managedSpeedDescendMach;
     }
 }
 
