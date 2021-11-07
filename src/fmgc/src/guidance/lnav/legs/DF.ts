@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 
-import { AltitudeConstraint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
+import { AltitudeConstraint, getAltitudeConstraintFromWaypoint, getSpeedConstraintFromWaypoint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { Guidable } from '@fmgc/guidance/Guidable';
 import { SegmentType } from '@fmgc/flightplanning/FlightPlanSegment';
@@ -102,7 +102,7 @@ export class DFLeg extends XFLeg {
     }
 
     get altitudeConstraint(): AltitudeConstraint | undefined {
-        return undefined;
+        return getAltitudeConstraintFromWaypoint(this.fix);
     }
 
     get inboundCourse(): Degrees {
@@ -130,7 +130,7 @@ export class DFLeg extends XFLeg {
     }
 
     get speedConstraint(): SpeedConstraint | undefined {
-        return undefined;
+        return getSpeedConstraintFromWaypoint(this.fix);
     }
 
     get repr(): string {

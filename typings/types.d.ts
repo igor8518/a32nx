@@ -14,6 +14,7 @@ declare global {
     type DegreesMagnetic = number;
     type DegreesTrue = number;
     type Seconds = number;
+    type Minutes = number;
     type Percent = number;
     type Radians = number;
     type RotationsPerMinute = number;
@@ -22,6 +23,7 @@ declare global {
     type PercentOver100 = number;
     type Gallons = number;
     type Kilograms = number;
+    type Pounds = number;
     type Celcius = number;
     type InchesOfMercury = number;
     type Millibar = number;
