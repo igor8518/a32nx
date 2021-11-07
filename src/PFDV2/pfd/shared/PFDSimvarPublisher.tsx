@@ -94,6 +94,9 @@ export interface PFDSimvars {
     setHoldSpeed: boolean;
     vls: number;
     alphaLim: number;
+    linearDeviationActive: boolean;
+    linearDeviation: number;
+    verticalProfileLatched: boolean;
   }
 
 export enum PFDVars {
@@ -189,6 +192,9 @@ export enum PFDVars {
     setHoldSpeed = 'L:A32NX_PFD_MSG_SET_HOLD_SPEED',
     vls = 'L:A32NX_SPEEDS_VLS',
     alphaLim = 'L:A32NX_SPEEDS_ALPHA_MAX',
+    linearDeviationActive = 'L:A32NX_PFD_LINEAR_DEVIATION_ACTIVE',
+    linearDeviation = 'L:A32NX_PFD_LINEAR_DEVIATION',
+    verticalProfileLatched = 'L:A32NX_PFD_VERTICAL_PROFILE_LATCHED',
   }
 
 /** A publisher to poll and publish nav/com simvars. */
@@ -301,6 +307,9 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['vls', { name: PFDVars.vls, type: SimVarValueType.Number }],
         ['alphaLim', { name: PFDVars.alphaLim, type: SimVarValueType.Number }],
 
+        ['linearDeviationActive', { name: PFDVars.linearDeviationActive, type: SimVarValueType.Bool }],
+        ['linearDeviation', { name: PFDVars.linearDeviation, type: SimVarValueType.Feet }],
+        ['verticalProfileLatched', { name: PFDVars.verticalProfileLatched, type: SimVarValueType.Bool }],
     ])
 
     /**
