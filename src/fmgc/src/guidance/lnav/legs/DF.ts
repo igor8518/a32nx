@@ -117,10 +117,6 @@ export class DFLeg extends XFLeg {
         return Geo.getGreatCircleBearing(this.start, this.fix.infos.coordinates);
     }
 
-    get distance(): NauticalMiles {
-        return undefined;
-    }
-
     getDistanceToGo(ppos: Coordinates): NauticalMiles {
         return courseToFixDistanceToGo(ppos, this.outboundCourse, this.getPathEndPoint());
     }

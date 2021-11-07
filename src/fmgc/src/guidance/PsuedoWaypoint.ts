@@ -60,8 +60,30 @@ export interface PseudoWaypoint {
     displayedOnMcdu: boolean,
 
     /**
+     * THe MCDU F-PLN page ident, if different
+     */
+    mcduIdent?: string,
+
+    /**
+     * THe MCDU F-PLN page fix annotation, if applicable
+     */
+    mcduHeader?: string,
+
+    /**
      * Waypoint stats for the PWP
      */
     stats: WaypointStats,
 
+    /**
+     * Additional information that is display if the waypoint is displayed on the MCDU (`displayedOnMcdu`)
+     */
+    flightPlanInfo?: PseudoWaypointFlightPlanInfo
+}
+
+export interface PseudoWaypointFlightPlanInfo {
+    distanceFromStart?: NauticalMiles,
+
+    altitude: Feet,
+
+    speed: Knots
 }

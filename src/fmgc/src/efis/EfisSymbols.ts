@@ -281,76 +281,83 @@ export class EfisSymbols {
                 }
             }
 
+            const waypointPredictions = this.guidanceController.vnavDriver.currentGeometryProfile?.computePredictionsAtWaypoints();
+
             // TODO don't send the waypoint before active once FP sequencing is properly implemented
             // (currently sequences with guidance which is too early)
-            {
-                for (let i = activeFp.length - 1; i >= (activeFp.activeWaypointIndex - 1) && i >= 0; i--) {
-                    const wp = activeFp.getWaypoint(i);
+            for (let i = activeFp.length - 1; i >= (activeFp.activeWaypointIndex - 1) && i >= 0; i--) {
+                const wp = activeFp.getWaypoint(i);
 
-                    // Managed by leg idents
-                    const legType = wp.additionalData.legType;
-                    if (legType === LegType.CA || legType === LegType.CI || legType === LegType.VI || legType === LegType.VM) {
-                        continue;
-                    }
-
-                    if (wp.type === 'A') {
-                    // we pick these up later
-                        continue;
-                    }
-                    // if range >= 160, don't include terminal waypoints
-                    if (range >= 160 && wp.icao.match(/^[A-Z][A-Z0-9 ]{2}[A-Z0-9]{4}/) !== null) {
-                        continue;
-                    }
-
-                    if (!withinEditArea(wp.infos.coordinates)) {
-                        continue;
-                    }
-
-                    let type = NdSymbolTypeFlags.FlightPlan;
-                    const constraints = [];
-
-                    if (i === activeFp.activeWaypointIndex) {
-                        type |= NdSymbolTypeFlags.ActiveLegTermination;
-                    }
-
-                    if (wp.legAltitudeDescription !== 0) {
-                    // TODO vnav to predict
-                        type |= NdSymbolTypeFlags.ConstraintUnknown;
-                    }
-
-                    if (efisOption === EfisOption.Constraints) {
-                        const descent = wp.constraintType === WaypointConstraintType.DES;
-                        switch (wp.legAltitudeDescription) {
-                        case 1:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent));
-                            break;
-                        case 2:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '+'));
-                            break;
-                        case 3:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
-                            break;
-                        case 4:
-                            constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
-                            constraints.push(formatConstraintAlt(wp.legAltitude2, descent, '+'));
-                            break;
-                        default:
-                            break;
-                        }
-
-                        if (wp.speedConstraint > 0) {
-                            constraints.push(formatConstraintSpeed(wp.speedConstraint));
-                        }
-                    }
-
-                    upsertSymbol({
-                        databaseId: wp.icao,
-                        ident: wp.ident,
-                        location: wp.infos.coordinates,
-                        type,
-                        constraints: constraints.length > 0 ? constraints : undefined,
-                    });
+                // Managed by leg idents
+                const legType = wp.additionalData.legType;
+                if (legType === LegType.CA || legType === LegType.CI || legType === LegType.VI || legType === LegType.VM) {
+                    continue;
                 }
+
+                if (wp.type === 'A') {
+                    // we pick these up later
+                    continue;
+                }
+                // if range >= 160, don't include terminal waypoints
+                if (range >= 160 && wp.icao.match(/^[A-Z][A-Z0-9 ]{2}[A-Z0-9]{4}/) !== null) {
+                    continue;
+                }
+
+                if (!withinEditArea(wp.infos.coordinates)) {
+                    continue;
+                }
+
+                let type = NdSymbolTypeFlags.FlightPlan;
+                const constraints = [];
+
+                if (i === activeFp.activeWaypointIndex) {
+                    type |= NdSymbolTypeFlags.ActiveLegTermination;
+                }
+
+                if (wp.legAltitudeDescription !== 0) {
+                    const predictionAtWaypoint = waypointPredictions?.get(i);
+
+                    if (!predictionAtWaypoint) {
+                        type |= NdSymbolTypeFlags.ConstraintUnknown;
+                    } else if (predictionAtWaypoint.isAltitudeConstraintMet) {
+                        type |= NdSymbolTypeFlags.ConstraintMet;
+                    } else {
+                        type |= NdSymbolTypeFlags.ConstraintMissed;
+                    }
+                }
+
+                if (efisOption === EfisOption.Constraints) {
+                    const descent = wp.constraintType === WaypointConstraintType.DES;
+                    switch (wp.legAltitudeDescription) {
+                    case 1:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent));
+                        break;
+                    case 2:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '+'));
+                        break;
+                    case 3:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
+                        break;
+                    case 4:
+                        constraints.push(formatConstraintAlt(wp.legAltitude1, descent, '-'));
+                        constraints.push(formatConstraintAlt(wp.legAltitude2, descent, '+'));
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (wp.speedConstraint > 0) {
+                        constraints.push(formatConstraintSpeed(wp.speedConstraint));
+                    }
+                }
+
+                upsertSymbol({
+                    databaseId: wp.icao,
+                    ident: wp.ident,
+                    location: wp.infos.coordinates,
+                    type,
+                    constraints: constraints.length > 0 ? constraints : undefined,
+                });
             }
 
             const airports: [WayPoint, OneWayRunway][] = [

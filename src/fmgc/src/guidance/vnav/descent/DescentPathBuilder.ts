@@ -1,14 +1,16 @@
 import { TheoreticalDescentPathCharacteristics } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
-import { Geometry } from '@fmgc/guidance/Geometry';
-import { DecelPathCharacteristics } from '@fmgc/guidance/vnav/descent/DecelPathBuilder';
+import { GeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/GeometryProfile';
 
-export class DescentBuilder {
-    static computeDescentPath(
-        geometry: Geometry,
-        decelPath: DecelPathCharacteristics,
-    ): TheoreticalDescentPathCharacteristics {
+export class DescentPathBuilder {
+    static computeDescentPath(profile: GeometryProfile): TheoreticalDescentPathCharacteristics {
+        const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);
+
+        if (!decelCheckpoint) {
+            return { tod: undefined };
+        }
+
         const cruiseAlt = SimVar.GetSimVarValue('L:AIRLINER_CRUISE_ALTITUDE', 'number');
-        const verticalDistance = cruiseAlt - decelPath.top;
+        const verticalDistance = cruiseAlt - decelCheckpoint.altitude;
         const fpa = 3;
 
         if (DEBUG) {
@@ -16,11 +18,19 @@ export class DescentBuilder {
             console.log(verticalDistance);
         }
 
-        const tod = decelPath.decel + (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
+        const tod = decelCheckpoint.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
 
         if (DEBUG) {
             console.log(`[FMS/VNAV] T/D: ${tod.toFixed(1)}nm`);
         }
+
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.TopOfDescent,
+            distanceFromStart: tod,
+            speed: 290,
+            // remainingFuelOnBoard: 250,
+            altitude: cruiseAlt,
+        });
 
         return { tod };
 

@@ -357,9 +357,9 @@ const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arc
         showIdent = false;
         elements.push(
             <>
-                <path d="M 0, 0.5 h 15.5 l 12, 12 m -4, 0 l 4, 0 l 0, -4" strokeWidth={1.8} className="shadow" />
+                <path d="M 0, 0 h 15.5 l 12, 12 m -4, 0 l 4, 0 l 0, -4" strokeWidth={1.8} className="shadow" />
 
-                <path d="M 0, 0.5 h 15.5 l 12, 12 m -4, 0 l 4, 0 l 0, -4" strokeWidth={1.5} className="White" />
+                <path d="M 0, 0 h 15.5 l 12, 12 m -4, 0 l 4, 0 l 0, -4" strokeWidth={1.5} className="White" />
             </>,
         );
     } else if (type & (NdSymbolTypeFlags.PwpCdaFlap1)) {
@@ -391,6 +391,47 @@ const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arc
 
                 <text x={1.5} y={2} className="Magenta shadow" strokeWidth={1} textAnchor="middle" dominantBaseline="middle" fontSize={22}>D</text>
             </>,
+        );
+    } else if (type & (NdSymbolTypeFlags.PwpTopOfClimb)) {
+        showIdent = false;
+        elements.push(
+            <g transform="translate(-31.5, 17)">
+                <path d="M 0, 0 l 15.5 -12 l 12, 0 m -4, -4 l 4 4 l -4 4" strokeWidth={1.8} className="shadow" />
+
+                <path d="M 0, 0 l 15.5 -12 l 12, 0 m -4, -4 l 4 4 l -4 4" strokeWidth={1.5} className="Cyan" />
+            </g>,
+        );
+    } else if (type & (NdSymbolTypeFlags.PwpLevelOffForRestriction)) {
+        showIdent = false;
+        elements.push(
+            <>
+                <path d="M -38, 20 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.8} className="shadow" />
+
+                <path d="M -38, 20 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.5} className="Magenta" />
+            </>,
+        );
+    } else if (type & (NdSymbolTypeFlags.PwpContinueClimb)) {
+        showIdent = false;
+        elements.push(
+            <>
+                <path d="M 0, 3 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.8} className="shadow" />
+
+                <path d="M 0, 3 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.5} className="Cyan" />
+            </>,
+        );
+    } else if (type & (NdSymbolTypeFlags.PwpTimeMarker)) {
+        colour = 'Green';
+        showIdent = true;
+        elements.push(
+            <>
+                <circle r={12} className="shadow" strokeWidth={2.5} />
+                <circle r={12} className="Green" strokeWidth={2} />
+            </>,
+        );
+    } else if (type & (NdSymbolTypeFlags.SpeedChange)) {
+        showIdent = false;
+        elements.push(
+            <circle cx={0} cy={0} r={7} className="Magenta Fill" />,
         );
     }
 
