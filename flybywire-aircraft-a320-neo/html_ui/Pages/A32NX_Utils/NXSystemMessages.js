@@ -56,7 +56,8 @@ const NXSystemMessages = {
     waitForSystemResponse:  new McduMessage("WAIT FOR SYSTEM RESPONSE", false, false),
     comUnavailable:         new McduMessage("COM UNAVAILABLE", false, false),
     dcduFileFull:           new McduMessage("DCDU FILE FULL", false, false),
-    systemBusy:             new McduMessage("SYSTEM BUSY-TRY LATER", false, false)
+    systemBusy:             new McduMessage("SYSTEM BUSY-TRY LATER", false, false),
+    stepAboveMaxFl:         new McduMessage("STEP ABOVE MAX FL", false, false),
 };
 
 const NXFictionalMessages = {
