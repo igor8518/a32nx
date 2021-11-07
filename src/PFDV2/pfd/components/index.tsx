@@ -90,6 +90,7 @@ export class PFDComponent extends DisplayComponent<PFDProps> {
                     <VerticalSpeedIndicator bus={this.props.bus} instrument={this.props.instrument} />
                     <HeadingOfftape bus={this.props.bus} failed={this.headingFailed} />
                     <AltitudeIndicatorOfftape bus={this.props.bus} />
+                    {/* <VerticalDeviationIndicator deviation={0} isLatched /> */}
 
                     <MachNumber bus={this.props.bus} />
                     <FMA bus={this.props.bus} />
