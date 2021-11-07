@@ -52,6 +52,12 @@ export enum NdSymbolTypeFlags {
     ActiveFlightPlanVector = 1 << 23,
     CourseReversalLeft = 1 << 24,
     CourseReversalRight = 1 << 25,
+    PwpTopOfClimb = 1 << 26,
+    PwpLevelOffForRestriction = 1 << 27,
+    PwpContinueClimb = 1 << 28,
+    PwpSpeedLimit = 1 << 29, // TODO: Figure out what to do with this. This allows me to put the SPD/LIM in the MCDU, but I might not want to show it on ND.
+    PwpTimeMarker = 1 << 30,
+    PwpStartOfClimb = 1 << 31, // Step climb
 }
 
 export interface NdSymbol {
@@ -68,6 +74,7 @@ export interface NdSymbol {
     constraints?: string[],
     radials?: number[],
     radii?: number[],
+    distanceFromAirplane?: number;
 }
 
 /**

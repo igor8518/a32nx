@@ -52,7 +52,8 @@ const NXSystemMessages = {
     setHoldSpeed:           new McduMessage("SET HOLD SPEED", false, true),
     uplinkInsertInProg:     new McduMessage("UPLINK INSERT IN PROG", false, true),
     vToDisagree:            new McduMessage("V1/VR/V2 DISAGREE", true, true),
-    waitForSystemResponse:  new McduMessage("WAIT FOR SYSTEM RESPONSE", false, false)
+    waitForSystemResponse:  new McduMessage("WAIT FOR SYSTEM RESPONSE", false, false),
+    stepAboveMaxFl:         new McduMessage("STEP ABOVE MAX FL", false, false),
 };
 
 const NXFictionalMessages = {
