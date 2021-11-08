@@ -240,7 +240,7 @@ void AutothrustModelClass::step()
   Autothrust_RateLimiterwithThreshold(look2_binlxpw(Autothrust_U.in.data.TAT_degC, Autothrust_U.in.data.H_ft,
     Autothrust_P.MaximumClimb_bp01Data, Autothrust_P.MaximumClimb_bp02Data, Autothrust_P.MaximumClimb_tableData,
     Autothrust_P.MaximumClimb_maxIndex, 26U) * look1_binlxpw(Autothrust_U.in.data.V_mach,
-    Autothrust_P.ScheduledGain_BreakpointsForDimension1, Autothrust_P.ScheduledGain_Table, 3U),
+    Autothrust_P.ScheduledGain_BreakpointsForDimension1, Autothrust_P.ScheduledGain_Table, 2U),
     Autothrust_P.RateLimiterThresholdVariableTs2_up, Autothrust_P.RateLimiterThresholdVariableTs2_lo,
     Autothrust_U.in.time.dt, Autothrust_P.RateLimiterThresholdVariableTs2_InitialCondition,
     Autothrust_P.RateLimiterThresholdVariableTs2_Threshold, &rtb_y_c, &Autothrust_DWork.sf_RateLimiterwithThreshold_h);

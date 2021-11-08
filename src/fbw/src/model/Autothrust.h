@@ -85,7 +85,7 @@ class AutothrustModelClass {
 
   struct Parameters_Autothrust_T {
     athr_out athr_out_MATLABStruct;
-    real_T ScheduledGain_BreakpointsForDimension1[4];
+    real_T ScheduledGain_BreakpointsForDimension1[3];
     real_T ScheduledGain2_BreakpointsForDimension1[2];
     real_T ScheduledGain1_BreakpointsForDimension1[2];
     real_T ScheduledGain_BreakpointsForDimension1_p[2];
@@ -114,7 +114,7 @@ class AutothrustModelClass {
     real_T DiscreteTimeIntegratorVariableTs1_LowerLimit;
     real_T DiscreteTimeIntegratorVariableTs_LowerLimit_e;
     real_T DiscreteTimeIntegratorVariableTs1_LowerLimit_h;
-    real_T ScheduledGain_Table[4];
+    real_T ScheduledGain_Table[3];
     real_T ScheduledGain2_Table[2];
     real_T ScheduledGain1_Table[2];
     real_T ScheduledGain_Table_b[2];
