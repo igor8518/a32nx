@@ -95,6 +95,9 @@
 1. [ATSU] Import lat/lon waypoints correctly from SimBrief - @tracernz (Mike)
 1. [MCDU] Added manual ILS tuning by ident on RAD NAV page - @tracernz (Mike)
 1. [MCDU] Support manual entry of forward LS course - @tracernz (Mike)
+1. [TCAS] Implemented traffic advisories, resolution advisories, and collision avoidance logic - @wpine215 (Iceman) @2hwk (2Cas#1022)
+1. [PFD] Implemented TCAS guidance on vertical speed tape - @wpine215 (Iceman)
+1. [SOUNDS] Connected TCAS TA/RA logic to TCAS Wwise events - @wpine215 (Iceman)  @2hwk (2Cas#1022)
 
 ## 0.7.0
 
