@@ -107,6 +107,9 @@
 1. [FBW] Improved sideslip controller - @IbrahimK42 (IbrahimK42)
 1. [AP] Further improved ALT CST* and ALT CST conditions - @aguther (Andreas Guther)
 1. [MCDU] Added support for connecting MCDU to external devices - @tyler58546 (tyler58546)
+1. [TCAS] Implemented traffic advisories, resolution advisories, and collision avoidance logic - @wpine215 (Iceman) @2hwk (2Cas#1022)
+1. [PFD] Implemented TCAS guidance on vertical speed tape - @wpine215 (Iceman)
+1. [SOUNDS] Connected TCAS TA/RA logic to TCAS Wwise events - @wpine215 (Iceman)  @2hwk (2Cas#1022)
 
 ## 0.7.0
 
