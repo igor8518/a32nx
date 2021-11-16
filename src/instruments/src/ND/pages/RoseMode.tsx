@@ -14,6 +14,7 @@ import { RadioNeedle } from '../elements/RadioNeedles';
 import { ApproachMessage } from '../elements/ApproachMessage';
 import { CrossTrack } from '../elements/CrossTrack';
 import { TrackLine } from '../elements/TrackLine';
+import { Traffic } from '../elements/Traffic';
 
 export interface RoseModeProps {
     symbols: NdSymbol[],
@@ -77,12 +78,6 @@ export const RoseMode: FC<RoseModeProps> = ({ symbols, adirsAlign, rangeSetting,
         }
         return (
             <>
-                <Overlay
-                    heading={heading}
-                    rangeSetting={rangeSetting}
-                    tcasMode={tcasMode}
-                />
-
                 <g id="map" clipPath="url(#rose-mode-map-clip)">
                     { mode === Mode.ROSE_NAV && (
                         <g visibility={mapHidden ? 'hidden' : 'visible'}>
@@ -109,11 +104,20 @@ export const RoseMode: FC<RoseModeProps> = ({ symbols, adirsAlign, rangeSetting,
                                 || fmaLatMode === LateralMode.TRACK) && !fmaLatArmed) || !flightPlanManager.getCurrentFlightPlan().length) && (
                                 <TrackLine x={384} y={384} heading={heading} track={track} />
                             )}
+                            <g clipPath="url(#rose-mode-tcas-clip)">
+                                <Traffic mode={mode} mapParams={mapParams} />
+                            </g>
                         </g>
                     )}
                     <RadioNeedle index={1} side={side} displayMode={mode} centreHeight={384} />
                     <RadioNeedle index={2} side={side} displayMode={mode} centreHeight={384} />
                 </g>
+
+                <Overlay
+                    heading={heading}
+                    rangeSetting={rangeSetting}
+                    tcasMode={tcasMode}
+                />
 
                 { mode === Mode.ROSE_VOR && <VorCaptureOverlay heading={magHeading} side={side} /> }
 

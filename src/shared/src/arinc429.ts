@@ -1,3 +1,5 @@
+
+/// <reference path="../../../typings/fs-base-ui/html_ui/JS/simvar.d.ts" />
 /* eslint-disable max-classes-per-file */
 type SignStatusMatrixRange = (typeof Arinc429Word.SignStatusMatrix)[keyof typeof Arinc429Word.SignStatusMatrix];
 
@@ -67,7 +69,12 @@ export class Arinc429Word {
     /**
      * Returns the value when normal operation, the supplied default value otherwise.
      */
-    valueOr(defaultValue: number) {
+    valueOr(defaultValue) {
         return this.isNormalOperation() ? this.value : defaultValue;
+    }
+
+    equals(other) {
+        return this === other
+            || (typeof other !== 'undefined' && other !== null && this.value === other.value && this.ssm === other.ssm);
     }
 }

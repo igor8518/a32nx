@@ -26,7 +26,7 @@ export class MapParameters {
         this.nmRadius = nmRadius;
     }
 
-    coordinatesToXYy(coordinates: Coordinates): Xy {
+    coordinatesToXYy(coordinates: Coordinates): [number, number] {
         const bearing = Avionics.Utils.computeGreatCircleHeading(this.centerCoordinates, coordinates) - this.mapUpTrueDeg - 90;
         const distance = Avionics.Utils.computeGreatCircleDistance(this.centerCoordinates, coordinates);
 
