@@ -73,6 +73,7 @@
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 1. [MCDU] Add menu item for automatic init flight, and prepare mcdu - @igor8518 (Igor Milovidov)
+1. [FM] Fetch transition alt and level from SimBrief - @tracernz (Mike)
 
 ## 0.7.0
 
