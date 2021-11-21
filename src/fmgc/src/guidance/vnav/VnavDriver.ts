@@ -21,6 +21,7 @@ export class VnavDriver implements GuidanceComponent {
     constructor(
         private readonly guidanceController: GuidanceController,
     ) {
+        console.log('VNAV Constructor');
     }
 
     init(): void {

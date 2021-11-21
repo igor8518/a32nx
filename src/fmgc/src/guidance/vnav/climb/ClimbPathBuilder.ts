@@ -24,7 +24,7 @@ export class ClimbPathBuilder {
 
         console.log(`mach: ${JSON.stringify(machSrs)}`);
 
-        const zeroFuelWeight = 101853.57;
+        const zeroFuelWeight = 141655.82;
         const fuelWeight = SimVar.GetSimVarValue('FUEL TOTAL QUANTITY WEIGHT', 'lbs');
         console.log(`fuelWeight: ${JSON.stringify(fuelWeight)}`);
 
@@ -47,7 +47,7 @@ export class ClimbPathBuilder {
         console.log(`pathAngleSrs: ${pathAngleSrs}`);
         console.log(`distanceToAccelerationAltitude: ${JSON.stringify(distanceTraveledSrs)}`);
 
-        const cruiseAltitude = 20000;
+        const cruiseAltitude = 36000;
         const climbSpeed = v2 + 10;
 
         const commandedN1Climb = SimVar.GetSimVarValue('L:A32NX_AUTOTHRUST_THRUST_LIMIT', 'Percent') ?? 0;
