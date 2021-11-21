@@ -15,7 +15,13 @@ class A32NX_InitFlight {
 
     async update(_deltaTime) {
         this.time += _deltaTime;
-
+        if (await SimVar.GetSimVarValue("L:A32NX_FMGC_FLIGHT_PHASE", "Number") !== 5) {
+            if (await SimVar.GetSimVarValue("L:A32NX_APPROACH_STATE", "Number") === 1) {
+                A32NX_InitFlight.MCDU.tryGoInApproachPhase();
+            }
+        } else {
+            await SimVar.SetSimVarValue("L:A32NX_APPROACH_STATE", "Number", 1);
+        }
         const initFlightState = await SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number");
 
         if (initFlightState === 20 || initFlightState === 0) {
@@ -133,6 +139,8 @@ class A32NX_InitFlight {
                 A32NX_InitFlight.MCDU.trySetVRSpeed(A32NX_InitFlight.MCDU._getVRSpeed().toString());
                 A32NX_InitFlight.MCDU.scratchpad.setText("SET V2");
                 A32NX_InitFlight.MCDU.trySetV2Speed(A32NX_InitFlight.MCDU._getV2Speed().toString());
+                A32NX_InitFlight.MCDU.scratchpad.setText("SET FLEX");
+                A32NX_InitFlight.MCDU.setPerfTOFlexTemp(59);
                 A32NX_InitFlight.MCDU.scratchpad.setText("INIT DONE");
 
                 const cur = A32NX_InitFlight.MCDU.page.Current;
