@@ -1913,6 +1913,9 @@ void AutopilotLawsModelClass::step()
     AutopilotLaws_DWork.Delay_DSTATE_h2 = rtb_GainTheta;
   }
 
+  AutopilotLaws_Voter1(rtb_Sum_ae, AutopilotLaws_P.Gain_Gain_jx * rtb_GainTheta1, AutopilotLaws_P.VS_Gain_nx * rtb_Tsxlo,
+                       &a);
+  switch (static_cast<int32_T>(rtb_Saturation)) {
    case 0:
     b_R = AutopilotLaws_P.Constant_Value_dh;
 
