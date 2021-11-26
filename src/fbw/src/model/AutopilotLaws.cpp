@@ -1132,16 +1132,16 @@ void AutopilotLawsModelClass::step()
     AutopilotLaws_DWork.wasActive_not_empty_a = true;
   }
 
-  R = AutopilotLaws_U.in.input.H_c_ft - AutopilotLaws_U.in.data.H_ind_ft;
-  if (R < 0.0) {
+  Phi2 = AutopilotLaws_U.in.input.H_c_ft - AutopilotLaws_U.in.data.H_ind_ft;
+  if (Phi2 < 0.0) {
     b_R = -1.0;
-  } else if (R > 0.0) {
+  } else if (Phi2 > 0.0) {
     b_R = 1.0;
   } else {
-    b_R = R;
+    b_R = Phi2;
   }
 
-  b_R = b_R * AutopilotLaws_DWork.dH_offset + R;
+  b_R = b_R * AutopilotLaws_DWork.dH_offset + Phi2;
   if ((!AutopilotLaws_DWork.wasActive_l) && rtb_Compare_o1) {
     AutopilotLaws_DWork.k = AutopilotLaws_U.in.data.H_dot_ft_min / b_R;
     AutopilotLaws_DWork.dH_offset = std::abs(500.0 / std::abs(AutopilotLaws_DWork.k) - 100.0);
@@ -1224,7 +1224,7 @@ void AutopilotLawsModelClass::step()
   if (R > AutopilotLaws_P.Switch_Threshold_l) {
     b_R = AutopilotLaws_P.Constant1_Value;
   } else {
-    b_R = AutopilotLaws_P.Gain5_Gain_g * rtb_Tsxlo;
+    b_R = AutopilotLaws_P.Gain5_Gain_g * rtb_Gain_du;
   }
 
   AutopilotLaws_V_LSSpeedSelection1(AutopilotLaws_U.in.input.V_c_kn, AutopilotLaws_U.in.data.VLS_kn, &rtb_Y_j5);
@@ -1233,7 +1233,7 @@ void AutopilotLawsModelClass::step()
     if (R > AutopilotLaws_P.Switch1_Threshold) {
       b_R = AutopilotLaws_P.Constant_Value_g;
     } else {
-      b_R = AutopilotLaws_P.Gain6_Gain * rtb_Tsxlo;
+      b_R = AutopilotLaws_P.Gain6_Gain * rtb_Gain_du;
     }
 
     if (rtb_Tsxlo >= b_R) {
@@ -1338,11 +1338,11 @@ void AutopilotLawsModelClass::step()
   b_R = (rtb_Tsxlo + b_R) * AutopilotLaws_P.ug_Gain_l;
   rtb_Tsxlo = AutopilotLaws_P.Gain1_Gain_g1 * Vz_Approach;
   b_L = b_R + rtb_Tsxlo;
-  rtb_Tsxlo = (AutopilotLaws_P.Gain1_Gain_ov * b_R + rtb_Tsxlo) * AutopilotLaws_P.Gain_Gain_a2;
+  rtb_Gain_du = (AutopilotLaws_P.Gain1_Gain_ov * b_R + rtb_Tsxlo) * AutopilotLaws_P.Gain_Gain_a2;
   AutopilotLaws_Voter1(AutopilotLaws_U.in.data.VLS_kn, AutopilotLaws_U.in.input.V_c_kn, AutopilotLaws_U.in.data.VMAX_kn,
                        &b_R);
   b_R = (AutopilotLaws_U.in.data.V_ias_kn - b_R) * AutopilotLaws_P.Gain1_Gain_lxw;
-  if ((R > AutopilotLaws_P.CompareToConstant_const_a) && (rtb_Tsxlo < AutopilotLaws_P.CompareToConstant1_const_n) &&
+  if ((Phi2 > AutopilotLaws_P.CompareToConstant_const_a) && (rtb_Gain_du < AutopilotLaws_P.CompareToConstant1_const_n) &&
       (b_R < AutopilotLaws_P.CompareToConstant2_const_b)) {
     b_R = AutopilotLaws_P.Constant_Value_c;
   } else {
@@ -1355,17 +1355,17 @@ void AutopilotLawsModelClass::step()
     if (b_R > rtb_Tsxlo) {
       b_R = rtb_Tsxlo;
     } else {
-      if (R > AutopilotLaws_P.Switch1_Threshold_o) {
-        R = AutopilotLaws_P.Gain1_Gain_lt * rtb_Tsxlo;
-        if (AutopilotLaws_P.Constant2_Value > R) {
-          R = AutopilotLaws_P.Constant2_Value;
+      if (Phi2 > AutopilotLaws_P.Switch1_Threshold_o) {
+        rtb_Gain_du *= AutopilotLaws_P.Gain1_Gain_lt;
+        if (AutopilotLaws_P.Constant2_Value > rtb_Gain_du) {
+          rtb_Gain_du = AutopilotLaws_P.Constant2_Value;
         }
       } else {
-        R = AutopilotLaws_P.Gain6_Gain_l * rtb_Tsxlo;
+        rtb_Gain_du *= AutopilotLaws_P.Gain6_Gain_l;
       }
 
-      if (b_R < R) {
-        b_R = R;
+      if (b_R < rtb_Gain_du) {
+        b_R = rtb_Gain_du;
       }
     }
   }
@@ -1442,7 +1442,7 @@ void AutopilotLawsModelClass::step()
   AutopilotLaws_V_LSSpeedSelection1(AutopilotLaws_U.in.input.V_c_kn, AutopilotLaws_U.in.data.VLS_kn, &rtb_Tsxlo);
   rtb_Tsxlo = (AutopilotLaws_U.in.data.V_ias_kn - rtb_Tsxlo) * AutopilotLaws_P.Gain1_Gain_dvi;
   if (rtb_Tsxlo <= b_R) {
-    if (rtb_Gain1_pj > AutopilotLaws_P.Switch1_Threshold_c) {
+    if (rtb_Cos1_pk > AutopilotLaws_P.Switch1_Threshold_c) {
       b_R = AutopilotLaws_P.Constant_Value_b;
     } else {
       b_R = AutopilotLaws_P.Gain6_Gain_a * rtb_Gain_ar;
@@ -1492,7 +1492,7 @@ void AutopilotLawsModelClass::step()
   rtb_Gain1_pj = b_R + rtb_Tsxlo;
   rtb_Cos1_pk = AutopilotLaws_P.Constant1_Value_d - AutopilotLaws_P.Constant2_Value_k;
   rtb_Tsxlo = (AutopilotLaws_P.Gain1_Gain_ou * b_R + rtb_Tsxlo) * AutopilotLaws_P.Gain_Gain_jg;
-  if (rtb_Gain1_pj > AutopilotLaws_P.Switch_Threshold_a) {
+  if (rtb_Cos1_pk > AutopilotLaws_P.Switch_Threshold_a) {
     b_R = AutopilotLaws_P.Constant1_Value_mi;
   } else {
     b_R = AutopilotLaws_P.Gain5_Gain_gm * rtb_Tsxlo;
@@ -1854,23 +1854,22 @@ void AutopilotLawsModelClass::step()
   b_R = (rtb_Gain_du * AutopilotLaws_P.Gain_Gain_pe + Phi2) * AutopilotLaws_P.Gain1_Gain_f2;
   switch (static_cast<int32_T>(rtb_Saturation)) {
    case 0:
-    Phi2 = AutopilotLaws_P.Constant_Value_dh;
+    R = AutopilotLaws_P.Constant_Value_dh;
     break;
 
    case 1:
-    Phi2 = rtb_Saturation1;
+    R = rtb_Saturation1;
     break;
 
    case 2:
-    Phi2 = L;
     break;
 
    case 3:
-    Phi2 = R;
+    R = b_L;
     break;
 
    case 4:
-    Phi2 = rtb_Gain1_pj;
+    R = rtb_Cos1_pk;
     break;
 
    case 5:
@@ -1918,17 +1917,18 @@ void AutopilotLawsModelClass::step()
   switch (static_cast<int32_T>(rtb_Saturation)) {
    case 0:
     b_R = AutopilotLaws_P.Constant_Value_dh;
+    break;
 
    case 1:
     b_R = AutopilotLaws_P.VS_Gain_n * rtb_Saturation1;
     break;
 
    case 2:
-    b_R = rtb_out_f;
+    b_R = L;
     break;
 
    case 3:
-    b_R = AutopilotLaws_P.Gain_Gain_f * R;
+    b_R = AutopilotLaws_P.Gain_Gain_f * b_L;
     break;
 
    case 4:
@@ -1949,6 +1949,10 @@ void AutopilotLawsModelClass::step()
     } else {
       b_R = (AutopilotLaws_P.Gain3_Gain * rtb_Y_j5 + rtb_Gain5) + AutopilotLaws_P.VS_Gain_e * rtb_Gain_n;
     }
+    break;
+
+   case 8:
+    b_R = a;
     break;
   }
 
