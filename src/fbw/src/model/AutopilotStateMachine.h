@@ -111,6 +111,7 @@ class AutopilotStateMachineModelClass {
     boolean_T nav_gs_deg_not_empty;
     boolean_T prev_FDES_active;
     boolean_T prev_FDES_armed;
+    boolean_T prev_TCAS_active;
     boolean_T eventTime_not_empty;
     boolean_T eventTime_not_empty_k;
     boolean_T eventTime_not_empty_a;
@@ -138,6 +139,7 @@ class AutopilotStateMachineModelClass {
     boolean_T sFINAL_DES;
     boolean_T sDES;
     boolean_T sCLB;
+    boolean_T was_TCAS_active;
     rtDW_LagFilter_AutopilotStateMachine_T sf_LagFilter_h;
     rtDW_WashoutFilter_AutopilotStateMachine_T sf_WashoutFilter_d;
     rtDW_WashoutFilter_AutopilotStateMachine_T sf_WashoutFilter;

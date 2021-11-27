@@ -802,23 +802,23 @@ class A320_Neo_FCU_Heading extends A320_Neo_FCU_Component {
 
     onEvent(_event) {
         if (_event === "HDG_INC_HEADING") {
-            this.selectedValue = (((this.selectedValue + this.getRotationSpeed()) % 360) + 360) % 360;
+            this.selectedValue = ((Math.round(this.selectedValue + this.getRotationSpeed()) % 360) + 360) % 360;
             this.onRotate();
         } else if (_event === "HDG_DEC_HEADING") {
-            this.selectedValue = (((this.selectedValue - this.getRotationSpeed()) % 360) + 360) % 360;
+            this.selectedValue = ((Math.round(this.selectedValue - this.getRotationSpeed()) % 360) + 360) % 360;
             this.onRotate();
         } else if (_event === "HDG_INC_TRACK") {
-            this.selectedValue = (((this.selectedValue + this.getRotationSpeed()) % 360) + 360) % 360;
+            this.selectedValue = ((Math.round(this.selectedValue + this.getRotationSpeed()) % 360) + 360) % 360;
             this.onRotate();
         } else if (_event === "HDG_DEC_TRACK") {
-            this.selectedValue = (((this.selectedValue - this.getRotationSpeed()) % 360) + 360) % 360;
+            this.selectedValue = ((Math.round(this.selectedValue - this.getRotationSpeed()) % 360) + 360) % 360;
             this.onRotate();
         } else if (_event === "HDG_PUSH") {
             this.onPush();
         } else if (_event === "HDG_PULL") {
             this.onPull();
         } else if (_event === "HDG_SET") {
-            this.selectedValue = SimVar.GetSimVarValue("L:A320_Neo_FCU_HDG_SET_DATA", "number") % 360;
+            this.selectedValue = Math.round(SimVar.GetSimVarValue("L:A320_Neo_FCU_HDG_SET_DATA", "number") % 360);
             this.isSelectedValueActive = true;
             this.onRotate();
         }

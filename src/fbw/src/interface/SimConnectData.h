@@ -333,4 +333,6 @@ struct ClientDataLocalVariablesAutothrust {
   double thrust_reduction_altitude_go_around;
   double flight_phase;
   double is_soft_alt_mode_active;
+  double is_TCAS_active;
+  double target_TCAS_RA_rate_fpm;
 };

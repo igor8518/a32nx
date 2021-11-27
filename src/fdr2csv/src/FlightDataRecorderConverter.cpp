@@ -290,8 +290,11 @@ void FlightDataRecorderConverter::writeHeader(ofstream& out, const string& delim
   out << "athr.data_computed.ATHR_push" << delimiter;
   out << "athr.data_computed.ATHR_disabled" << delimiter;
   out << "athr.data_computed.time_since_touchdown" << delimiter;
+  out << "athr.data_computed.alpha_floor_inhibited" << delimiter;
   out << "athr.input.ATHR_push" << delimiter;
   out << "athr.input.ATHR_disconnect" << delimiter;
+  out << "athr.input.is_TCAS_active" << delimiter;
+  out << "athr.input.target_TCAS_RA_rate_fpm" << delimiter;
   out << "athr.input.TLA_1_deg" << delimiter;
   out << "athr.input.TLA_2_deg" << delimiter;
   out << "athr.input.V_c_kn" << delimiter;
@@ -818,8 +821,11 @@ void FlightDataRecorderConverter::writeStruct(ofstream& out,
   out << static_cast<unsigned int>(athr.data_computed.ATHR_push) << delimiter;
   out << static_cast<unsigned int>(athr.data_computed.ATHR_disabled) << delimiter;
   out << athr.data_computed.time_since_touchdown << delimiter;
+  out << static_cast<unsigned int>(athr.data_computed.alpha_floor_inhibited) << delimiter;
   out << static_cast<unsigned int>(athr.input.ATHR_push) << delimiter;
   out << static_cast<unsigned int>(athr.input.ATHR_disconnect) << delimiter;
+  out << static_cast<unsigned int>(athr.input.is_TCAS_active) << delimiter;
+  out << athr.input.target_TCAS_RA_rate_fpm << delimiter;
   out << athr.input.TLA_1_deg << delimiter;
   out << athr.input.TLA_2_deg << delimiter;
   out << athr.input.V_c_kn << delimiter;

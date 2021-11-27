@@ -1105,6 +1105,7 @@ bool FlyByWireInterface::updateAutopilotLaws(double sampleTime) {
           autopilotStateMachineOutput.vertical_mode_armed,
           autopilotStateMachineOutput.mode_reversion_lateral,
           autopilotStateMachineOutput.mode_reversion_vertical,
+          autopilotStateMachineOutput.mode_reversion_vertical_target_fpm,
           autopilotStateMachineOutput.mode_reversion_TRK_FPA,
           autopilotStateMachineOutput.mode_reversion_triple_click,
           autopilotStateMachineOutput.mode_reversion_fma,
@@ -1120,6 +1121,13 @@ bool FlyByWireInterface::updateAutopilotLaws(double sampleTime) {
           autopilotStateMachineOutput.EXPED_mode_active,
           autopilotStateMachineOutput.FD_disconnect,
           autopilotStateMachineOutput.FD_connect,
+          idRadioReceiverLocalizerValid->get(),
+          idRadioReceiverLocalizerDeviation->get(),
+          idRadioReceiverGlideSlopeValid->get(),
+          idRadioReceiverGlideSlopeDeviation->get(),
+          autopilotStateMachineOutput.TCAS_message_disarm,
+          autopilotStateMachineOutput.TCAS_message_RA_inhibit,
+          autopilotStateMachineOutput.TCAS_message_TRK_FPA_deselection,
       };
       simConnectInterface.setClientDataAutopilotStateMachine(clientDataStateMachine);
     }
@@ -1427,6 +1435,8 @@ bool FlyByWireInterface::updateAutothrust(double sampleTime) {
         idFmgcThrustReductionAltitudeGoAround->get(),
         idFmgcFlightPhase->get(),
         autopilotStateMachineOutput.ALT_soft_mode_active,
+        getTcasAdvisoryState() > 1,
+        autopilotStateMachineOutput.H_dot_c_fpm,
     };
     simConnectInterface.setClientDataLocalVariablesAutothrust(ClientDataLocalVariablesAutothrust);
   }
@@ -1498,6 +1508,8 @@ bool FlyByWireInterface::updateAutothrust(double sampleTime) {
     autoThrustInput.in.input.is_air_conditioning_2_active = idAirConditioningPack_2->get();
     autoThrustInput.in.input.FD_active = simData.ap_fd_1_active || simData.ap_fd_2_active;
     autoThrustInput.in.input.ATHR_reset_disable = simConnectInterface.getSimInputThrottles().ATHR_reset_disable == 1;
+    autoThrustInput.in.input.is_TCAS_active = getTcasAdvisoryState() > 1;
+    autoThrustInput.in.input.target_TCAS_RA_rate_fpm = autopilotStateMachineOutput.H_dot_c_fpm;
 
     // step the model -------------------------------------------------------------------------------------------------
     autoThrust.setExternalInputs(&autoThrustInput);
