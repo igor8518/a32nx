@@ -146,6 +146,7 @@ struct ap_raw_sm_input
   real_T FM_H_dot_c_fpm;
   boolean_T FM_rnav_appr_selected;
   boolean_T FM_final_des_can_engage;
+  boolean_T TCAS_mode_fail;
   boolean_T TCAS_mode_available;
   real_T TCAS_advisory_state;
   real_T TCAS_advisory_target_min_fpm;

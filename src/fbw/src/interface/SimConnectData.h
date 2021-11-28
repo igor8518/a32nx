@@ -301,6 +301,7 @@ struct ClientDataLocalVariables {
   unsigned long long flightManagement_final_can_engage;
   double is_SPEED_managed;
   double locPhiCommand;
+  unsigned long long TCAS_mode_fail;
   unsigned long long TCAS_mode_available;
   double TCAS_advisory_state;
   double TCAS_advisory_target_min_fpm;

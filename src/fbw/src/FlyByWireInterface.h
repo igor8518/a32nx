@@ -177,6 +177,7 @@ class FlyByWireInterface {
   std::unique_ptr<LocalVariable> idFmRnavAppSelected;
   std::unique_ptr<LocalVariable> idFmFinalCanEngage;
 
+  std::unique_ptr<LocalVariable> idTcasFault;
   std::unique_ptr<LocalVariable> idTcasMode;
   std::unique_ptr<LocalVariable> idTcasTaOnly;
   std::unique_ptr<LocalVariable> idTcasState;

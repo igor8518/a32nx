@@ -306,26 +306,26 @@ class AutopilotStateMachineModelClass {
   void AutopilotStateMachine_updateTcasTargetVerticalSpeed(boolean_T isEntry);
   void AutopilotStateMachine_TCAS_during(void);
   void AutopilotStateMachine_TCAS_exit(void);
+  void AutopilotStateMachine_OFF_entry_o(void);
+  void AutopilotStateMachine_DES_entry(void);
+  void AutopilotStateMachine_CLB_entry(void);
+  void AutopilotStateMachine_OP_CLB_entry(void);
+  void AutopilotStateMachine_OP_DES_entry(void);
   void AutopilotStateMachine_FINAL_DES_entry(void);
   void AutopilotStateMachine_GS_CPT_entry(void);
-  void AutopilotStateMachine_OFF_entry_o(void);
   void AutopilotStateMachine_TCAS_TO_VS_Action(void);
   void AutopilotStateMachine_VS_entry(void);
   void AutopilotStateMachine_ALT_CPT_entry(void);
   void AutopilotStateMachine_ALT_entry(void);
+  void AutopilotStateMachine_TCAS(void);
   boolean_T AutopilotStateMachine_X_TO_TCAS(void);
-  boolean_T AutopilotStateMachine_X_TO_TCAS_Man(void);
   boolean_T AutopilotStateMachine_X_TO_SRS_GA(void);
   void AutopilotStateMachine_OFF_during(void);
   void AutopilotStateMachine_SRS_GA_entry(void);
   void AutopilotStateMachine_X_TO_TCAS_Action(void);
   void AutopilotStateMachine_TCAS_entry(void);
-  void AutopilotStateMachine_DES_entry(void);
-  void AutopilotStateMachine_CLB_entry(void);
   void AutopilotStateMachine_SRS_entry(void);
   void AutopilotStateMachine_VS_during(void);
-  void AutopilotStateMachine_OP_CLB_entry(void);
-  void AutopilotStateMachine_OP_DES_entry(void);
   void AutopilotStateMachine_VS(void);
   void AutopilotStateMachine_ALT_during(void);
   void AutopilotStateMachine_ALT_exit(void);
@@ -359,7 +359,6 @@ class AutopilotStateMachineModelClass {
   void AutopilotStateMachine_exit_internal_ON(void);
   void AutopilotStateMachine_ON_g(void);
   void AutopilotStateMachine_SRS_GA_during(void);
-  void AutopilotStateMachine_SRS_GA(void);
 };
 
 #endif

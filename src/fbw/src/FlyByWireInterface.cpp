@@ -303,6 +303,7 @@ void FlyByWireInterface::setupLocalVariables() {
   idFmRnavAppSelected = make_unique<LocalVariable>("A32NX_FG_RNAV_APP_SELECTED");
   idFmFinalCanEngage = make_unique<LocalVariable>("A32NX_FG_FINAL_CAN_ENGAGE");
 
+  idTcasFault = make_unique<LocalVariable>("A32NX_TCAS_FAULT");
   idTcasMode = make_unique<LocalVariable>("A32NX_TCAS_MODE");
   idTcasTaOnly = make_unique<LocalVariable>("A32NX_TCAS_TA_ONLY");
   idTcasState = make_unique<LocalVariable>("A32NX_TCAS_STATE");
@@ -483,7 +484,8 @@ bool FlyByWireInterface::readDataAndLocalVariables(double sampleTime) {
                                                          static_cast<unsigned long long>(idFmFinalCanEngage->get()),
                                                          simData.speed_slot_index == 2,
                                                          autopilotLawsOutput.Phi_loc_c,
-                                                         getTcasModeAvailable(),
+                                                         static_cast<unsigned long long>(idTcasFault->get()),
+                                                         static_cast<unsigned long long>(getTcasModeAvailable()),
                                                          getTcasAdvisoryState(),
                                                          idTcasTargetGreenMin->get(),
                                                          idTcasTargetGreenMax->get()};
