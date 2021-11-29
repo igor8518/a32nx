@@ -169,6 +169,7 @@
 1. [SOUNDS] Add rain sounds in cockpit - @Mico975 (Mico)
 1. [SOUNDS] Add passenger announcements and ambience - @hotshotp (Boris)
 1. [EFB] Added setting for colored METAR in EFB weather widget - @frankkopp (Frank Kopp)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
