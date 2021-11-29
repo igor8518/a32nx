@@ -247,6 +247,7 @@
 1. [RMP] Fixed colour of SEL indicator - @tracernz (Mike)
 1. [MISC] Added custom Autobrake event for SimConnect - @aguther (Andreas Guther)
 1. [EFB] Presets for Lighting and Aircraft states - @frankkopp (Frank Kopp)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
