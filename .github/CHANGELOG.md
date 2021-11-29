@@ -141,6 +141,7 @@
 1. [SOUNDS] Connected TCAS TA/RA logic to TCAS Wwise events - @wpine215 (Iceman)  @2hwk (2Cas#1022)
 1. [HYD] Aileron hydraulic control (only visual and hydraulics) - @Crocket63
 1. [HYD] Elevator hydraulic control (only visual and hydraulics) - @Crocket63
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
