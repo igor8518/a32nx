@@ -170,6 +170,7 @@
 1. [SOUNDS] Add passenger announcements and ambience - @hotshotp (Boris)
 1. [EFB] Added setting for colored METAR in EFB weather widget - @frankkopp (Frank Kopp)
 1. [MCDU] Improved Remote MCDU with CLR hold and light-dark mode - @frankkopp (Frank Kopp)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
