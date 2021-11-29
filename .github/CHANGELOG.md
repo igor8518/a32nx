@@ -229,6 +229,7 @@
 1. [EIS] Implement display switching - @tracernz (Mike)
 1. [HYD] Removed ground spoiler group until animations are modified - @Crocket63
 1. [EFB] Presets for Lighting and Aircraft states - @frankkopp (Frank Kopp)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
