@@ -161,6 +161,7 @@
 1. [DUs] Override MSFS menu animation setting for display units - @tracernz (Mike)
 1. [FLIGHTMODEL] Flight model improvements - @donstim (donbikes#4084)
 1. [SPEEDS] Fix GS mini not being limited by VFE-5 in CONF FULL -  @donstim (donbikes#4084)
+1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 
 ## 0.7.0
 
