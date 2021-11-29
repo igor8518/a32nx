@@ -1,0 +1,1439 @@
+{
+	"accessors": [
+		{
+			"bufferView": 1,
+			"byteOffset": 28,
+			"componentType": 5123,
+			"count": 64496,
+			"type": "VEC4",
+			"name": "SALON_A320_4_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 16,
+			"componentType": 5120,
+			"count": 64496,
+			"type": "VEC4",
+			"name": "SALON_A320_4_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"componentType": 5126,
+			"count": 64496,
+			"min": [
+				-1.9091947078704835,
+				-1.8299922943115235,
+				6.042854309082031
+			],
+			"max": [
+				1.9091947078704835,
+				0.5192043781280518,
+				13.902942657470704
+			],
+			"type": "VEC3",
+			"name": "SALON_A320_4_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 12,
+			"componentType": 5120,
+			"count": 64496,
+			"type": "VEC4",
+			"name": "SALON_A320_4_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 20,
+			"componentType": 5122,
+			"count": 64496,
+			"type": "VEC2",
+			"name": "SALON_A320_4_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 24,
+			"componentType": 5122,
+			"count": 64496,
+			"type": "VEC2",
+			"name": "SALON_A320_4_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"componentType": 5123,
+			"count": 119724,
+			"type": "SCALAR",
+			"name": "SALON_A320_4_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2321884,
+			"componentType": 5123,
+			"count": 16552,
+			"type": "VEC4",
+			"name": "Glasses_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2321872,
+			"componentType": 5120,
+			"count": 16552,
+			"type": "VEC4",
+			"name": "Glasses_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2321856,
+			"componentType": 5126,
+			"count": 16552,
+			"min": [
+				-21.541141510009767,
+				-0.044902682304382327,
+				-0.1646515130996704
+			],
+			"max": [
+				0.09436893463134766,
+				3.884666919708252,
+				0.15346278250217439
+			],
+			"type": "VEC3",
+			"name": "Glasses_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2321868,
+			"componentType": 5120,
+			"count": 16552,
+			"type": "VEC4",
+			"name": "Glasses_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2321876,
+			"componentType": 5122,
+			"count": 16552,
+			"type": "VEC2",
+			"name": "Glasses_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2321880,
+			"componentType": 5122,
+			"count": 16552,
+			"type": "VEC2",
+			"name": "Glasses_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 239448,
+			"componentType": 5123,
+			"count": 39360,
+			"type": "SCALAR",
+			"name": "Glasses_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2917756,
+			"componentType": 5123,
+			"count": 40759,
+			"type": "VEC4",
+			"name": "HublotsAll_5_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2917744,
+			"componentType": 5120,
+			"count": 40759,
+			"type": "VEC4",
+			"name": "HublotsAll_5_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2917728,
+			"componentType": 5126,
+			"count": 40759,
+			"min": [
+				-11.875550270080567,
+				-18.611160278320314,
+				-20.093992233276368
+			],
+			"max": [
+				397.4595947265625,
+				57.319313049316409,
+				232.673095703125
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_5_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2917740,
+			"componentType": 5120,
+			"count": 40759,
+			"type": "VEC4",
+			"name": "HublotsAll_5_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2917748,
+			"componentType": 5122,
+			"count": 40759,
+			"type": "VEC2",
+			"name": "HublotsAll_5_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 2917752,
+			"componentType": 5122,
+			"count": 40759,
+			"type": "VEC2",
+			"name": "HublotsAll_5_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 318168,
+			"componentType": 5123,
+			"count": 140040,
+			"type": "SCALAR",
+			"name": "HublotsAll_5_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 4385080,
+			"componentType": 5123,
+			"count": 52233,
+			"type": "VEC4",
+			"name": "SALON_A320_1_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 4385068,
+			"componentType": 5120,
+			"count": 52233,
+			"type": "VEC4",
+			"name": "SALON_A320_1_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 4385052,
+			"componentType": 5126,
+			"count": 52233,
+			"min": [
+				-1.9624937772750855,
+				-1.8266998529434205,
+				-6.957145690917969
+			],
+			"max": [
+				1.9624937772750855,
+				0.5791988372802734,
+				-1.3516464233398438
+			],
+			"type": "VEC3",
+			"name": "SALON_A320_1_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 4385064,
+			"componentType": 5120,
+			"count": 52233,
+			"type": "VEC4",
+			"name": "SALON_A320_1_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 4385072,
+			"componentType": 5122,
+			"count": 52233,
+			"type": "VEC2",
+			"name": "SALON_A320_1_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 4385076,
+			"componentType": 5122,
+			"count": 52233,
+			"type": "VEC2",
+			"name": "SALON_A320_1_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 598248,
+			"componentType": 5123,
+			"count": 101016,
+			"type": "SCALAR",
+			"name": "SALON_A320_1_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 6265468,
+			"componentType": 5123,
+			"count": 38757,
+			"type": "VEC4",
+			"name": "SALON_A320_3_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 6265456,
+			"componentType": 5120,
+			"count": 38757,
+			"type": "VEC4",
+			"name": "SALON_A320_3_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 6265440,
+			"componentType": 5126,
+			"count": 38757,
+			"min": [
+				-1.9091947078704835,
+				-1.8266998529434205,
+				2.5784530639648439
+			],
+			"max": [
+				1.9091947078704835,
+				0.35039520263671877,
+				6.241844177246094
+			],
+			"type": "VEC3",
+			"name": "SALON_A320_3_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 6265452,
+			"componentType": 5120,
+			"count": 38757,
+			"type": "VEC4",
+			"name": "SALON_A320_3_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 6265460,
+			"componentType": 5122,
+			"count": 38757,
+			"type": "VEC2",
+			"name": "SALON_A320_3_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 6265464,
+			"componentType": 5122,
+			"count": 38757,
+			"type": "VEC2",
+			"name": "SALON_A320_3_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 800280,
+			"componentType": 5123,
+			"count": 75840,
+			"type": "SCALAR",
+			"name": "SALON_A320_3_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 7660720,
+			"componentType": 5123,
+			"count": 55339,
+			"type": "VEC4",
+			"name": "HublotsAll_0_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 7660708,
+			"componentType": 5120,
+			"count": 55339,
+			"type": "VEC4",
+			"name": "HublotsAll_0_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 7660692,
+			"componentType": 5126,
+			"count": 55339,
+			"min": [
+				-9.311081886291504,
+				-18.945953369140626,
+				1879.5711669921876
+			],
+			"max": [
+				394.9736328125,
+				57.094993591308597,
+				2242.821533203125
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_0_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 7660704,
+			"componentType": 5120,
+			"count": 55339,
+			"type": "VEC4",
+			"name": "HublotsAll_0_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 7660712,
+			"componentType": 5122,
+			"count": 55339,
+			"type": "VEC2",
+			"name": "HublotsAll_0_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 7660716,
+			"componentType": 5122,
+			"count": 55339,
+			"type": "VEC2",
+			"name": "HublotsAll_0_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 951960,
+			"componentType": 5123,
+			"count": 196056,
+			"type": "SCALAR",
+			"name": "HublotsAll_0_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 9652924,
+			"componentType": 5123,
+			"count": 55388,
+			"type": "VEC4",
+			"name": "HublotsAll_1_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 9652912,
+			"componentType": 5120,
+			"count": 55388,
+			"type": "VEC4",
+			"name": "HublotsAll_1_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 9652896,
+			"componentType": 5126,
+			"count": 55388,
+			"min": [
+				-10.073334693908692,
+				-18.109832763671876,
+				1490.3704833984376
+			],
+			"max": [
+				395.70697021484377,
+				57.775123596191409,
+				1855.2978515625
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_1_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 9652908,
+			"componentType": 5120,
+			"count": 55388,
+			"type": "VEC4",
+			"name": "HublotsAll_1_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 9652916,
+			"componentType": 5122,
+			"count": 55388,
+			"type": "VEC2",
+			"name": "HublotsAll_1_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 9652920,
+			"componentType": 5122,
+			"count": 55388,
+			"type": "VEC2",
+			"name": "HublotsAll_1_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 1344072,
+			"componentType": 5123,
+			"count": 196056,
+			"type": "SCALAR",
+			"name": "HublotsAll_1_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11646892,
+			"componentType": 5123,
+			"count": 55315,
+			"type": "VEC4",
+			"name": "HublotsAll_2_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11646880,
+			"componentType": 5120,
+			"count": 55315,
+			"type": "VEC4",
+			"name": "HublotsAll_2_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11646864,
+			"componentType": 5126,
+			"count": 55315,
+			"min": [
+				-10.779633522033692,
+				-17.560348510742189,
+				1032.6519775390626
+			],
+			"max": [
+				396.3890075683594,
+				58.07245635986328,
+				1466.0858154296876
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_2_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11646876,
+			"componentType": 5120,
+			"count": 55315,
+			"type": "VEC4",
+			"name": "HublotsAll_2_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11646884,
+			"componentType": 5122,
+			"count": 55315,
+			"type": "VEC2",
+			"name": "HublotsAll_2_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 11646888,
+			"componentType": 5122,
+			"count": 55315,
+			"type": "VEC2",
+			"name": "HublotsAll_2_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 1736184,
+			"componentType": 5123,
+			"count": 196056,
+			"type": "SCALAR",
+			"name": "HublotsAll_2_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 13638232,
+			"componentType": 5123,
+			"count": 55271,
+			"type": "VEC4",
+			"name": "HublotsAll_3_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 13638220,
+			"componentType": 5120,
+			"count": 55271,
+			"type": "VEC4",
+			"name": "HublotsAll_3_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 13638204,
+			"componentType": 5126,
+			"count": 55271,
+			"min": [
+				-11.224884986877442,
+				-17.434356689453126,
+				644.869873046875
+			],
+			"max": [
+				396.81787109375,
+				58.07617950439453,
+				1008.35205078125
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_3_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 13638216,
+			"componentType": 5120,
+			"count": 55271,
+			"type": "VEC4",
+			"name": "HublotsAll_3_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 13638224,
+			"componentType": 5122,
+			"count": 55271,
+			"type": "VEC2",
+			"name": "HublotsAll_3_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 13638228,
+			"componentType": 5122,
+			"count": 55271,
+			"type": "VEC2",
+			"name": "HublotsAll_3_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 2128296,
+			"componentType": 5123,
+			"count": 196056,
+			"type": "SCALAR",
+			"name": "HublotsAll_3_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 15627988,
+			"componentType": 5123,
+			"count": 56466,
+			"type": "VEC4",
+			"name": "HublotsAll_4_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 15627976,
+			"componentType": 5120,
+			"count": 56466,
+			"type": "VEC4",
+			"name": "HublotsAll_4_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 15627960,
+			"componentType": 5126,
+			"count": 56466,
+			"min": [
+				-11.528992652893067,
+				-17.965560913085939,
+				257.0035400390625
+			],
+			"max": [
+				397.112548828125,
+				57.886558532714847,
+				620.5543823242188
+			],
+			"type": "VEC3",
+			"name": "HublotsAll_4_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 15627972,
+			"componentType": 5120,
+			"count": 56466,
+			"type": "VEC4",
+			"name": "HublotsAll_4_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 15627980,
+			"componentType": 5122,
+			"count": 56466,
+			"type": "VEC2",
+			"name": "HublotsAll_4_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 15627984,
+			"componentType": 5122,
+			"count": 56466,
+			"type": "VEC2",
+			"name": "HublotsAll_4_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 2520408,
+			"componentType": 5123,
+			"count": 196056,
+			"type": "SCALAR",
+			"name": "HublotsAll_4_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 17660764,
+			"componentType": 5123,
+			"count": 34023,
+			"type": "VEC4",
+			"name": "SALON_A320_0_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 17660752,
+			"componentType": 5120,
+			"count": 34023,
+			"type": "VEC4",
+			"name": "SALON_A320_0_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 17660736,
+			"componentType": 5126,
+			"count": 34023,
+			"min": [
+				-1.948197603225708,
+				-1.8232985734939576,
+				-13.22335147857666
+			],
+			"max": [
+				1.9481940269470215,
+				0.46779346466064455,
+				11.037544250488282
+			],
+			"type": "VEC3",
+			"name": "SALON_A320_0_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 17660748,
+			"componentType": 5120,
+			"count": 34023,
+			"type": "VEC4",
+			"name": "SALON_A320_0_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 17660756,
+			"componentType": 5122,
+			"count": 34023,
+			"type": "VEC2",
+			"name": "SALON_A320_0_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 17660760,
+			"componentType": 5122,
+			"count": 34023,
+			"type": "VEC2",
+			"name": "SALON_A320_0_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 2912520,
+			"componentType": 5123,
+			"count": 62646,
+			"type": "SCALAR",
+			"name": "SALON_A320_0_indices#0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 18885592,
+			"componentType": 5123,
+			"count": 42365,
+			"type": "VEC4",
+			"name": "SALON_A320_2_vertices#0_COLOR_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 18885580,
+			"componentType": 5120,
+			"count": 42365,
+			"type": "VEC4",
+			"name": "SALON_A320_2_vertices#0_NORMAL"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 18885564,
+			"componentType": 5126,
+			"count": 42365,
+			"min": [
+				-1.9624937772750855,
+				-1.8266998529434205,
+				-1.5163497924804688
+			],
+			"max": [
+				1.9624937772750855,
+				0.35039520263671877,
+				2.8617477416992189
+			],
+			"type": "VEC3",
+			"name": "SALON_A320_2_vertices#0_POSITION"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 18885576,
+			"componentType": 5120,
+			"count": 42365,
+			"type": "VEC4",
+			"name": "SALON_A320_2_vertices#0_TANGENT"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 18885584,
+			"componentType": 5122,
+			"count": 42365,
+			"type": "VEC2",
+			"name": "SALON_A320_2_vertices#0_TEXCOORD_0"
+		},
+		{
+			"bufferView": 1,
+			"byteOffset": 18885588,
+			"componentType": 5122,
+			"count": 42365,
+			"type": "VEC2",
+			"name": "SALON_A320_2_vertices#0_TEXCOORD_1"
+		},
+		{
+			"bufferView": 0,
+			"byteOffset": 3037812,
+			"componentType": 5123,
+			"count": 82386,
+			"type": "SCALAR",
+			"name": "SALON_A320_2_indices#0"
+		}
+	],
+	"asset": {
+		"generator": "Khronos glTF Blender I/O v1.7.5",
+		"version": "2.0",
+		"extensions": {
+			"ASOBO_normal_map_convention": {
+				"tangent_space_convention": "DirectX"
+			},
+			"ASOBO_asset_optimized": {
+				"BoundingBoxMax": [
+					397.4595947265625,
+					58.07617950439453,
+					2242.821533203125
+				],
+				"BoundingBoxMin": [
+					-21.541141510009767,
+					-18.945953369140626,
+					-20.093992233276368
+				],
+				"MajorVersion": 4,
+				"MinorVersion": 2
+			}
+		}
+	},
+	"bufferViews": [
+		{
+			"buffer": 0,
+			"byteLength": 3202584,
+			"byteOffset": 0,
+			"target": 34963,
+			"name": "BufferViewIndex"
+		},
+		{
+			"buffer": 0,
+			"byteLength": 20410704,
+			"byteStride": 36,
+			"byteOffset": 3202584,
+			"target": 34962,
+			"name": "BufferViewVertexND"
+		}
+	],
+	"extensionsUsed": [
+		"MSFT_texture_dds",
+		"ASOBO_asset_optimized",
+		"ASOBO_normal_map_convention"
+	],
+	"extensionsRequired": [
+		"MSFT_texture_dds"
+	],
+	"meshes": [
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 0,
+						"NORMAL": 1,
+						"POSITION": 2,
+						"TANGENT": 3,
+						"TEXCOORD_0": 4,
+						"TEXCOORD_1": 5
+					},
+					"indices": 6,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 39908,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "SALON_A320_4"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 7,
+						"NORMAL": 8,
+						"POSITION": 9,
+						"TANGENT": 10,
+						"TEXCOORD_0": 11,
+						"TEXCOORD_1": 12
+					},
+					"indices": 13,
+					"material": "WINDSHIELD",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 13120,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "Glasses"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 14,
+						"NORMAL": 15,
+						"POSITION": 16,
+						"TANGENT": 17,
+						"TEXCOORD_0": 18,
+						"TEXCOORD_1": 19
+					},
+					"indices": 20,
+					"material": "HublotIn",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 46680,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll_5"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 21,
+						"NORMAL": 22,
+						"POSITION": 23,
+						"TANGENT": 24,
+						"TEXCOORD_0": 25,
+						"TEXCOORD_1": 26
+					},
+					"indices": 27,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 33672,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "SALON_A320_1"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 28,
+						"NORMAL": 29,
+						"POSITION": 30,
+						"TANGENT": 31,
+						"TEXCOORD_0": 32,
+						"TEXCOORD_1": 33
+					},
+					"indices": 34,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 25280,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "SALON_A320_3"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 35,
+						"NORMAL": 36,
+						"POSITION": 37,
+						"TANGENT": 38,
+						"TEXCOORD_0": 39,
+						"TEXCOORD_1": 40
+					},
+					"indices": 41,
+					"material": "HublotIn",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 65352,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll_0"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 42,
+						"NORMAL": 43,
+						"POSITION": 44,
+						"TANGENT": 45,
+						"TEXCOORD_0": 46,
+						"TEXCOORD_1": 47
+					},
+					"indices": 48,
+					"material": "HublotIn",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 65352,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll_1"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 49,
+						"NORMAL": 50,
+						"POSITION": 51,
+						"TANGENT": 52,
+						"TEXCOORD_0": 53,
+						"TEXCOORD_1": 54
+					},
+					"indices": 55,
+					"material": "HublotIn",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 65352,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll_2"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 56,
+						"NORMAL": 57,
+						"POSITION": 58,
+						"TANGENT": 59,
+						"TEXCOORD_0": 60,
+						"TEXCOORD_1": 61
+					},
+					"indices": 62,
+					"material": "HublotIn",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 65352,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll_3"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 63,
+						"NORMAL": 64,
+						"POSITION": 65,
+						"TANGENT": 66,
+						"TEXCOORD_0": 67,
+						"TEXCOORD_1": 68
+					},
+					"indices": 69,
+					"material": "HublotIn",
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 65352,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "HublotsAll_4"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 70,
+						"NORMAL": 71,
+						"POSITION": 72,
+						"TANGENT": 73,
+						"TEXCOORD_0": 74,
+						"TEXCOORD_1": 75
+					},
+					"indices": 76,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 20882,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "SALON_A320_0"
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"COLOR_0": 77,
+						"NORMAL": 78,
+						"POSITION": 79,
+						"TANGENT": 80,
+						"TEXCOORD_0": 81,
+						"TEXCOORD_1": 82
+					},
+					"indices": 83,
+					"material": 0,
+					"mode": 4,
+					"extras": {
+						"ASOBO_primitive": {
+							"PrimitiveCount": 27462,
+							"VertexType": "VTX",
+							"VertexVersion": 2
+						}
+					}
+				}
+			],
+			"name": "SALON_A320_2"
+		}
+	],
+	"nodes": [
+		{
+			"translation": [
+				0,
+				2.8223018646240236,
+				-3.4795830249786379
+			],
+			"rotation": [
+				0,
+				-0.9999985098838806,
+				-0.001723765511997044,
+				-7.549779468263296e-8
+			],
+			"scale": [
+				0.9990000128746033,
+				0.9990000128746033,
+				0.9990000128746033
+			],
+			"mesh": 0,
+			"name": "SALON_A320_4"
+		},
+		{
+			"translation": [
+				-1.9198652505874634,
+				2.0445668697357179,
+				-14.064969062805176
+			],
+			"rotation": [
+				-0.5008631944656372,
+				-0.500863254070282,
+				0.49913549423217776,
+				-0.49913519620895388
+			],
+			"scale": [
+				0.9989994168281555,
+				1,
+				1
+			],
+			"mesh": 1,
+			"name": "Glasses"
+		},
+		{
+			"translation": [
+				-1.8516881465911866,
+				1.9833831787109376,
+				-14.021504402160645
+			],
+			"rotation": [
+				0.0017296640435233713,
+				-0.000007547139830421656,
+				-0.004363305401057005,
+				0.9999890327453613
+			],
+			"scale": [
+				0.00960948783904314,
+				0.009609484113752842,
+				0.00959987472742796
+			],
+			"mesh": 2,
+			"name": "HublotsAll_5"
+		},
+		{
+			"translation": [
+				0,
+				2.8223018646240236,
+				-3.4795830249786379
+			],
+			"rotation": [
+				0,
+				-0.9999985098838806,
+				-0.001723765511997044,
+				-7.549779468263296e-8
+			],
+			"scale": [
+				0.9990000128746033,
+				0.9990000128746033,
+				0.9990000128746033
+			],
+			"mesh": 3,
+			"name": "SALON_A320_1"
+		},
+		{
+			"translation": [
+				0,
+				2.8223018646240236,
+				-3.4795830249786379
+			],
+			"rotation": [
+				0,
+				-0.9999985098838806,
+				-0.001723765511997044,
+				-7.549779468263296e-8
+			],
+			"scale": [
+				0.9990000128746033,
+				0.9990000128746033,
+				0.9990000128746033
+			],
+			"mesh": 4,
+			"name": "SALON_A320_3"
+		},
+		{
+			"translation": [
+				-1.8516881465911866,
+				1.9833831787109376,
+				-14.021504402160645
+			],
+			"rotation": [
+				0.0017296638106927276,
+				-0.000007547136192442849,
+				-0.004363305866718292,
+				0.9999890327453613
+			],
+			"scale": [
+				0.00960948783904314,
+				0.009609484113752842,
+				0.009599875658750534
+			],
+			"mesh": 5,
+			"name": "HublotsAll_0"
+		},
+		{
+			"translation": [
+				-1.8516881465911866,
+				1.9833831787109376,
+				-14.021504402160645
+			],
+			"rotation": [
+				0.0017296638106927276,
+				-0.000007547136192442849,
+				-0.004363305866718292,
+				0.9999890327453613
+			],
+			"scale": [
+				0.00960948783904314,
+				0.009609484113752842,
+				0.009599875658750534
+			],
+			"mesh": 6,
+			"name": "HublotsAll_1"
+		},
+		{
+			"translation": [
+				-1.8516881465911866,
+				1.9833831787109376,
+				-14.021504402160645
+			],
+			"rotation": [
+				0.0017296638106927276,
+				-0.000007547136192442849,
+				-0.004363305866718292,
+				0.9999890327453613
+			],
+			"scale": [
+				0.00960948783904314,
+				0.009609484113752842,
+				0.009599875658750534
+			],
+			"mesh": 7,
+			"name": "HublotsAll_2"
+		},
+		{
+			"translation": [
+				-1.8516881465911866,
+				1.9833831787109376,
+				-14.021504402160645
+			],
+			"rotation": [
+				0.0017296638106927276,
+				-0.000007547136192442849,
+				-0.004363305866718292,
+				0.9999890327453613
+			],
+			"scale": [
+				0.00960948783904314,
+				0.009609484113752842,
+				0.009599875658750534
+			],
+			"mesh": 8,
+			"name": "HublotsAll_3"
+		},
+		{
+			"translation": [
+				-1.8516881465911866,
+				1.9833831787109376,
+				-14.021504402160645
+			],
+			"rotation": [
+				0.0017296638106927276,
+				-0.000007547136192442849,
+				-0.004363305866718292,
+				0.9999890327453613
+			],
+			"scale": [
+				0.00960948783904314,
+				0.009609484113752842,
+				0.009599875658750534
+			],
+			"mesh": 9,
+			"name": "HublotsAll_4"
+		},
+		{
+			"translation": [
+				0,
+				2.8223018646240236,
+				-3.4795830249786379
+			],
+			"rotation": [
+				0,
+				-0.9999985098838806,
+				-0.001723765511997044,
+				-7.549779468263296e-8
+			],
+			"scale": [
+				0.9990000128746033,
+				0.9990000128746033,
+				0.9990000128746033
+			],
+			"mesh": 10,
+			"name": "SALON_A320_0"
+		},
+		{
+			"translation": [
+				0,
+				2.8223018646240236,
+				-3.4795830249786379
+			],
+			"rotation": [
+				0,
+				-0.9999985098838806,
+				-0.001723765511997044,
+				-7.549779468263296e-8
+			],
+			"scale": [
+				0.9990000128746033,
+				0.9990000128746033,
+				0.9990000128746033
+			],
+			"mesh": 11,
+			"name": "SALON_A320_2"
+		}
+	],
+	"scene": 0,
+	"scenes": [
+		{
+			"name": "Scene",
+			"nodes": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11
+			]
+		}
+	],
+	"buffers": [
+		{
+			"byteLength": 23613288,
+			"uri": "salon2.bin"
+		}
+	],
+	"materials": [
+		{
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 0
+				},
+				"metallicFactor": 0,
+				"roughnessFactor": 0.8
+			},
+			"name": "INTERIOR"
+		}
+	],
+	"textures": [
+		{
+			"extensions": {
+				"MSFT_texture_dds": {
+					"source": 0
+				}
+			}
+		}
+	],
+	"images": [
+		{
+			"uri": "SALON.PNG.DDS",
+			"extras": "ASOBO_image_converted_meta"
+		}
+	]
+}
