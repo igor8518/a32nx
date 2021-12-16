@@ -69,7 +69,7 @@ export class DecelPathBuilder {
         distance += cFullTo3Segment.distanceTraveled;
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.FlapsFull,
-            distanceFromStart: profile.totalDistance() - distance,
+            distanceFromStart: profile.totalFlightPlanDistance - distance,
             speed: F,
             altitude: cFullTo3Segment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
@@ -90,7 +90,7 @@ export class DecelPathBuilder {
         distance += c3to2Segment.distanceTraveled;
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Flaps3,
-            distanceFromStart: profile.totalDistance() - distance,
+            distanceFromStart: profile.totalFlightPlanDistance - distance,
             speed: F + (S - F) / 2,
             altitude: c3to2Segment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
@@ -111,7 +111,7 @@ export class DecelPathBuilder {
         distance += c2to1Segment.distanceTraveled;
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Flaps2,
-            distanceFromStart: profile.totalDistance() - distance,
+            distanceFromStart: profile.totalFlightPlanDistance - distance,
             speed: S,
             altitude: c2to1Segment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
@@ -132,7 +132,7 @@ export class DecelPathBuilder {
         distance += c1toCleanSegment.distanceTraveled;
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Flaps1,
-            distanceFromStart: profile.totalDistance() - distance,
+            distanceFromStart: profile.totalFlightPlanDistance - distance,
             speed: O,
             altitude: c1toCleanSegment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
@@ -178,7 +178,7 @@ export class DecelPathBuilder {
         distance += cleanToDesSpeedSegment.distanceTraveled;
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Decel,
-            distanceFromStart: profile.totalDistance() - distance,
+            distanceFromStart: profile.totalFlightPlanDistance - distance,
             speed: DES,
             altitude: cleanToDesSpeedSegment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,

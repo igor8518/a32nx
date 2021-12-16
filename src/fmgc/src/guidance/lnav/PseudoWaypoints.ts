@@ -47,7 +47,7 @@ export class PseudoWaypoints implements GuidanceComponent {
         }
 
         const newPseudoWaypoints: PseudoWaypoint[] = [];
-        const totalDistance = this.guidanceController.vnavDriver.currentGeometryProfile.totalDistance();
+        const totalDistance = this.guidanceController.vnavDriver.currentGeometryProfile.totalFlightPlanDistance;
 
         const geometryProfile = this.guidanceController.vnavDriver.currentGeometryProfile;
 
