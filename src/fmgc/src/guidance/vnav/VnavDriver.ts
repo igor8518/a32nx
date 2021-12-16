@@ -77,10 +77,10 @@ export class VnavDriver implements GuidanceComponent {
 
         if (geometry.legs.size > 0) {
             this.climbPathBuilder.computeClimbPath(this.currentGeometryProfile);
-
             DecelPathBuilder.computeDecelPath(this.currentGeometryProfile);
-
             this.currentDescentProfile = DescentPathBuilder.computeDescentPath(this.currentGeometryProfile);
+
+            this.currentGeometryProfile.finalizeProfile();
 
             console.log(this.currentGeometryProfile);
 

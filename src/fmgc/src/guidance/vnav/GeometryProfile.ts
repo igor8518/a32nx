@@ -66,6 +66,8 @@ export interface MaxSpeedConstraint {
 }
 
 export class GeometryProfile {
+    private _isReadyToDisplay: boolean = false;
+
     public totalFlightPlanDistance: NauticalMiles = 0;
 
     public distanceToPresentPosition: NauticalMiles = 0;
@@ -450,11 +452,21 @@ export class GeometryProfile {
 
         for (let i = 0; i < this.checkpoints.length - 1; i++) {
             if (distanceFromStart > this.checkpoints[i].distanceFromStart && distanceFromStart <= this.checkpoints[i + 1].distanceFromStart) {
-                this.checkpoints.splice(i + 1, 0, { ...this.interpolateEverythingFromStart(distanceFromStart), speed, reason });
+                this.checkpoints.splice(i + 1, 0, { reason, ...this.interpolateEverythingFromStart(distanceFromStart), speed });
                 return;
             }
         }
 
         this.checkpoints.push({ ...this.interpolateEverythingFromStart(distanceFromStart), speed, reason });
+    }
+
+    public finalizeProfile() {
+        this.checkpoints.sort((a, b) => a.distanceFromStart - b.distanceFromStart);
+
+        this._isReadyToDisplay = true;
+    }
+
+    get isReadyToDisplay(): boolean {
+        return this._isReadyToDisplay;
     }
 }

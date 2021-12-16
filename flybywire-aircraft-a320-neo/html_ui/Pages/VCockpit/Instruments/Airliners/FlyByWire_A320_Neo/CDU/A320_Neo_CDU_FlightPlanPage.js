@@ -87,7 +87,7 @@ class CDUFlightPlanPage {
         const fmsGeometryProfile = mcdu.guidanceController.vnavDriver.currentGeometryProfile;
 
         let vnavPredictionsMapByWaypoint = null;
-        if (fmsGeometryProfile) {
+        if (fmsGeometryProfile && fmsGeometryProfile.isReadyToDisplay) {
             vnavPredictionsMapByWaypoint = fmsGeometryProfile.computePredictionsAtWaypoints();
         }
 

@@ -27,6 +27,8 @@ export class ClimbPathBuilder {
 
     private fcuAltitude: Feet;
 
+    private fcuVerticalMode: number;
+
     constructor(private fmgc: Fmgc) {
         // TODO: Hook this up to the actual MCDU field
         SimVar.SetSimVarValue('L:A32NX_STATUS_PERF_FACTOR', 'Percent', 0);
@@ -41,6 +43,7 @@ export class ClimbPathBuilder {
         this.climbSpeedLimitAltitude = 10000; // TODO: Make dynamic
         this.perfFactor = SimVar.GetSimVarValue('L:A32NX_STATUS_PERF_FACTOR', 'Percent');
         this.fcuAltitude = Simplane.getAutoPilotDisplayedAltitudeLockValue();
+        this.fcuVerticalMode = SimVar.GetSimVarValue('L:A32NX_FMA_VERTICAL_MODE', 'Enum');
 
         this.atmosphericConditions.update();
     }
@@ -49,7 +52,11 @@ export class ClimbPathBuilder {
         const isOnGround = SimVar.GetSimVarValue('SIM ON GROUND', 'Bool');
 
         if (!isOnGround) {
-            this.computeLivePrediction(profile);
+            if (this.fcuVerticalMode === 11 || this.fcuVerticalMode === 22) {
+                this.computeLivePrediction(profile);
+            }
+
+            return;
         }
 
         if (this.canComputeProfile()) {
@@ -287,21 +294,6 @@ export class ClimbPathBuilder {
     private computeClimbSegmentPrediction(startingAltitude: Feet, targetAltitude: Feet, climbSpeed: Knots, remainingFuelOnBoard: number): StepResults {
         const midwayAltitudeClimb = (startingAltitude + targetAltitude) / 2;
         const machClimb = this.atmosphericConditions.computeMachFromCas(midwayAltitudeClimb, climbSpeed);
-
-        const selectedVs = SimVar.GetSimVarValue('L:A32NX_AUTOPILOT_VS_SELECTED', 'feet per minute');
-        if (!SimVar.GetSimVarValue('L:A32NX_FCU_VS_MANAGED', 'Bool') && selectedVs > 0) {
-            return Predictions.verticalSpeedStep(
-                startingAltitude,
-                targetAltitude,
-                selectedVs,
-                climbSpeed,
-                machClimb,
-                this.fmgc.getZeroFuelWeight() * ClimbPathBuilder.TONS_TO_POUNDS,
-                remainingFuelOnBoard,
-                this.atmosphericConditions.isaDeviation,
-                this.perfFactor,
-            );
-        }
 
         const estimatedTat = this.atmosphericConditions.totalAirTemperatureFromMach(midwayAltitudeClimb, machClimb);
         const predictedN1 = this.getClimbThrustN1Limit(estimatedTat, midwayAltitudeClimb);
