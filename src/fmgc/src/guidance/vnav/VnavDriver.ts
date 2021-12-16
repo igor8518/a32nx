@@ -6,9 +6,10 @@ import { DecelPathBuilder, DecelPathCharacteristics } from '@fmgc/guidance/vnav/
 import { DescentPathBuilder } from '@fmgc/guidance/vnav/descent/DescentPathBuilder';
 import { GuidanceController } from '@fmgc/guidance/GuidanceController';
 import { FlightPlanManager } from '@fmgc/flightplanning/FlightPlanManager';
+import { resolvePlugin } from '@babel/core';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
-import { GeometryProfile, VerticalCheckpoint } from './GeometryProfile';
+import { GeometryProfile, VerticalCheckpoint, VerticalPseudoWaypointPrediction } from './GeometryProfile';
 import { ClimbPathBuilder } from './climb/ClimbPathBuilder';
 import { Fmgc } from '../GuidanceController';
 
@@ -20,6 +21,12 @@ export class VnavDriver implements GuidanceComponent {
     currentDescentProfile: TheoreticalDescentPathCharacteristics
 
     currentApproachProfile: DecelPathCharacteristics;
+
+    timeMarkers: { [k: number]: VerticalPseudoWaypointPrediction | undefined } = {
+        190: undefined,
+        500: undefined,
+        700: undefined,
+    };
 
     constructor(
         private readonly guidanceController: GuidanceController,
@@ -44,6 +51,7 @@ export class VnavDriver implements GuidanceComponent {
 
     update(_: number): void {
         const newCruiseAltitude = SimVar.GetSimVarValue('L:AIRLINER_CRUISE_ALTITUDE', 'number');
+
         if (newCruiseAltitude !== this.lastCruiseAltitude) {
             this.lastCruiseAltitude = newCruiseAltitude;
 
@@ -52,6 +60,16 @@ export class VnavDriver implements GuidanceComponent {
             }
 
             this.computeVerticalProfile(this.guidanceController.activeGeometry);
+        }
+
+        this.updateTimeMarkers();
+    }
+
+    private updateTimeMarkers() {
+        for (const [time] of Object.entries(this.timeMarkers)) {
+            const prediction = this.currentGeometryProfile.predictAtTime(parseInt(time)!);
+
+            this.timeMarkers[time] = prediction;
         }
     }
 

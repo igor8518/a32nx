@@ -419,6 +419,15 @@ const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arc
                 <path d="M 0, 3 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.5} className="Cyan" />
             </>,
         );
+    } else if (type & (NdSymbolTypeFlags.PwpTimeMarker)) {
+        colour = 'Green';
+        showIdent = true;
+        elements.push(
+            <>
+                <circle r={12} className="shadow" strokeWidth={2.5} />
+                <circle r={12} className="Green" strokeWidth={2} />
+            </>,
+        );
     } else if (type & (NdSymbolTypeFlags.SpeedChange)) {
         showIdent = false;
         elements.push(

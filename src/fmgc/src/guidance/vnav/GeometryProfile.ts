@@ -3,9 +3,10 @@ import { Geometry } from '../Geometry';
 import { AltitudeConstraint, AltitudeConstraintType, SpeedConstraint, SpeedConstraintType } from '../lnav/legs';
 
 // TODO: Merge this with VerticalCheckpoint
-interface VerticalWaypointPrediction {
+export interface VerticalWaypointPrediction {
     waypointIndex: number,
-    distanceFromStart: NauticalMiles
+    distanceFromStart: NauticalMiles,
+    secondsFromPresent: Seconds,
     altitude: Feet,
     speed: Knots,
     altitudeConstraint: AltitudeConstraint,
@@ -13,6 +14,8 @@ interface VerticalWaypointPrediction {
     isAltitudeConstraintMet: boolean,
     isSpeedConstraintMet: boolean,
 }
+
+export type VerticalPseudoWaypointPrediction = Omit<VerticalWaypointPrediction, 'waypointIndex' | 'altitudeConstraint' | 'speedConstraint' | 'isAltitudeConstraintMet' | 'isSpeedConstraintMet'>
 
 export enum VerticalCheckpointReason {
     Liftoff = 'Liftoff',
@@ -43,6 +46,7 @@ export enum VerticalCheckpointReason {
 export interface VerticalCheckpoint {
     reason: VerticalCheckpointReason,
     distanceFromStart: NauticalMiles,
+    secondsFromPresent: Seconds,
     altitude: Feet,
     remainingFuelOnBoard: number,
     speed: Knots,
@@ -72,12 +76,46 @@ export class GeometryProfile {
         return totalDistance;
     }
 
+    predictAtTime(
+        secondsFromPresent: Seconds,
+    ): Omit<VerticalWaypointPrediction, 'waypointIndex' | 'altitudeConstraint' | 'speedConstraint' | 'isAltitudeConstraintMet' | 'isSpeedConstraintMet'> {
+        const distanceFromStart = this.interpolateDistanceAtTime(secondsFromPresent);
+
+        return {
+            distanceFromStart,
+            secondsFromPresent,
+            altitude: this.interpolateAltitudeAtDistance(distanceFromStart),
+            speed: this.findSpeedTarget(distanceFromStart),
+        };
+    }
+
+    /**
+     * Find the time from start at which the profile predicts us to be at a distance along the flightplan.
+     * @param distanceFromStart Distance along that path
+     * @returns Predicted altitude
+     */
+    interpolateTimeAtDistance(distanceFromStart: NauticalMiles): Seconds {
+        if (distanceFromStart < this.checkpoints[0].distanceFromStart) {
+            return this.checkpoints[0].secondsFromPresent;
+        }
+
+        for (let i = 0; i < this.checkpoints.length - 1; i++) {
+            if (distanceFromStart >= this.checkpoints[i].distanceFromStart && distanceFromStart < this.checkpoints[i + 1].distanceFromStart) {
+                return this.checkpoints[i].secondsFromPresent
+                    + (distanceFromStart - this.checkpoints[i].distanceFromStart) * (this.checkpoints[i + 1].secondsFromPresent - this.checkpoints[i].secondsFromPresent)
+                    / (this.checkpoints[i + 1].distanceFromStart - this.checkpoints[i].distanceFromStart);
+            }
+        }
+
+        return this.checkpoints[this.checkpoints.length - 1].secondsFromPresent;
+    }
+
     /**
      * Find the altitude at which the profile predicts us to be at a distance along the flightplan.
      * @param distanceFromStart Distance along that path
      * @returns Predicted altitude
      */
-    private interpolateAltitude(distanceFromStart: NauticalMiles): Feet {
+    interpolateAltitudeAtDistance(distanceFromStart: NauticalMiles): Feet {
         if (distanceFromStart < this.checkpoints[0].distanceFromStart) {
             return this.checkpoints[0].altitude;
         }
@@ -94,6 +132,27 @@ export class GeometryProfile {
     }
 
     /**
+     * Find the altitude at which the profile predicts us to be at a distance along the flightplan.
+     * @param distanceFromStart Distance along that path
+     * @returns Predicted altitude
+     */
+    interpolateDistanceAtTime(secondsFromPresent: Seconds): NauticalMiles {
+        if (secondsFromPresent < this.checkpoints[0].secondsFromPresent) {
+            return this.checkpoints[0].distanceFromStart;
+        }
+
+        for (let i = 0; i < this.checkpoints.length - 1; i++) {
+            if (secondsFromPresent >= this.checkpoints[i].secondsFromPresent && secondsFromPresent < this.checkpoints[i + 1].secondsFromPresent) {
+                return this.checkpoints[i].distanceFromStart
+                    + (secondsFromPresent - this.checkpoints[i].secondsFromPresent) * (this.checkpoints[i + 1].distanceFromStart - this.checkpoints[i].distanceFromStart)
+                    / (this.checkpoints[i + 1].secondsFromPresent - this.checkpoints[i].secondsFromPresent);
+            }
+        }
+
+        return this.checkpoints[this.checkpoints.length - 1].distanceFromStart;
+    }
+
+    /**
      * I am not sure how well this works.
      * Find speed target to the next waypoint
      * @param distanceFromStart Distance along that path
@@ -101,7 +160,10 @@ export class GeometryProfile {
      */
     private findSpeedTarget(distanceFromStart: NauticalMiles): Feet {
         // We check for this because there is no speed change point upon reaching acceleration altitude.
-        const indexOfAccelerationAltitudeCheckpoint = Math.min(this.checkpoints.length - 1, Math.max(this.checkpoints.findIndex(({ reason }) => reason === VerticalCheckpointReason.AccelerationAltitude) + 1, 0));
+        const indexOfAccelerationAltitudeCheckpoint = Math.min(
+            this.checkpoints.length - 1,
+            Math.max(this.checkpoints.findIndex(({ reason }) => reason === VerticalCheckpointReason.AccelerationAltitude) + 1, 0),
+        );
 
         if (distanceFromStart <= this.checkpoints[indexOfAccelerationAltitudeCheckpoint].distanceFromStart) {
             return this.checkpoints[indexOfAccelerationAltitudeCheckpoint].speed;
@@ -157,12 +219,14 @@ export class GeometryProfile {
         for (const [i, leg] of this.geometry.legs.entries()) {
             totalDistance += Geometry.completeLegPathLengths(leg, this.geometry.transitions.get(i - 1), this.geometry.transitions.get(i)).reduce((sum, el) => sum + el, 0);
 
-            const predictedAltitudeAtEndOfLeg = this.interpolateAltitude(totalDistance);
+            const predictedSecondsFromStartAtEndOfLeg = this.interpolateTimeAtDistance(totalDistance);
+            const predictedAltitudeAtEndOfLeg = this.interpolateAltitudeAtDistance(totalDistance);
             const predictedSpeedAtEndOfLeg = this.findSpeedTarget(totalDistance);
 
             predictions.set(i, {
                 waypointIndex: i,
                 distanceFromStart: totalDistance,
+                secondsFromPresent: predictedSecondsFromStartAtEndOfLeg,
                 altitude: predictedAltitudeAtEndOfLeg,
                 speed: predictedSpeedAtEndOfLeg,
                 altitudeConstraint: leg.altitudeConstraint,

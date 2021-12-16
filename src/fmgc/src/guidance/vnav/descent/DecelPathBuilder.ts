@@ -332,6 +332,15 @@ export class DecelPathBuilder {
     }
 
     /**
+     * Only compute if the last leg is a destination airport / runway
+     */
+    static canCompute(geometry: Geometry): boolean {
+        const lastLeg = geometry.legs.get(geometry.legs.size - 1);
+
+        return lastLeg instanceof TFLeg && (lastLeg.to.isRunway || lastLeg.to.type === 'A');
+    }
+
+    /**
      * Returns altitude of either, in order of priority:
      * - runway threshold;
      * - missed approach point;

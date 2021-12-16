@@ -189,9 +189,9 @@ export class Predictions {
             verticalSpeed: 0,
             timeElapsed: stepTime,
             distanceTraveled: stepSize,
-            fuelBurned: fuelBurned,
+            fuelBurned,
             finalAltitude: altitude,
-        }
+        };
     }
 
     /**
@@ -608,10 +608,9 @@ export class Predictions {
             tas = Common.CAStoTAS(econCAS, theta, delta);
         }
 
-
         const pathAngle = Math.atan2(verticalSpeed, tas * 101.269); // radians
-        const stepTime = (finalAltitude - initialAltitude) / verticalSpeed // minutes
-        const distanceTraveled = tas * Math.cos(pathAngle) * stepTime / 60
+        const stepTime = (finalAltitude - initialAltitude) / verticalSpeed; // minutes
+        const distanceTraveled = tas * Math.cos(pathAngle) * stepTime / 60;
 
         let fuelBurned = 0;
         let iterations = 0;
@@ -620,7 +619,7 @@ export class Predictions {
         let predictedN1 = 0;
         do {
             const drag = FlightModel.getDrag(midstepWeight, mach, delta, false, false, FlapConf.CLEAN);
-            const thrust = FlightModel.getThrustFromConstantPathAngle(pathAngle * MathUtils.Rad2Deg, midstepWeight, drag, 0);
+            const thrust = FlightModel.getThrustFromConstantPathAngle(pathAngle * MathUtils.RADIANS_TO_DEGREES, midstepWeight, drag, 0);
 
             const correctedThrust = (thrust / delta2) / 2;
             // Since table 1506 describes corrected thrust as a fraction of max thrust, divide it
@@ -629,19 +628,19 @@ export class Predictions {
             const correctedFuelFlow = EngineModel.getCorrectedFuelFlow(predictedN1, mach, midStepAltitude) * 2;
             const fuelFlow = EngineModel.getUncorrectedFuelFlow(correctedFuelFlow, delta2, theta2) * (1 + perfFactorPercent / 100); // in lbs/hour
 
-            fuelBurned = fuelFlow / 60 * stepTime
-            previousMidstepWeight = midstepWeight
-            midstepWeight -= (fuelBurned / 2)
-        } while (++iterations < 4 && Math.abs(previousMidstepWeight - midstepWeight) < 100)
+            fuelBurned = fuelFlow / 60 * stepTime;
+            previousMidstepWeight = midstepWeight;
+            midstepWeight -= (fuelBurned / 2);
+        } while (++iterations < 4 && Math.abs(previousMidstepWeight - midstepWeight) < 100);
 
         return {
-            pathAngle: pathAngle * MathUtils.Rad2Deg,
+            pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
             verticalSpeed,
             distanceTraveled,
             fuelBurned,
             timeElapsed: stepTime,
             finalAltitude,
-            predictedN1
+            predictedN1,
         };
     }
 }
