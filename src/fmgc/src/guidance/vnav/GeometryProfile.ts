@@ -66,7 +66,7 @@ export interface MaxSpeedConstraint {
 }
 
 export class GeometryProfile {
-    private _isReadyToDisplay: boolean = false;
+    private isReadyToDisplay: boolean = false;
 
     public totalFlightPlanDistance: NauticalMiles = 0;
 
@@ -290,6 +290,11 @@ export class GeometryProfile {
      */
     computePredictionsAtWaypoints(): Map<number, VerticalWaypointPrediction> {
         const predictions = new Map<number, VerticalWaypointPrediction>();
+
+        if (!this.isReadyToDisplay) {
+            return predictions;
+        }
+
         let totalDistance = 0;
 
         for (const [i, leg] of this.geometry.legs.entries()) {
@@ -463,10 +468,6 @@ export class GeometryProfile {
     public finalizeProfile() {
         this.checkpoints.sort((a, b) => a.distanceFromStart - b.distanceFromStart);
 
-        this._isReadyToDisplay = true;
-    }
-
-    get isReadyToDisplay(): boolean {
-        return this._isReadyToDisplay;
+        this.isReadyToDisplay = true;
     }
 }

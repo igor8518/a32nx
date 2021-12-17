@@ -59,9 +59,7 @@ export class ClimbPathBuilder {
             return;
         }
 
-        if (this.canComputeProfile()) {
-            this.computePreflightPrediction(profile);
-        }
+        this.computePreflightPrediction(profile);
     }
 
     computePreflightPrediction(profile: GeometryProfile) {
@@ -355,10 +353,6 @@ export class ClimbPathBuilder {
         }
 
         return maxSpeed;
-    }
-
-    private canComputeProfile(): boolean {
-        return this.fmgc.getV2Speed() > 0;
     }
 
     private addSpeedConstraintsAsCheckpoints(profile: GeometryProfile): void {
