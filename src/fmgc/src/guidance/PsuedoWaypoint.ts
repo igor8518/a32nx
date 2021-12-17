@@ -64,4 +64,14 @@ export interface PseudoWaypoint {
      */
     stats: WaypointStats,
 
+    /**
+     * Additional information that is display if the waypoint is displayed on the MCDU (`displayedOnMcdu`)
+     */
+    flightPlanInfo?: PseudoWaypointFlightPlanInfo
+}
+
+export interface PseudoWaypointFlightPlanInfo {
+    altitude: Feet,
+
+    speed: Knots
 }

@@ -320,44 +320,8 @@ export class GeometryProfile {
         return predictions;
     }
 
-    findDistanceToTopOfClimbFromEnd(): NauticalMiles | undefined {
-        const distance = this.totalFlightPlanDistance - this.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.TopOfClimb)?.distanceFromStart;
-
-        if (distance < 0) {
-            return undefined;
-        }
-
-        return distance;
-    }
-
-    findDistanceFromEndToEarliestLevelOffForRestriction(): NauticalMiles | undefined {
-        const distance = this.totalFlightPlanDistance - this.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.LevelOffForConstraint)?.distanceFromStart;
-
-        if (distance < 0) {
-            return undefined;
-        }
-
-        return distance;
-    }
-
-    findDistanceFromEndToEarliestContinueClimb(): NauticalMiles | undefined {
-        const distance = this.totalFlightPlanDistance - this.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.ContinueClimb)?.distanceFromStart;
-
-        if (distance < 0) {
-            return undefined;
-        }
-
-        return distance;
-    }
-
-    findDistanceFromEndToSpeedLimit(): NauticalMiles | undefined {
-        const distance = this.totalFlightPlanDistance - this.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.CrossingSpeedLimit)?.distanceFromStart;
-
-        if (distance < 0) {
-            return undefined;
-        }
-
-        return distance;
+    findVerticalCheckpoint(reason: VerticalCheckpointReason): VerticalCheckpoint | undefined {
+        return this.checkpoints.find((checkpoint) => checkpoint.reason === reason);
     }
 
     // TODO: We shouldn't have to go looking for this here...

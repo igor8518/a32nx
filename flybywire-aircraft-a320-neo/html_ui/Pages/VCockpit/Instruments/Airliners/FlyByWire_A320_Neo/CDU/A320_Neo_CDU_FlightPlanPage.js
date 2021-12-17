@@ -32,6 +32,14 @@ class CDUFlightPlanPage {
             return [runwayText, runwayAlt];
         }
 
+        function formatAltitudeOrLevel(altitudeToFormat) {
+            if (mcdu.flightPlanManager.getOriginTransitionAltitude() >= 100 && altitudeToFormat > mcdu.flightPlanManager.getOriginTransitionAltitude()) {
+                return `FL${(altitudeToFormat / 100).toFixed(0).toString().padStart(3,"0")}`;
+            }
+
+            return (10 * Math.round(altitudeToFormat / 10)).toFixed(0).toString().padStart(5,"\xa0");
+        }
+
         //mcdu.flightPlanManager.updateWaypointDistances(false /* approach */);
         //mcdu.flightPlanManager.updateWaypointDistances(true /* approach */);
         mcdu.clearDisplay();
@@ -349,12 +357,7 @@ class CDUFlightPlanPage {
                             altitudeToFormat = verticalWaypoint.altitude;
                         }
 
-                        if (mcdu.flightPlanManager.getOriginTransitionAltitude() >= 100 && altitudeToFormat > mcdu.flightPlanManager.getOriginTransitionAltitude()) {
-                            altitudeConstraint = (altitudeToFormat / 100).toFixed(0).toString();
-                            altitudeConstraint = `FL${altitudeConstraint.padStart(3,"0")}`;
-                        } else {
-                            altitudeConstraint = (10 * Math.round(altitudeToFormat / 10)).toFixed(0).toString().padStart(5,"\xa0");
-                        }
+                        altitudeConstraint = formatAltitudeOrLevel(altitudeToFormat);
 
                         if (verticalWaypoint) {
                             altPrefix = verticalWaypoint.isAltitudeConstraintMet ? "{magenta}*{end}" : "{amber}*{end}";
@@ -423,14 +426,7 @@ class CDUFlightPlanPage {
                     // In this case `altitudeConstraint is actually just the predictedAltitude`
                     } else if (vnavPredictionsMapByWaypoint && !wp.legAltitude1 && !wp.legAltitudeDescription) {
                         if (verticalWaypoint && verticalWaypoint.altitude) {
-                            altitudeConstraint = verticalWaypoint.altitude;
-
-                            if (mcdu.transitionAltitude >= 100 && altitudeConstraint > mcdu.transitionAltitude) {
-                                altitudeConstraint = (altitudeConstraint / 100).toFixed(0).toString();
-                                altitudeConstraint = `FL${altitudeConstraint.padStart(3,"0")}`;
-                            } else {
-                                altitudeConstraint = (10 * Math.round(altitudeConstraint / 10)).toFixed(0).toString();
-                            }
+                            altitudeConstraint = formatAltitudeOrLevel(verticalWaypoint.altitude);
                         } else {
                             console.log(`No predictions found for waypoint without alt constraint ${wp.ident}`);
                             altitudeConstraint = "-----";
@@ -556,10 +552,10 @@ class CDUFlightPlanPage {
                     ident: pwp.ident,
                     color: (fpm.isCurrentFlightPlanTemporary()) ? "yellow" : "green",
                     distance: Math.round(pwp.stats.distanceInFP).toString(),
-                    spdColor: "white",
-                    speedConstraint: "---",
-                    altColor: 'white',
-                    altitudeConstraint: { alt: "-----", altPrefix: "\xa0" },
+                    spdColor: pwp.flightPlanInfo ? "green" : "white",
+                    speedConstraint: pwp.flightPlanInfo ? Math.round(pwp.flightPlanInfo.speed) : "---",
+                    altColor: pwp.flightPlanInfo ? "green" : "white",
+                    altitudeConstraint: { alt: pwp.flightPlanInfo ? formatAltitudeOrLevel(pwp.flightPlanInfo.altitude) : "-----", altPrefix: "\xa0" },
                     timeCell: "----[s-text]",
                     timeColor: "white",
                     fixAnnotation: pwp.ident === "(LIM)" ? "{green}(SPD){end}" : "",
