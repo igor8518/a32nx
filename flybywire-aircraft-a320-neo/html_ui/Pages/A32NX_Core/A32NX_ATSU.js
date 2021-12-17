@@ -149,9 +149,11 @@ const getSimBriefOfp = (mcdu, updateView, callback = () => {}) => {
             mcdu.simbrief["route"] = data.general.route;
             mcdu.simbrief["cruiseAltitude"] = data.general.initial_altitude;
             mcdu.simbrief["originIcao"] = data.origin.icao_code;
+            mcdu.simbrief["originRwy"] = data.origin.plan_rwy;
             mcdu.simbrief["originTransAlt"] = parseInt(data.origin.trans_alt, 10);
             mcdu.simbrief["originTransLevel"] = parseInt(data.origin.trans_level, 10);
             mcdu.simbrief["destinationIcao"] = data.destination.icao_code;
+            mcdu.simbrief["destinationRwy"] = data.destination.plan_rwy;
             mcdu.simbrief["destinationTransAlt"] = parseInt(data.destination.trans_alt, 10);
             mcdu.simbrief["destinationTransLevel"] = parseInt(data.destination.trans_level, 10);
             mcdu.simbrief["blockFuel"] = mcdu.simbrief["units"] === 'kgs' ? data.fuel.plan_ramp : lbsToKg(data.fuel.plan_ramp);
@@ -230,10 +232,11 @@ const insertUplink = (mcdu) => {
             }
 
             await mcdu.tryUpdateAltDestination(alternateIcao);
-
+            SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 1);
             setTimeout(async () => {
                 await uplinkRoute(mcdu);
                 mcdu.addNewMessage(NXSystemMessages.aocActFplnUplink);
+                SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 2);
             }, mcdu.getDelayRouteChange());
 
             if (mcdu.page.Current === mcdu.page.InitPageA) {
@@ -241,17 +244,20 @@ const insertUplink = (mcdu) => {
             }
         }
     });
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 1);
     mcdu.updateFlightNo(fltNbr, (result) => {
         if (result) {
             if (mcdu.page.Current === mcdu.page.InitPageA) {
                 CDUInitPage.ShowPage1(mcdu);
             }
         }
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 2);
     });
 
     /**
      * INIT PAGE DATA UPLINK
     */
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 1);
     setTimeout(() => {
         mcdu.setCruiseFlightLevelAndTemperature(cruiseAltitude);
         mcdu.tryUpdateCostIndex(costIndex);
@@ -259,6 +265,7 @@ const insertUplink = (mcdu) => {
         if (mcdu.page.Current === mcdu.page.InitPageA) {
             CDUInitPage.ShowPage1(mcdu);
         }
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 2);
     }, mcdu.getDelayHigh());
 };
 
