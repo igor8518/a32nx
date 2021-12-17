@@ -121,7 +121,7 @@ export class GeometryProfile {
             }
 
             if (leg.altitudeConstraint && leg.altitudeConstraint.type !== AltitudeConstraintType.atOrAbove) {
-                if (this.maxAltitudeConstraints.length < 1 || leg.altitudeConstraint.altitude1 > this.maxAltitudeConstraints[this.maxAltitudeConstraints.length - 1].maxAltitude) {
+                if (this.maxAltitudeConstraints.length < 1 || leg.altitudeConstraint.altitude1 >= this.maxAltitudeConstraints[this.maxAltitudeConstraints.length - 1].maxAltitude) {
                     this.maxAltitudeConstraints.push({
                         distanceFromStart: this.totalFlightPlanDistance,
                         maxAltitude: leg.altitudeConstraint.altitude1,
@@ -130,7 +130,7 @@ export class GeometryProfile {
             }
 
             if (leg.speedConstraint?.speed > 100 && leg.speedConstraint.type !== SpeedConstraintType.atOrAbove) {
-                if (this.maxSpeedConstraints.length < 1 || leg.speedConstraint.speed > this.maxSpeedConstraints[this.maxSpeedConstraints.length - 1].maxSpeed) {
+                if (this.maxSpeedConstraints.length < 1 || leg.speedConstraint.speed >= this.maxSpeedConstraints[this.maxSpeedConstraints.length - 1].maxSpeed) {
                     this.maxSpeedConstraints.push({
                         distanceFromStart: this.totalFlightPlanDistance,
                         maxSpeed: leg.speedConstraint.speed,

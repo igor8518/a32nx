@@ -310,22 +310,25 @@ export class DecelPathBuilder {
         case ApproachPathSegmentType.CONSTANT_SPEED:
             throw new Error('[FMS/VNAV/computeConfigurationChangeSegment] CONSTANT_SPEED is not supported for configuration changes.');
         case ApproachPathSegmentType.LEVEL_DECELERATION:
-            return Predictions.speedChangeStep(
-                0,
-                finalAltitude * ALTITUDE_ADJUSTMENT_FACTOR,
-                fromSpeed,
-                toSpeed,
-                999,
-                999,
-                26,
-                107_000,
-                initialFuelWeight,
-                2,
-                0,
-                tropoAltitude,
-                gearExtended,
-                newConfiguration,
-            );
+            return {
+                ...Predictions.speedChangeStep(
+                    0,
+                    finalAltitude * ALTITUDE_ADJUSTMENT_FACTOR,
+                    fromSpeed,
+                    toSpeed,
+                    999,
+                    999,
+                    26,
+                    107_000,
+                    initialFuelWeight,
+                    2,
+                    0,
+                    tropoAltitude,
+                    gearExtended,
+                    newConfiguration,
+                ),
+                initialAltitude: finalAltitude * ALTITUDE_ADJUSTMENT_FACTOR,
+            };
         default:
             throw new Error('[FMS/VNAV/computeConfigurationChangeSegment] Unknown segment type.');
         }

@@ -18,19 +18,19 @@ export class DescentPathBuilder {
             console.log(verticalDistance);
         }
 
-        const tod = decelCheckpoint.distanceFromStart + (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
+        const tod = decelCheckpoint.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
 
         if (DEBUG) {
             console.log(`[FMS/VNAV] T/D: ${tod.toFixed(1)}nm`);
         }
 
-        // profile.checkpoints.push({
-        //     reason: VerticalCheckpointReason.TopOfDescent,
-        //     distanceFromStart: tod,
-        //     speed: 250,
-        //     remainingFuelOnBoard: 250,
-        //     altitude: 5000,
-        // });
+        profile.checkpoints.push({
+            reason: VerticalCheckpointReason.TopOfDescent,
+            distanceFromStart: tod,
+            speed: 290,
+            // remainingFuelOnBoard: 250,
+            altitude: cruiseAlt,
+        });
 
         return { tod };
 

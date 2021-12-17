@@ -172,7 +172,7 @@ export class PseudoWaypoints implements GuidanceComponent {
         }
 
         // Top of descent
-        const tod = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, this.guidanceController.vnavDriver.currentDescentProfile.tod, DEBUG && PWP_IDENT_TOD);
+        const tod = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - this.guidanceController.vnavDriver.currentDescentProfile.tod, DEBUG && PWP_IDENT_TOD);
 
         if (tod) {
             const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = tod;
