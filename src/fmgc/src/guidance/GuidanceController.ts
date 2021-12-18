@@ -9,6 +9,7 @@ import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { EfisState } from '@fmgc/guidance/FmsState';
 import { EfisSide, Mode, rangeSettings } from '@shared/NavigationDisplay';
 import { TaskCategory, TaskQueue } from '@fmgc/guidance/TaskQueue';
+import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { LnavDriver } from './lnav/LnavDriver';
 import { FlightPlanManager, FlightPlans } from '../flightplanning/FlightPlanManager';
 import { GuidanceManager } from './GuidanceManager';
@@ -20,9 +21,12 @@ const GEOMETRY_RECOMPUTATION_TIMER = 5_000;
 export interface Fmgc {
     getZeroFuelWeight(): number;
     getFOB(): number;
-    getV2Speed(): number;
-    getTropoPause(): number;
-    getManagedClimbSpeed(): number;
+    getV2Speed(): Knots;
+    getTropoPause(): Feet;
+    getManagedClimbSpeed(): Knots;
+    getAccelerationAltitude(): Feet,
+    getThrustReductionAltitude(): Feet,
+    getCruiseAltitude(): Feet,
 }
 
 export class GuidanceController {
@@ -65,6 +69,8 @@ export class GuidanceController {
     efisStateForSide: { L: EfisState, R: EfisState }
 
     taskQueue = new TaskQueue();
+
+    verticalProfileComputationParametersObserver: VerticalProfileComputationParametersObserver;
 
     get hasTemporaryFlightPlan() {
         // eslint-disable-next-line no-underscore-dangle
@@ -125,8 +131,10 @@ export class GuidanceController {
         this.flightPlanManager = flightPlanManager;
         this.guidanceManager = guidanceManager;
 
+        this.verticalProfileComputationParametersObserver = new VerticalProfileComputationParametersObserver(fmgc);
+
         this.lnavDriver = new LnavDriver(this);
-        this.vnavDriver = new VnavDriver(this, fmgc, flightPlanManager);
+        this.vnavDriver = new VnavDriver(this, this.verticalProfileComputationParametersObserver, flightPlanManager);
         this.pseudoWaypoints = new PseudoWaypoints(this);
         this.efisVectors = new EfisVectors(this);
     }
@@ -168,6 +176,8 @@ export class GuidanceController {
 
         this.updateEfisState('L', this.leftEfisState);
         this.updateEfisState('R', this.rightEfisState);
+
+        this.verticalProfileComputationParametersObserver.update();
 
         try {
             // Generate new geometry when flight plan changes

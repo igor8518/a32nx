@@ -7,11 +7,11 @@ import { DescentPathBuilder } from '@fmgc/guidance/vnav/descent/DescentPathBuild
 import { GuidanceController } from '@fmgc/guidance/GuidanceController';
 import { FlightPlanManager } from '@fmgc/flightplanning/FlightPlanManager';
 import { PseudoWaypointFlightPlanInfo } from '@fmgc/guidance/PsuedoWaypoint';
+import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { GeometryProfile } from './GeometryProfile';
 import { ClimbPathBuilder } from './climb/ClimbPathBuilder';
-import { Fmgc } from '../GuidanceController';
 
 export class VnavDriver implements GuidanceComponent {
     climbPathBuilder: ClimbPathBuilder;
@@ -28,10 +28,10 @@ export class VnavDriver implements GuidanceComponent {
 
     constructor(
         private readonly guidanceController: GuidanceController,
-        private readonly fmgc: Fmgc,
+        private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
         private readonly flightPlanManager: FlightPlanManager,
     ) {
-        this.climbPathBuilder = new ClimbPathBuilder(fmgc);
+        this.climbPathBuilder = new ClimbPathBuilder(computationParametersObserver);
     }
 
     init(): void {
@@ -78,7 +78,7 @@ export class VnavDriver implements GuidanceComponent {
     private computeVerticalProfile(geometry: Geometry) {
         this.currentGeometryProfile = new GeometryProfile(geometry, this.flightPlanManager, this.guidanceController.activeLegIndex);
 
-        if (this.canComputeProfile(geometry)) {
+        if (geometry.legs.size > 0 && this.computationParametersObserver.canComputeProfile()) {
             this.climbPathBuilder.computeClimbPath(this.currentGeometryProfile);
             DecelPathBuilder.computeDecelPath(this.currentGeometryProfile);
             this.currentDescentProfile = DescentPathBuilder.computeDescentPath(this.currentGeometryProfile);
@@ -91,9 +91,5 @@ export class VnavDriver implements GuidanceComponent {
         } else if (DEBUG) {
             console.warn('[FMS/VNAV] Did not compute vertical profile. Reason: no legs in flight plan.');
         }
-    }
-
-    private canComputeProfile(geometry: Geometry): boolean {
-        return this.fmgc.getV2Speed() > 0 && geometry.legs.size > 0;
     }
 }

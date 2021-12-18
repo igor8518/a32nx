@@ -4330,6 +4330,18 @@ class FMCMainDisplay extends BaseAirliners {
     getManagedClimbSpeed() {
         return this.managedSpeedClimb;
     }
+
+    getAccelerationAltitude() {
+        return this.accelerationAltitude;
+    }
+
+    getThrustReductionAltitude() {
+        return this.thrustReductionAltitude;
+    }
+
+    getCruiseAltitude() {
+        return this.cruiseFlightLevel * 100;
+    }
 }
 
 FMCMainDisplay.clrValue = "\xa0\xa0\xa0\xa0\xa0CLR";
