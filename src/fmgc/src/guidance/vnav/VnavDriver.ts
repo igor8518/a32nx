@@ -65,6 +65,10 @@ export class VnavDriver implements GuidanceComponent {
     }
 
     private updateTimeMarkers() {
+        if (!this.currentGeometryProfile.isReadyToDisplay) {
+            return;
+        }
+
         for (const [time] of Object.entries(this.timeMarkers)) {
             const prediction = this.currentGeometryProfile.predictAtTime(parseInt(time)!);
 

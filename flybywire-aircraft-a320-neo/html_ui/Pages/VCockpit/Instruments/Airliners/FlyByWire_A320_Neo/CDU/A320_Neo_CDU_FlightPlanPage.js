@@ -101,10 +101,24 @@ class CDUFlightPlanPage {
 
         // Primary F-PLAN
         for (let i = first; i < fpm.getWaypointsCount(); i++) {
-            const pseudoWaypointsOnLeg = fmsPseudoWaypoints.filter((it) => it.displayedOnMcdu && it.alongLegIndex === i);
+            const waypointsAlongLeg = fmsPseudoWaypoints
+                .filter((pwp) => pwp && pwp.displayedOnMcdu && pwp.alongLegIndex === i)
+                .sort((a, b) => a.stats.distanceInFP - b.stats.distanceInFP);
 
-            if (pseudoWaypointsOnLeg) {
-                waypointsAndMarkers.push(...pseudoWaypointsOnLeg.map((pwp) => ({ pwp, fpIndex: i })));
+            let waypointAlongLegIndex = 0;
+            let distanceAlongLeg = 0;
+            for (const pwp of waypointsAlongLeg) {
+                // Make sure consecutive PWPs show a proper distance between them
+                if (waypointAlongLegIndex++ > 0) {
+                    pwp.stats.distanceInFP -= distanceAlongLeg;
+                }
+
+                distanceAlongLeg += pwp.stats.distanceInFP;
+
+                waypointsAndMarkers.push({
+                    fpIndex: i,
+                    pwp,
+                });
             }
 
             const wp = fpm.getWaypoint(i);

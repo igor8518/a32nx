@@ -66,7 +66,7 @@ export interface MaxSpeedConstraint {
 }
 
 export class GeometryProfile {
-    private isReadyToDisplay: boolean = false;
+    public isReadyToDisplay: boolean = false;
 
     public totalFlightPlanDistance: NauticalMiles = 0;
 
