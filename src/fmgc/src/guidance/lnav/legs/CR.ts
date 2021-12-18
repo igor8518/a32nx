@@ -7,6 +7,7 @@ import { courseToFixDistanceToGo, courseToFixGuidance } from '@fmgc/guidance/lna
 import { Geo } from '@fmgc/utils/Geo';
 import { LnavConfig } from '@fmgc/guidance/LnavConfig';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 import { PathVector, PathVectorType } from '../PathVector';
 
 export class CRLeg extends Leg {
@@ -18,11 +19,13 @@ export class CRLeg extends Leg {
         public readonly radial: DegreesTrue,
         segment: SegmentType,
         indexInFullPath: number,
+        constrainedTurnDirection = TurnDirection.Unknown,
     ) {
         super();
 
         this.segment = segment;
         this.indexInFullPath = indexInFullPath;
+        this.constrainedTurnDirection = constrainedTurnDirection;
     }
 
     private intercept: Coordinates | undefined = undefined;

@@ -4,6 +4,7 @@ import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
 import { PathVector, PathVectorType } from '@fmgc/guidance/lnav/PathVector';
 import { Guidable } from '@fmgc/guidance/Guidable';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 
 /**
  * Temporary - better solution is just to have an `InfiniteLine` vector...
@@ -19,10 +20,12 @@ export class VMLeg extends Leg {
         public course: DegreesTrue,
         segment: SegmentType,
         indexInFullPath: number,
+        constrainedTurnDirection = TurnDirection.Unknown,
     ) {
         super();
         this.segment = segment;
         this.indexInFullPath = indexInFullPath;
+        this.constrainedTurnDirection = constrainedTurnDirection;
     }
 
     get terminationWaypoint(): WayPoint {

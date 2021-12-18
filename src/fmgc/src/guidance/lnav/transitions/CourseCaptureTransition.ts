@@ -54,8 +54,7 @@ export class CourseCaptureTransition extends Transition {
     }
 
     get courseVariation(): Degrees {
-        // TODO reverse turn direction
-        return this.deltaTrack;
+        return MathUtils.adjustAngleForTurnDirection(this.deltaTrack, this.nextLeg.constrainedTurnDirection);
     }
 
     public isArc: boolean;

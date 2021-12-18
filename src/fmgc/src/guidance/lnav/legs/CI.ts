@@ -9,6 +9,7 @@ import { LnavConfig } from '@fmgc/guidance/LnavConfig';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
 import { IFLeg } from '@fmgc/guidance/lnav/legs/IF';
 import { XFLeg } from '@fmgc/guidance/lnav/legs/XF';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 import { PathVector, PathVectorType } from '../PathVector';
 
 export class CILeg extends Leg {
@@ -19,11 +20,13 @@ export class CILeg extends Leg {
         public readonly nextLeg: Leg,
         segment: SegmentType,
         indexInFullPath: number,
+        constrainedTurnDirection = TurnDirection.Unknown,
     ) {
         super();
 
         this.segment = segment;
         this.indexInFullPath = indexInFullPath;
+        this.constrainedTurnDirection = constrainedTurnDirection;
     }
 
     intercept: Coordinates | undefined = undefined;

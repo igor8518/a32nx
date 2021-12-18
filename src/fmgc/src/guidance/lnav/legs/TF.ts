@@ -16,6 +16,7 @@ import { XFLeg } from '@fmgc/guidance/lnav/legs/XF';
 import { Geo } from '@fmgc/utils/Geo';
 import { courseToFixDistanceToGo, courseToFixGuidance } from '@fmgc/guidance/lnav/CommonGeometry';
 import { LnavConfig } from '@fmgc/guidance/LnavConfig';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 import { PathVector, PathVectorType } from '../PathVector';
 
 export class TFLeg extends XFLeg {
@@ -29,13 +30,20 @@ export class TFLeg extends XFLeg {
 
     private computedPath: PathVector[] = [];
 
-    constructor(from: WayPoint, to: WayPoint, segment: SegmentType, indexInFullPath: number) {
+    constructor(
+        from: WayPoint,
+        to: WayPoint,
+        segment: SegmentType,
+        indexInFullPath: number,
+        constrainedTurnDirection = TurnDirection.Unknown,
+    ) {
         super();
         this.from = from;
         this.to = to;
         this.fix = to;
         this.segment = segment;
         this.indexInFullPath = indexInFullPath;
+        this.constrainedTurnDirection = constrainedTurnDirection;
         this.constraintType = to.constraintType;
         this.course = Avionics.Utils.computeGreatCircleHeading(
             this.from.infos.coordinates,

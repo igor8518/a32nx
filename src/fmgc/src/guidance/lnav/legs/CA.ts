@@ -7,6 +7,7 @@ import { GuidanceParameters } from '@fmgc/guidance/ControlLaws';
 import { LnavConfig } from '@fmgc/guidance/LnavConfig';
 import { courseToFixDistanceToGo, courseToFixGuidance } from '@fmgc/guidance/lnav/CommonGeometry';
 import { IFLeg } from '@fmgc/guidance/lnav/legs/IF';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 import { PathVector, PathVectorType } from '../PathVector';
 
 export class CALeg extends Leg {
@@ -19,11 +20,13 @@ export class CALeg extends Leg {
         public readonly altitude: Feet,
         segment: SegmentType,
         indexInFullPath: number,
+        constrainedTurnDirection = TurnDirection.Unknown,
     ) {
         super();
 
         this.segment = segment;
         this.indexInFullPath = indexInFullPath;
+        this.constrainedTurnDirection = constrainedTurnDirection;
     }
 
     private start: Coordinates;

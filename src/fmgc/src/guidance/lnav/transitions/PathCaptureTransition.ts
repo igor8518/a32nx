@@ -77,11 +77,10 @@ export class PathCaptureTransition extends Transition {
         const targetTrack = previousGuidable.outboundCourse;
 
         const naturalTurnDirectionSign = Math.sign(MathUtils.diffAngle(targetTrack, this.nextLeg.inboundCourse));
-        const constrainedTurnDirection = this.nextLeg instanceof XFLeg ? this.nextLeg.fix.turnDirection : TurnDirection.Unknown;
 
         const initialTurningPoint = this.previousLeg.getPathEndPoint();
         const distanceFromItp: NauticalMiles = Geo.distanceToLeg(initialTurningPoint, this.nextLeg);
-        const deltaTrack: Degrees = MathUtils.diffAngle(targetTrack, this.nextLeg.inboundCourse, constrainedTurnDirection);
+        const deltaTrack: Degrees = MathUtils.diffAngle(targetTrack, this.nextLeg.inboundCourse, this.nextLeg.constrainedTurnDirection);
 
         this.predictedPath.length = 0;
 
@@ -134,7 +133,7 @@ export class PathCaptureTransition extends Transition {
             } else {
                 courseChange = CourseChange.acuteNear(turnDirection, turnCenterDistance, deltaTrack);
             }
-        } else if (Math.abs(deltaTrack) >= 45 && !compareTurnDirections(turnDirection, constrainedTurnDirection)) {
+        } else if (Math.abs(deltaTrack) >= 45 && !compareTurnDirections(turnDirection, this.nextLeg.constrainedTurnDirection)) {
             turnCenter = Geo.computeDestinationPoint(initialTurningPoint, radius, targetTrack - turnDirection * 90);
             turnDirection = -turnDirection;
             turnCenterDistance = Math.sign(MathUtils.diffAngle(Geo.getGreatCircleBearing(turnCenter, this.nextLeg.getPathEndPoint()), this.nextLeg.outboundCourse))
@@ -192,7 +191,7 @@ export class PathCaptureTransition extends Transition {
                 courseChange = CourseChange.acuteNear(turnDirection, turnCenterDistance, deltaTrack);
             }
         } else {
-            const isReverse = !compareTurnDirections(naturalTurnDirectionSign, constrainedTurnDirection);
+            const isReverse = !compareTurnDirections(naturalTurnDirectionSign, this.nextLeg.constrainedTurnDirection);
 
             if (isReverse) {
                 courseChange = CourseChange.reverse(turnDirection, turnCenterDistance, deltaTrack, radius);

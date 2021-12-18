@@ -29,54 +29,6 @@ export class GuidanceManager {
         this.flightPlanManager = flightPlanManager;
     }
 
-    private static ifLeg(fix: WayPoint, segment: SegmentType, indexInFullPath: number) {
-        return new IFLeg(fix, segment, indexInFullPath);
-    }
-
-    private static vmLeg(heading: DegreesMagnetic, course: DegreesTrue, segment: SegmentType, indexInFullPath: number) {
-        return new VMLeg(heading, course, segment, indexInFullPath);
-    }
-
-    private static cfLeg(fix: WayPoint, course: DegreesTrue, segment: SegmentType, indexInFullPath: number) {
-        return new CFLeg(fix, course, segment, indexInFullPath);
-    }
-
-    private static dfLeg(fix: WayPoint, segment: SegmentType, indexInFullPath: number) {
-        return new DFLeg(fix, segment, indexInFullPath);
-    }
-
-    private static rfLeg(from: WayPoint, to: WayPoint, center: LatLongData, segment: SegmentType, indexInFullPath: number) {
-        return new RFLeg(from, to, center, segment, indexInFullPath);
-    }
-
-    private static tfLeg(from: WayPoint, to: WayPoint, segment: SegmentType, indexInFullPath: number) {
-        return new TFLeg(from, to, segment, indexInFullPath);
-    }
-
-    private static haLeg(to: WayPoint, segment: SegmentType, indexInFullPath: number) {
-        return new HALeg(to, segment, indexInFullPath);
-    }
-
-    private static hfLeg(to: WayPoint, segment: SegmentType, indexInFullPath: number) {
-        return new HFLeg(to, segment, indexInFullPath);
-    }
-
-    private static hmLeg(to: WayPoint, segment: SegmentType, indexInFullPath: number) {
-        return new HMLeg(to, segment, indexInFullPath);
-    }
-
-    private static caLeg(course: DegreesTrue, altitude: Feet, segment: SegmentType, indexInFullPath: number) {
-        return new CALeg(course, altitude, segment, indexInFullPath);
-    }
-
-    private static crLeg(course: DegreesTrue, origin: RawFacility, radial: DegreesTrue, segment: SegmentType, indexInFullPath: number) {
-        return new CRLeg(course, { coordinates: { lat: origin.lat, long: origin.lon }, ident: origin.icao }, radial, segment, indexInFullPath);
-    }
-
-    private static ciLeg(course: DegreesTrue, nextLeg: Leg, segment: SegmentType, indexInFullPath: number) {
-        return new CILeg(course, nextLeg, segment, indexInFullPath);
-    }
-
     /**
      * Returns a {@link Leg} from two {@link WayPoint} objects. Only for fpm v1.
      *
@@ -97,10 +49,10 @@ export class GuidanceManager {
     ): Leg {
         if (to?.additionalData?.legType === LegType.IF) {
             if (prevLeg && prevLeg instanceof XFLeg) {
-                return GuidanceManager.tfLeg(prevLeg.fix, to, segment, toIndex);
+                return new TFLeg(prevLeg.fix, to, segment, toIndex, to.turnDirection);
             }
 
-            return GuidanceManager.ifLeg(to, segment, toIndex);
+            return new IFLeg(to, segment, toIndex);
         }
 
         if (!from || !to) {
@@ -109,7 +61,7 @@ export class GuidanceManager {
 
         if (from.endsInDiscontinuity) {
             if (to?.additionalData.legType === LegType.CF || to?.additionalData.legType === LegType.TF) {
-                return this.ifLeg(to, segment, toIndex);
+                return new IFLeg(to, segment, toIndex);
             }
 
             return null;
@@ -117,22 +69,22 @@ export class GuidanceManager {
 
         if (to.additionalData) {
             if (to.additionalData.legType === LegType.CF) {
-                return GuidanceManager.cfLeg(to, to.additionalData.course, segment, toIndex);
+                return new CFLeg(to, to.additionalData.course, segment, toIndex, to.turnDirection);
             }
 
             if (to.additionalData.legType === LegType.DF) {
-                return GuidanceManager.dfLeg(to, segment, toIndex);
+                return new DFLeg(to, segment, toIndex, to.turnDirection);
             }
 
             if (to.additionalData.legType === LegType.RF) {
-                return GuidanceManager.rfLeg(from, to, to.additionalData.center, segment, toIndex);
+                return new RFLeg(from, to, to.additionalData.center, segment, toIndex);
             }
 
             if (to.additionalData.legType === LegType.CA) {
                 const course = to.additionalData.vectorsCourse;
                 const altitude = to.additionalData.vectorsAltitude;
 
-                return GuidanceManager.caLeg(course, altitude, segment, toIndex);
+                return new CALeg(course, altitude, segment, toIndex, to.turnDirection);
             }
 
             if (to.additionalData.legType === LegType.CI || to.additionalData.legType === LegType.VI) {
@@ -142,7 +94,7 @@ export class GuidanceManager {
 
                 const course = to.additionalData.vectorsCourse;
 
-                return GuidanceManager.ciLeg(course, nextLeg, segment, toIndex);
+                return new CILeg(course, nextLeg, segment, toIndex, to.turnDirection);
             }
 
             if (to.additionalData.legType === LegType.CR) {
@@ -150,27 +102,29 @@ export class GuidanceManager {
                 const origin = to.additionalData.origin as RawFacility;
                 const radial = to.additionalData.radial;
 
-                return GuidanceManager.crLeg(course, origin, radial, segment, toIndex);
+                const originObj = { coordinates: { lat: origin.lat, long: origin.lon }, ident: origin.icao };
+
+                return new CRLeg(course, originObj, radial, segment, toIndex, to.turnDirection);
             }
 
             if (to.additionalData?.legType === LegType.HA) {
-                return GuidanceManager.haLeg(to, segment, toIndex);
+                return new HALeg(to, segment, toIndex);
             }
 
             if (to.additionalData?.legType === LegType.HF) {
-                return GuidanceManager.hfLeg(to, segment, toIndex);
+                return new HFLeg(to, segment, toIndex);
             }
 
             if (to.additionalData?.legType === LegType.HM) {
-                return GuidanceManager.hmLeg(to, segment, toIndex);
+                return new HMLeg(to, segment, toIndex);
             }
         }
 
         if (to.isVectors) {
-            return GuidanceManager.vmLeg(to.additionalData.vectorsHeading, to.additionalData.vectorsCourse, segment, toIndex);
+            return new VMLeg(to.additionalData.vectorsHeading, to.additionalData.vectorsCourse, segment, toIndex, to.turnDirection);
         }
 
-        return GuidanceManager.tfLeg(from, to, segment, toIndex);
+        return new TFLeg(from, to, segment, toIndex, to.turnDirection);
     }
 
     getLeg(prevLeg: Leg | null, nextLeg: Leg | null, index: number, flightPlanIndex): Leg | null {
@@ -186,7 +140,7 @@ export class GuidanceManager {
             console.log('[Fms/Geometry/Update] Starting geometry update.');
         }
 
-        for (let i = activeIdx; i < wptCount; i++) {
+        for (let i = activeIdx - 1; i < wptCount; i++) {
             const prevLeg = geometry.legs.get(i - 1);
             const oldLeg = geometry.legs.get(i);
             const nextLeg = this.getLeg(prevLeg, null, i + 1, flightPlanIndex);

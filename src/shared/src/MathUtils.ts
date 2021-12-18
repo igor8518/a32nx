@@ -52,6 +52,19 @@ export class MathUtils {
         return diff;
     }
 
+    public static adjustAngleForTurnDirection(angle: Degrees, turnDirection: TurnDirection) {
+        let ret = angle;
+
+        if (angle < 0 && turnDirection === TurnDirection.Right) {
+            ret += 360;
+        }
+        if (angle > 0 && turnDirection === TurnDirection.Left) {
+            ret -= 360;
+        }
+
+        return ret;
+    }
+
     /**
     * Calculates the inner angle of the small triangle formed by two intersecting lines
     *

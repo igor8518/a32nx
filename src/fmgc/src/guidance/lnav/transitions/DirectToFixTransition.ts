@@ -5,7 +5,6 @@ import { DFLeg } from '@fmgc/guidance/lnav/legs/DF';
 import { HALeg, HFLeg, HMLeg } from '@fmgc/guidance/lnav/legs/HX';
 import { TFLeg } from '@fmgc/guidance/lnav/legs/TF';
 import { VMLeg } from '@fmgc/guidance/lnav/legs/VM';
-import { XFLeg } from '@fmgc/guidance/lnav/legs/XF';
 import { Transition } from '@fmgc/guidance/lnav/Transition';
 import { GuidanceParameters, LateralPathGuidance } from '@fmgc/guidance/ControlLaws';
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
@@ -109,9 +108,7 @@ export class DirectToFixTransition extends Transition {
 
         this.radius = gs ** 2 / (Constants.G * tan(maxBank(tas, true))) / 6080.2;
 
-        const turnDirectionConstraint = this.nextLeg instanceof XFLeg ? this.nextLeg.fix.turnDirection : TurnDirection.Unknown;
-
-        let trackChange = MathUtils.diffAngle(this.previousLeg.outboundCourse, Geo.getGreatCircleBearing(this.previousLeg.getPathEndPoint(), nextFix), turnDirectionConstraint);
+        let trackChange = MathUtils.diffAngle(this.previousLeg.outboundCourse, Geo.getGreatCircleBearing(this.previousLeg.getPathEndPoint(), nextFix), this.nextLeg.constrainedTurnDirection);
         if (Math.abs(trackChange) < 3) {
             this.revertedTransition = null;
         }
@@ -130,7 +127,7 @@ export class DirectToFixTransition extends Transition {
         const distanceToFix = Geo.getDistance(turnCentre, nextFix);
 
         if (distanceToFix < this.radius) {
-            if (Math.abs(MathUtils.diffAngle(this.previousLeg.outboundCourse, Geo.getGreatCircleBearing(termFix, nextFix), c)) < 60) {
+            if (Math.abs(MathUtils.diffAngle(this.previousLeg.outboundCourse, Geo.getGreatCircleBearing(termFix, nextFix), this.nextLeg.constrainedTurnDirection)) < 60) {
                 this.revertedTransition = null;
 
                 this.hasArc = false;

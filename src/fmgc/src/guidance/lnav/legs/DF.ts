@@ -10,6 +10,7 @@ import { LnavConfig } from '@fmgc/guidance/LnavConfig';
 import { courseToFixDistanceToGo, courseToFixGuidance } from '@fmgc/guidance/lnav/CommonGeometry';
 import { Transition } from '@fmgc/guidance/lnav/Transition';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 import { PathVector, PathVectorType } from '../PathVector';
 
 export class DFLeg extends XFLeg {
@@ -19,11 +20,13 @@ export class DFLeg extends XFLeg {
         public fix: WayPoint,
         segment: SegmentType,
         indexInFullPath: number,
+        constrainedTurnDirection = TurnDirection.Unknown,
     ) {
         super();
 
         this.segment = segment;
         this.indexInFullPath = indexInFullPath;
+        this.constrainedTurnDirection = constrainedTurnDirection;
     }
 
     getPathStartPoint(): Coordinates | undefined {

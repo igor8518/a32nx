@@ -3,11 +3,14 @@ import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { AltitudeConstraint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
 import { Guidable } from '@fmgc/guidance/Guidable';
 import { Geo } from '@fmgc/utils/Geo';
+import { TurnDirection } from '@fmgc/types/fstypes/FSEnums';
 
 export abstract class Leg extends Guidable {
     segment: SegmentType;
 
     indexInFullPath: number
+
+    constrainedTurnDirection = TurnDirection.Unknown;
 
     abstract get inboundCourse(): Degrees | undefined;
 
