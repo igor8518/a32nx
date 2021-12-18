@@ -17,7 +17,7 @@ type ButtonType = {
     setting: string,
 }
 
-type SimVarButton = {
+type AdirsButton = {
     simVarValue: number,
 }
 
@@ -355,9 +355,8 @@ const RealismPage = () => {
     const [boardingRate, setBoardingRate] = usePersistentProperty('CONFIG_BOARDING_RATE', 'REAL');
     const [mcduInput, setMcduInput] = usePersistentProperty('MCDU_KB_INPUT', 'DISABLED');
     const [mcduTimeout, setMcduTimeout] = usePersistentProperty('CONFIG_MCDU_KB_TIMEOUT', '60');
-    const [realisticTiller, setRealisticTiller] = usePersistentProperty('REALISTIC_TILLER_ENABLED', '0');
 
-    const adirsAlignTimeButtons: (ButtonType & SimVarButton)[] = [
+    const adirsAlignTimeButtons: (ButtonType & AdirsButton)[] = [
         { name: 'Instant', setting: 'INSTANT', simVarValue: 1 },
         { name: 'Fast', setting: 'FAST', simVarValue: 2 },
         { name: 'Real', setting: 'REAL', simVarValue: 0 },
@@ -373,11 +372,6 @@ const RealismPage = () => {
         { name: 'Instant', setting: 'INSTANT' },
         { name: 'Fast', setting: 'FAST' },
         { name: 'Real', setting: 'REAL' },
-    ];
-
-    const steeringSeparationButtons: (ButtonType & SimVarButton)[] = [
-        { name: 'Disabled', setting: '0', simVarValue: 0 },
-        { name: 'Enabled', setting: '1', simVarValue: 1 },
     ];
 
     return (
@@ -460,21 +454,6 @@ const RealismPage = () => {
                                 }
                             }}
                         />
-                    </div>
-
-                    <div className="py-4 flex flex-row justify-between items-center">
-                        <span className="text-lg text-gray-300 mr-1">Separate Tiller from Rudder Inputs</span>
-                        <SelectGroup>
-                            {steeringSeparationButtons.map((button) => (
-                                <SelectItem
-                                    enabled
-                                    onSelect={() => setRealisticTiller(button.setting)}
-                                    selected={realisticTiller === button.setting}
-                                >
-                                    {button.name}
-                                </SelectItem>
-                            ))}
-                        </SelectGroup>
                     </div>
                 </div>
             </>
