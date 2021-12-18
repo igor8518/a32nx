@@ -49,6 +49,10 @@ export class DecelPathBuilder {
         const S = 184;
         const F = 143;
 
+        if (!this.canCompute(profile.geometry)) {
+            return;
+        }
+
         const vappSegment = DecelPathBuilder.computeVappSegment(profile.geometry);
 
         let fuelWeight = TEMP_FUEL_WEIGHT;
