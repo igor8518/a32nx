@@ -15,6 +15,7 @@ export class ClimbPathBuilder {
         VerticalMode.CLB,
         VerticalMode.OP_CLB,
         VerticalMode.VS,
+        VerticalMode.ALT,
         VerticalMode.ALT_CPT,
         VerticalMode.ALT_CST_CPT,
         VerticalMode.ALT_CST,
