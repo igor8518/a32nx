@@ -1,4 +1,4 @@
-import { MaxSpeedConstraint } from '@fmgc/guidance/vnav/GeometryProfile';
+import { MaxSpeedConstraint } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 
 export class ClimbSpeedProfile {

@@ -5,7 +5,7 @@ import { Geometry } from '@fmgc/guidance/Geometry';
 import { TFLeg } from '@fmgc/guidance/lnav/legs/TF';
 import { Predictions, StepResults, VnavStepError } from '@fmgc/guidance/vnav/Predictions';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
-import { GeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/GeometryProfile';
+import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 
 const ALTITUDE_ADJUSTMENT_FACTOR = 1.4;
 
@@ -30,7 +30,7 @@ export interface DecelPathCharacteristics {
 }
 
 export class DecelPathBuilder {
-    computeDecelPath(profile: GeometryProfile, estimatedFuelOnBoardAtDestination: number) {
+    computeDecelPath(profile: NavGeometryProfile, estimatedFuelOnBoardAtDestination: number) {
         // TO GET FPA:
         // If approach exists, use approach alt constraints to get FPA and glidepath
         // If no approach but arrival, use arrival alt constraints, if any

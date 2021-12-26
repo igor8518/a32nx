@@ -13,9 +13,10 @@ import { CruiseToDescentCoordinator } from '@fmgc/guidance/vnav/CruiseToDescentC
 import { ArmedLateralMode, LateralMode } from '@shared/autopilot';
 import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { ClimbSpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
+import { SelectedGeometryProfile } from '@fmgc/guidance/vnav/profile/SelectedGeometryProfile';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
-import { GeometryProfile } from './GeometryProfile';
+import { NavGeometryProfile } from './profile/NavGeometryProfile';
 import { ClimbPathBuilder } from './climb/ClimbPathBuilder';
 
 export class VnavDriver implements GuidanceComponent {
@@ -29,7 +30,9 @@ export class VnavDriver implements GuidanceComponent {
 
     cruiseToDescentCoordinator: CruiseToDescentCoordinator;
 
-    currentGeometryProfile: GeometryProfile;
+    currentNavGeometryProfile: NavGeometryProfile;
+
+    currentSelectedGeometryProfile?: SelectedGeometryProfile;
 
     currentDescentProfile: TheoreticalDescentPathCharacteristics
 
@@ -64,7 +67,8 @@ export class VnavDriver implements GuidanceComponent {
         this.climbPathBuilder.update();
         this.cruisePathBuilder.update();
 
-        this.computeVerticalProfile(geometry);
+        this.computeVerticalProfileForNav(geometry);
+        this.computeVerticalProfileForSelected();
     }
 
     lastCruiseAltitude: Feet = 0;
@@ -79,38 +83,41 @@ export class VnavDriver implements GuidanceComponent {
                 console.log('[FMS/VNAV] Computed new vertical profile because of new cruise altitude.');
             }
 
-            this.computeVerticalProfile(this.guidanceController.activeGeometry);
+            this.computeVerticalProfileForNav(this.guidanceController.activeGeometry);
+            this.computeVerticalProfileForSelected();
         }
 
         this.updateTimeMarkers();
     }
 
     private updateTimeMarkers() {
-        if (!this.currentGeometryProfile.isReadyToDisplay) {
+        if (!this.currentNavGeometryProfile.isReadyToDisplay) {
             return;
         }
 
         for (const [time] of this.timeMarkers.entries()) {
-            const prediction = this.currentGeometryProfile.predictAtTime(time);
+            const prediction = this.currentNavGeometryProfile.predictAtTime(time);
 
             this.timeMarkers.set(time, prediction);
         }
     }
 
-    private computeVerticalProfile(geometry: Geometry) {
+    private computeVerticalProfileForNav(geometry: Geometry) {
         console.time('VNAV computation');
-        this.currentGeometryProfile = new GeometryProfile(geometry, this.flightPlanManager, this.guidanceController.activeLegIndex, this.isInManagedNav());
-        this.climbSpeedProfile.updateMaxSpeedConstraints(this.currentGeometryProfile.maxSpeedConstraints);
+        this.currentNavGeometryProfile = new NavGeometryProfile(geometry, this.flightPlanManager, this.guidanceController.activeLegIndex);
+        this.climbSpeedProfile.updateMaxSpeedConstraints(this.currentNavGeometryProfile.maxSpeedConstraints);
 
         if (geometry.legs.size > 0 && this.computationParametersObserver.canComputeProfile()) {
-            this.climbPathBuilder.computeClimbPath(this.currentGeometryProfile);
+            this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile);
 
-            this.cruiseToDescentCoordinator.coordinate(this.currentGeometryProfile);
+            if (!this.decelPathBuilder.canCompute(geometry)) {
+                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile);
+            }
 
-            this.currentGeometryProfile.finalizeProfile();
+            this.currentNavGeometryProfile.finalizeProfile();
 
             if (VnavConfig.DEBUG_PROFILE) {
-                console.log(this.currentGeometryProfile);
+                console.log(this.currentNavGeometryProfile);
             }
 
             this.guidanceController.pseudoWaypoints.acceptVerticalProfile();
@@ -123,6 +130,22 @@ export class VnavDriver implements GuidanceComponent {
         }
 
         console.timeEnd('VNAV computation');
+    }
+
+    private computeVerticalProfileForSelected() {
+        if (this.isInManagedNav()) {
+            return;
+        }
+
+        this.currentSelectedGeometryProfile = new SelectedGeometryProfile();
+
+        this.climbPathBuilder.computeClimbPath(this.currentSelectedGeometryProfile);
+
+        this.currentSelectedGeometryProfile.finalizeProfile();
+
+        if (VnavConfig.DEBUG_PROFILE) {
+            console.log(this.currentSelectedGeometryProfile);
+        }
     }
 
     private isInManagedNav(): boolean {

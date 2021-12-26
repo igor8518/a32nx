@@ -8,7 +8,7 @@ import { GuidanceController } from '@fmgc/guidance/GuidanceController';
 import { LateralMode } from '@shared/autopilot';
 import { FixedRadiusTransition } from '@fmgc/guidance/lnav/transitions/FixedRadiusTransition';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
-import { VerticalCheckpointReason } from '@fmgc/guidance/vnav/GeometryProfile';
+import { VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { TimeUtils } from '@fmgc/utils/TimeUtils';
 
 const PWP_IDENT_CLIMB_CONSTRAINT_LEVEL_OFF = 'Level off for climb constraint';
@@ -60,9 +60,9 @@ export class PseudoWaypoints implements GuidanceComponent {
         }
 
         const newPseudoWaypoints: PseudoWaypoint[] = [];
-        const totalDistance = this.guidanceController.vnavDriver.currentGeometryProfile.totalFlightPlanDistance;
+        const totalDistance = this.guidanceController.vnavDriver.currentNavGeometryProfile.totalFlightPlanDistance;
 
-        const geometryProfile = this.guidanceController.vnavDriver.currentGeometryProfile;
+        const geometryProfile = this.guidanceController.vnavDriver.currentNavGeometryProfile;
 
         if (!geometryProfile.isReadyToDisplay) {
             return;
@@ -154,39 +154,22 @@ export class PseudoWaypoints implements GuidanceComponent {
 
         // Top Of Climb
         const tocCheckpoint = geometryProfile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
+        const toc = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - tocCheckpoint?.distanceFromStart);
 
-        if (geometryProfile.shouldDrawPwpAlongNavPath) {
-            const toc = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - tocCheckpoint?.distanceFromStart);
-
-            if (toc) {
-                const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = toc;
-
-                newPseudoWaypoints.push({
-                    ident: PWP_IDENT_TOC,
-                    alongLegIndex,
-                    distanceFromLegTermination,
-                    efisSymbolFlag: NdSymbolTypeFlags.PwpTopOfClimb,
-                    efisSymbolLla,
-                    displayedOnMcdu: true,
-                    flightPlanInfo: {
-                        ...tocCheckpoint,
-                        distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
-                    },
-                });
-            }
-        } else {
-            const { lat, long } = this.guidanceController.getPresentPosition();
-            const diff = Avionics.Utils.diffAngle(heading, track);
-            const toc = Avionics.Utils.bearingDistanceToCoordinates(trueHeading + diff, tocCheckpoint.distanceFromStart, lat, long);
+        if (toc) {
+            const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = toc;
 
             newPseudoWaypoints.push({
                 ident: PWP_IDENT_TOC,
-                alongLegIndex: Infinity,
-                distanceFromLegTermination: 0,
+                alongLegIndex,
+                distanceFromLegTermination,
                 efisSymbolFlag: NdSymbolTypeFlags.PwpTopOfClimb,
-                efisSymbolLla: toc,
-                displayedOnMcdu: false,
-                flightPlanInfo: undefined,
+                efisSymbolLla,
+                displayedOnMcdu: true,
+                flightPlanInfo: {
+                    ...tocCheckpoint,
+                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                },
             });
         }
 

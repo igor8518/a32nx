@@ -65,6 +65,10 @@ export const FlightPlan: FC<FlightPathProps> = memo(({ x = 0, y = 0, side, symbo
             ))}
 
             {symbols.map((symbol) => {
+                if (!symbol.location) {
+                    return false;
+                }
+
                 const position = mapParams.coordinatesToXYy(symbol.location);
 
                 let endPosition;
@@ -231,7 +235,7 @@ interface SymbolMarkerProps {
     mapParams: MapParameters,
 }
 
-const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arcRadius, arcSweep, type, constraints, length, direction, radials, radii, mapParams }) => {
+export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arcRadius, arcSweep, type, constraints, length, direction, radials, radii, mapParams }) => {
     let colour = 'White';
     let shadow = true;
     // todo airport as well if in flightplan
@@ -456,7 +460,7 @@ interface ConstraintMarkerProps {
     type: NdSymbolTypeFlags,
 }
 
-const ConstraintMarker: FC<ConstraintMarkerProps> = memo(({ x, y, type }) => {
+export const ConstraintMarker: FC<ConstraintMarkerProps> = memo(({ x, y, type }) => {
     if (type & NdSymbolTypeFlags.ConstraintMet) {
         return (
             <Layer x={x} y={y}>

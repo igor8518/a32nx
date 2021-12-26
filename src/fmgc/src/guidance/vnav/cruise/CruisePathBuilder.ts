@@ -1,6 +1,6 @@
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { Predictions, StepResults } from '../Predictions';
-import { GeometryProfile, VerticalCheckpointReason } from '../GeometryProfile';
+import { NavGeometryProfile, VerticalCheckpointReason } from '../profile/NavGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
 
 export interface CruisePathBuilderResults {
@@ -22,7 +22,7 @@ export class CruisePathBuilder {
         this.atmosphericConditions.update();
     }
 
-    computeCruisePath(profile: GeometryProfile): CruisePathBuilderResults {
+    computeCruisePath(profile: NavGeometryProfile): CruisePathBuilderResults {
         const topOfClimb = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
         const topOfDescent = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfDescent);
 

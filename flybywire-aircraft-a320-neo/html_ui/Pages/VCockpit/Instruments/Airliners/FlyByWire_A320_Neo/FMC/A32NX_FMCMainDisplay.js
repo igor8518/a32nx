@@ -1098,7 +1098,7 @@ class FMCMainDisplay extends BaseAirliners {
     // TODO/VNAV: Speed constraint
     getSpeedConstraint() {
         const climbPathBuilder = this.guidanceController.vnavDriver.climbPathBuilder;
-        const geometryProfile = this.guidanceController.vnavDriver.currentGeometryProfile;
+        const geometryProfile = this.guidanceController.vnavDriver.currentNavGeometryProfile;
 
         if (climbPathBuilder && geometryProfile && geometryProfile.distanceToPresentPosition) {
             return climbPathBuilder.findMaxSpeedAtDistanceAlongTrack(geometryProfile.distanceToPresentPosition);

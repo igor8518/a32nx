@@ -1,8 +1,8 @@
 import { TheoreticalDescentPathCharacteristics } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
-import { GeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/GeometryProfile';
+import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 
 export class DescentPathBuilder {
-    computeDescentPath(profile: GeometryProfile): TheoreticalDescentPathCharacteristics {
+    computeDescentPath(profile: NavGeometryProfile): TheoreticalDescentPathCharacteristics {
         const TEMP_FUEL_BURN = 2000;
 
         const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);

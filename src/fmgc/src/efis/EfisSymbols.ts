@@ -281,7 +281,7 @@ export class EfisSymbols {
                 }
             }
 
-            const waypointPredictions = this.guidanceController.vnavDriver.currentGeometryProfile?.computePredictionsAtWaypoints();
+            const waypointPredictions = this.guidanceController.vnavDriver.currentNavGeometryProfile?.computePredictionsAtWaypoints();
 
             // TODO don't send the waypoint before active once FP sequencing is properly implemented
             // (currently sequences with guidance which is too early)
@@ -397,6 +397,19 @@ export class EfisSymbols {
                     ident: pwp.ident,
                     location: pwp.efisSymbolLla,
                     type: pwp.efisSymbolFlag,
+                });
+            }
+
+            // Symbols along the track line
+
+            for (const checkpoint of this.guidanceController.vnavDriver.currentSelectedGeometryProfile?.getCheckpointsToShowOnTrackLine() ?? []) {
+                // TODO: Create more dynamically
+                upsertSymbol({
+                    databaseId: 'W      \'T/C\'',
+                    ident: 'T/C',
+                    location: undefined,
+                    type: NdSymbolTypeFlags.PwpTopOfClimb,
+                    distanceFromAirplane: checkpoint.distanceFromStart,
                 });
             }
 
