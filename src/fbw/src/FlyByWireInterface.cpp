@@ -1472,6 +1472,7 @@ bool FlyByWireInterface::updateThrustLimits(double sampleTime) {
 
   // fill input data
   thrustLimitsInput.in.dt = sampleTime;
+  thrustLimitsInput.in.simulation_time_s = simData.simulationTime;
   thrustLimitsInput.in.H_ft = simData.H_ft;
   thrustLimitsInput.in.V_mach = simData.V_mach;
   thrustLimitsInput.in.OAT_degC = simData.ambient_temperature_celsius;
@@ -1484,13 +1485,14 @@ bool FlyByWireInterface::updateThrustLimits(double sampleTime) {
   thrustLimitsInput.in.is_air_conditioning_2_active = idAirConditioningPack_2->get();
   thrustLimitsInput.in.thrust_limit_IDLE_percent = engineEngineIdleN1->get();
   thrustLimitsInput.in.flex_temperature_degC = idFmgcFlexTemperature->get();
-  if (!autothrustThrustLimitUseExternalFlex) {
+  if (autothrustThrustLimitUseExternal && !autothrustThrustLimitUseExternalFlex) {
     thrustLimitsInput.in.use_external_CLB_limit = true;
     thrustLimitsInput.in.thrust_limit_CLB_percent = idAutothrustThrustLimitCLB->get();
   } else {
     thrustLimitsInput.in.use_external_CLB_limit = false;
     thrustLimitsInput.in.thrust_limit_CLB_percent = 0;
   }
+  thrustLimitsInput.in.thrust_limit_type = autoThrustOutput.thrust_limit_type;
 
   // set input data
   thrustLimits.setExternalInputs(&thrustLimitsInput);
