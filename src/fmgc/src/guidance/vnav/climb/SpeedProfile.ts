@@ -12,6 +12,7 @@ interface ClimbSpeedProfileParameters {
 export interface SpeedProfile {
     get(distanceFromStart: NauticalMiles, altitude: Feet): Knots;
     getCurrentSpeedConstraint(): Knots;
+    shouldTakeSpeedLimitIntoAccount(): boolean;
 }
 
 /**
@@ -120,6 +121,10 @@ export class McduSpeedProfile implements SpeedProfile {
             `[FMS/VNAV] Performed ${this.maxSpeedLookups} max speed lookups. Of which ${this.maxSpeedCacheHits} (${100 * this.maxSpeedCacheHits / this.maxSpeedLookups}%) had been cached`,
         );
     }
+
+    shouldTakeSpeedLimitIntoAccount(): boolean {
+        return this.isValidSpeedLimit();
+    }
 }
 
 export class ExpediteSpeedProfile implements SpeedProfile {
@@ -131,6 +136,10 @@ export class ExpediteSpeedProfile implements SpeedProfile {
 
     getCurrentSpeedConstraint(): Knots {
         return Infinity;
+    }
+
+    shouldTakeSpeedLimitIntoAccount(): boolean {
+        return false;
     }
 }
 
@@ -229,5 +238,9 @@ export class NdSpeedProfile implements SpeedProfile {
         console.log(
             `[FMS/VNAV] Performed ${this.maxSpeedLookups} max speed lookups. Of which ${this.maxSpeedCacheHits} (${100 * this.maxSpeedCacheHits / this.maxSpeedLookups}%) had been cached`,
         );
+    }
+
+    shouldTakeSpeedLimitIntoAccount(): boolean {
+        return this.isValidSpeedLimit() && !this.isSelectedSpeed();
     }
 }
