@@ -36,16 +36,6 @@ export class McduSpeedProfile implements SpeedProfile {
         return Number.isFinite(speed) && Number.isFinite(underAltitude);
     }
 
-    private withSpeedLimitIfApplicable(altitude: Feet, fallbackSpeed: Knots): Knots {
-        const { speed, underAltitude } = this.parameters.speedLimit;
-
-        if (this.isValidSpeedLimit() && altitude < underAltitude) {
-            return Math.min(speed, fallbackSpeed);
-        }
-
-        return fallbackSpeed;
-    }
-
     get(distanceFromStart: NauticalMiles, altitude: Feet): Knots {
         const { fcuSpeed, flightPhase, preselectedClbSpeed } = this.parameters;
 
@@ -70,9 +60,12 @@ export class McduSpeedProfile implements SpeedProfile {
     }
 
     private getManaged(distanceFromStart: NauticalMiles, altitude: Feet): Knots {
-        let managedClimbSpeed = this.parameters.managedClimbSpeed;
+        let { managedClimbSpeed } = this.parameters;
+        const { speed, underAltitude } = this.parameters.speedLimit;
 
-        managedClimbSpeed = this.withSpeedLimitIfApplicable(altitude, managedClimbSpeed);
+        if (this.isValidSpeedLimit() && altitude < underAltitude) {
+            managedClimbSpeed = Math.min(speed, managedClimbSpeed);
+        }
 
         return Math.min(managedClimbSpeed, this.findMaxSpeedAtDistanceAlongTrack(distanceFromStart));
     }
@@ -164,16 +157,6 @@ export class NdSpeedProfile implements SpeedProfile {
         return Number.isFinite(speed) && Number.isFinite(underAltitude);
     }
 
-    private withSpeedLimitIfApplicable(altitude: Feet, fallbackSpeed: Knots): Knots {
-        const { speed, underAltitude } = this.parameters.speedLimit;
-
-        if (this.isValidSpeedLimit() && altitude < underAltitude) {
-            return Math.min(speed, fallbackSpeed);
-        }
-
-        return fallbackSpeed;
-    }
-
     get(distanceFromStart: NauticalMiles, altitude: Feet): Knots {
         const { fcuSpeed, flightPhase, preselectedClbSpeed } = this.parameters;
 
@@ -192,15 +175,27 @@ export class NdSpeedProfile implements SpeedProfile {
     }
 
     private getManaged(distanceFromStart: NauticalMiles, altitude: Feet): Knots {
-        let managedClimbSpeed = this.parameters.managedClimbSpeed;
+        let { managedClimbSpeed } = this.parameters;
+        const { speed, underAltitude } = this.parameters.speedLimit;
 
-        managedClimbSpeed = this.withSpeedLimitIfApplicable(altitude, managedClimbSpeed);
+        if (this.isValidSpeedLimit() && altitude < underAltitude) {
+            managedClimbSpeed = Math.min(speed, managedClimbSpeed);
+        }
 
         return Math.min(managedClimbSpeed, this.findMaxSpeedAtDistanceAlongTrack(distanceFromStart));
     }
 
     getCurrentSpeedConstraint(): Knots {
         return this.findMaxSpeedAtDistanceAlongTrack(this.aircraftDistanceAlongTrack);
+    }
+
+    isSelectedSpeed(): boolean {
+        const { fcuSpeed, flightPhase, preselectedClbSpeed } = this.parameters;
+
+        const hasPreselectedSpeed = flightPhase < FlightPhase.FLIGHT_PHASE_CLIMB && preselectedClbSpeed > 1;
+        const hasSelectedSpeed = fcuSpeed > 1;
+
+        return hasSelectedSpeed || hasPreselectedSpeed;
     }
 
     private findMaxSpeedAtDistanceAlongTrack(distanceAlongTrack: NauticalMiles): Knots {
