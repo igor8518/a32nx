@@ -155,7 +155,7 @@ export class ClimbPathBuilder {
 
             if (constraintAltitude > profile.lastCheckpoint.altitude) {
                 // Continue climb
-                if (profile.lastCheckpoint.reason === VerticalCheckpointReason.WaypointWithConstraint) {
+                if (profile.lastCheckpoint.reason === VerticalCheckpointReason.AltitudeConstraint) {
                     profile.lastCheckpoint.reason = VerticalCheckpointReason.ContinueClimb;
                 }
 
@@ -173,7 +173,7 @@ export class ClimbPathBuilder {
             }
         }
 
-        if (profile.lastCheckpoint.reason === VerticalCheckpointReason.WaypointWithConstraint) {
+        if (profile.lastCheckpoint.reason === VerticalCheckpointReason.AltitudeConstraint) {
             profile.lastCheckpoint.reason = VerticalCheckpointReason.ContinueClimb;
         }
 
@@ -226,7 +226,7 @@ export class ClimbPathBuilder {
             );
 
             profile.checkpoints.push({
-                reason: VerticalCheckpointReason.WaypointWithConstraint,
+                reason: VerticalCheckpointReason.AltitudeConstraint,
                 distanceFromStart: speedConstraint.distanceFromStart,
                 secondsFromPresent: lastCheckpoint.secondsFromPresent + (timeElapsed * 60),
                 altitude,
@@ -246,7 +246,7 @@ export class ClimbPathBuilder {
         );
 
         profile.checkpoints.push({
-            reason: VerticalCheckpointReason.WaypointWithConstraint,
+            reason: VerticalCheckpointReason.AltitudeConstraint,
             distanceFromStart: toDistanceFromStart,
             secondsFromPresent: lastCheckpoint.secondsFromPresent + (timeElapsed * 60),
             altitude,
