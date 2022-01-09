@@ -75,10 +75,6 @@ export class PseudoWaypoints implements GuidanceComponent {
 
         const totalDistance = navGeometryProfile.totalFlightPlanDistance;
 
-        if (!navGeometryProfile.isReadyToDisplay) {
-            return;
-        }
-
         const shouldEmitCdaPwp = VnavConfig.VNAV_DESCENT_MODE === VnavDescentMode.CDA && VnavConfig.VNAV_EMIT_CDA_FLAP_PWP;
 
         // We do this so we only draw the first of each waypoint type

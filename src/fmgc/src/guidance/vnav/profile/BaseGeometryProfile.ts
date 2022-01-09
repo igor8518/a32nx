@@ -261,6 +261,10 @@ export abstract class BaseGeometryProfile {
     }
 
     getCheckpointsToDrawOnNd(): VerticalCheckpoint[] {
+        if (!this.isReadyToDisplay) {
+            return [];
+        }
+
         const CHECKPOINTS_TO_DRAW_ON_ND = new Set([
             VerticalCheckpointReason.TopOfClimb,
             VerticalCheckpointReason.LevelOffForConstraint,
@@ -278,6 +282,10 @@ export abstract class BaseGeometryProfile {
     }
 
     getCheckpointsInMcdu(): VerticalCheckpoint[] {
+        if (!this.isReadyToDisplay) {
+            return [];
+        }
+
         const CHECKPOINTS_TO_PUT_IN_MCDU = new Set([
             VerticalCheckpointReason.TopOfClimb,
             VerticalCheckpointReason.CrossingSpeedLimit,

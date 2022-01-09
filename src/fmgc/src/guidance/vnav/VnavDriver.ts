@@ -165,6 +165,7 @@ export class VnavDriver implements GuidanceComponent {
             : new NdSpeedProfile(this.computationParametersObserver.get(), this.currentNdGeometryProfile.distanceToPresentPosition, this.currentNdGeometryProfile.maxSpeedConstraints);
 
         this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile, speedProfile, this.computationParametersObserver.get().fcuAltitude);
+        this.currentNdGeometryProfile.finalizeProfile();
 
         if (VnavConfig.DEBUG_PROFILE) {
             console.log('this.currentNdGeometryProfile:', this.currentNdGeometryProfile);
