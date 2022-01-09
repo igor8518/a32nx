@@ -53,7 +53,7 @@ export class ClimbPathBuilder {
         this.addTakeoffStepCheckpoint(profile, originAirfieldElevation, thrustReductionAltitude);
         this.addAccelerationAltitudeStep(profile, thrustReductionAltitude, accelerationAltitude, v2Speed + 10);
 
-        if (speedLimit.underAltitude > accelerationAltitude && speedLimit.underAltitude < targetAltitude) {
+        if (speedProfile.shouldTakeSpeedLimitIntoAccount() && speedLimit.underAltitude > accelerationAltitude && speedLimit.underAltitude < targetAltitude) {
             this.addClimbSteps(profile, speedProfile, speedLimit.underAltitude, VerticalCheckpointReason.CrossingSpeedLimit);
         }
 
@@ -71,7 +71,7 @@ export class ClimbPathBuilder {
         const { presentPosition, speedLimit } = this.computationParametersObserver.get();
 
         this.addPresentPositionCheckpoint(profile, presentPosition.alt);
-        if (speedLimit.underAltitude > presentPosition.alt && speedLimit.underAltitude < targetAltitude) {
+        if (speedProfile.shouldTakeSpeedLimitIntoAccount() && speedLimit.underAltitude > presentPosition.alt && speedLimit.underAltitude < targetAltitude) {
             this.addClimbSteps(profile, speedProfile, speedLimit.underAltitude, VerticalCheckpointReason.CrossingSpeedLimit);
         }
 
