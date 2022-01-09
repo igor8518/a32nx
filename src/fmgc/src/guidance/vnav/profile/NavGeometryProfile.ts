@@ -27,7 +27,7 @@ export enum VerticalCheckpointReason {
     AtmosphericConditions = 'AtmosphericConditions',
     PresentPosition = 'PresentPosition',
     LevelOffForConstraint = 'LevelOffForConstraint',
-    WaypointWithConstraint = 'WaypointWithConstraint',
+    AltitudeConstraint = 'AltitudeConstraint',
     ContinueClimb = 'ContinueClimb',
     CrossingSpeedLimit = 'CrossingSpeedLimit',
     SpeedConstraint = 'SpeedConstraint',
