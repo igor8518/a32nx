@@ -1,4 +1,3 @@
-import { Celcius, Feet, Knots } from '../../../../../typings';
 import { Common } from './common';
 
 export class AtmosphericConditions {

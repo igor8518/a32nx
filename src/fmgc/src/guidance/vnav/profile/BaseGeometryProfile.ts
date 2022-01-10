@@ -93,7 +93,7 @@ export abstract class BaseGeometryProfile {
         return this.interpolateFromCheckpoints(secondsFromPresent, (checkpoint) => checkpoint.secondsFromPresent, (checkpoint) => checkpoint.distanceFromStart);
     }
 
-    interpolateEverythingFromStart(distanceFromStart: NauticalMiles): Omit<VerticalCheckpoint, 'reason'> {
+    interpolateEverythingFromStart(distanceFromStart: NauticalMiles, doInterpolateAltitude = true): Omit<VerticalCheckpoint, 'reason'> {
         if (distanceFromStart <= this.checkpoints[0].distanceFromStart) {
             return {
                 distanceFromStart,
@@ -115,13 +115,13 @@ export abstract class BaseGeometryProfile {
                         this.checkpoints[i].secondsFromPresent,
                         this.checkpoints[i + 1].secondsFromPresent,
                     ),
-                    altitude: Common.interpolate(
+                    altitude: doInterpolateAltitude ? Common.interpolate(
                         distanceFromStart,
                         this.checkpoints[i].distanceFromStart,
                         this.checkpoints[i + 1].distanceFromStart,
                         this.checkpoints[i].altitude,
                         this.checkpoints[i + 1].altitude,
-                    ),
+                    ) : this.checkpoints[i].altitude,
                     remainingFuelOnBoard: Common.interpolate(
                         distanceFromStart,
                         this.checkpoints[i].distanceFromStart,
@@ -147,8 +147,20 @@ export abstract class BaseGeometryProfile {
         return this.interpolateFromCheckpoints(altitude, (checkpoint) => checkpoint.altitude, (checkpoint) => checkpoint.distanceFromStart);
     }
 
+    interpolateFuelAtDistance(distance: NauticalMiles): NauticalMiles {
+        return this.interpolateFromCheckpoints(distance, (checkpoint) => checkpoint.distanceFromStart, (checkpoint) => checkpoint.remainingFuelOnBoard);
+    }
+
     findVerticalCheckpoint(reason: VerticalCheckpointReason): VerticalCheckpoint | undefined {
         return this.checkpoints.find((checkpoint) => checkpoint.reason === reason);
+    }
+
+    findLastVerticalCheckpoint(reason: VerticalCheckpointReason): VerticalCheckpoint | undefined {
+        return [...this.checkpoints].reverse().find((checkpoint) => checkpoint.reason === reason);
+    }
+
+    purgeVerticalCheckpoints(reason: VerticalCheckpointReason): void {
+        this.checkpoints = this.checkpoints.filter((checkpoint) => checkpoint.reason !== reason);
     }
 
     // TODO: We shouldn't have to go looking for this here...
@@ -239,8 +251,12 @@ export abstract class BaseGeometryProfile {
         });
     }
 
-    finalizeProfile() {
+    sortCheckpoints() {
         this.checkpoints.sort((a, b) => a.distanceFromStart - b.distanceFromStart);
+    }
+
+    finalizeProfile() {
+        this.sortCheckpoints();
 
         this.isReadyToDisplay = true;
     }
