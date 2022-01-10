@@ -9,7 +9,7 @@ import { BaseGeometryProfile } from '../profile/BaseGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
 
 export class ClimbPathBuilder {
-    private static TONS_TO_POUNDS = 2204.62;
+    static TONS_TO_POUNDS = 2204.62;
 
     private verticalModesToComputeProfileFor: VerticalMode[] = [
         VerticalMode.CLB,

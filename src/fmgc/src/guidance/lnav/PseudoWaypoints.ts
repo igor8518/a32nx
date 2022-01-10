@@ -324,8 +324,13 @@ export class PseudoWaypoints implements GuidanceComponent {
     }
 
     private createPseudoWaypointFromVerticalCheckpoint(geometry: Geometry, wptCount: number, totalDistance: number, checkpoint: VerticalCheckpoint): PseudoWaypoint | undefined {
-        const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - checkpoint?.distanceFromStart)
-            ?? [undefined, undefined, undefined];
+        const pwp = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - checkpoint?.distanceFromStart);
+
+        if (!pwp) {
+            return;
+        }
+
+        const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = pwp;
 
         switch (checkpoint.reason) {
         case VerticalCheckpointReason.LevelOffForConstraint:
