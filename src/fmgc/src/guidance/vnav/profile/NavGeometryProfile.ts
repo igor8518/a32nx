@@ -35,6 +35,7 @@ export enum VerticalCheckpointReason {
 
     // Descent
     TopOfDescent = 'TopOfDescent',
+    IdlePathAtmosphericConditions = 'IdlePathAtmosphericConditions',
     IdlePathEnd = 'IdlePathEnd',
 
     // Approach
