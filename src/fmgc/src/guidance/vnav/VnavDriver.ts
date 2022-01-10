@@ -58,7 +58,7 @@ export class VnavDriver implements GuidanceComponent {
 
         this.climbPathBuilder = new ClimbPathBuilder(computationParametersObserver);
         this.cruisePathBuilder = new CruisePathBuilder(computationParametersObserver);
-        this.descentPathBuilder = new DescentPathBuilder();
+        this.descentPathBuilder = new DescentPathBuilder(computationParametersObserver);
         this.decelPathBuilder = new DecelPathBuilder();
         this.cruiseToDescentCoordinator = new CruiseToDescentCoordinator(this.cruisePathBuilder, this.descentPathBuilder, this.decelPathBuilder);
     }
@@ -126,8 +126,8 @@ export class VnavDriver implements GuidanceComponent {
         if (geometry.legs.size > 0 && this.computationParametersObserver.canComputeProfile()) {
             this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, this.currentClimbSpeedProfile, cruiseAltitude);
 
-            if (!this.decelPathBuilder.canCompute(geometry)) {
-                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile);
+            if (this.decelPathBuilder.canCompute(geometry)) {
+                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentClimbSpeedProfile);
             }
 
             this.currentNavGeometryProfile.finalizeProfile();
