@@ -1,4 +1,4 @@
-import { AltitudeConstraint, getSpeedConstraintFromWaypoint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
+import { AltitudeConstraint, getAltitudeConstraintFromWaypoint, getSpeedConstraintFromWaypoint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { Guidable } from '@fmgc/guidance/Guidable';
 import { SegmentType } from '@fmgc/flightplanning/FlightPlanSegment';
@@ -97,7 +97,7 @@ export class DFLeg extends XFLeg {
     }
 
     get altitudeConstraint(): AltitudeConstraint | undefined {
-        return undefined;
+        return getAltitudeConstraintFromWaypoint(this.fix);
     }
 
     get inboundCourse(): Degrees {
