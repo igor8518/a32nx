@@ -327,7 +327,7 @@ export class PseudoWaypoints implements GuidanceComponent {
         const pwp = PseudoWaypoints.pointFromEndOfPath(geometry, wptCount, totalDistance - checkpoint?.distanceFromStart);
 
         if (!pwp) {
-            return;
+            return undefined;
         }
 
         const [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = pwp;
