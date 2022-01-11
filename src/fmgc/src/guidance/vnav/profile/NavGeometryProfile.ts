@@ -77,7 +77,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
     constructor(
         public geometry: Geometry,
-        flightPlanManager: FlightPlanManager,
+        private flightPlanManager: FlightPlanManager,
         activeLegIndex: number,
     ) {
         super();
@@ -107,7 +107,13 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
         this.distanceToPresentPosition = -flightPlanManager.getDistanceToActiveWaypoint();
 
-        for (const [i, leg] of legs.entries()) {
+        for (let i = 0; i < this.flightPlanManager.getWaypointsCount(); i++) {
+            const leg = legs.get(i);
+
+            if (!leg) {
+                continue;
+            }
+
             const inboundTransition = transitions.get(i - 1);
 
             const legDistance = Geometry.completeLegPathLengths(
@@ -165,7 +171,12 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
         let totalDistance = 0;
 
-        for (const [i, leg] of this.geometry.legs.entries()) {
+        for (let i = 0; i < this.flightPlanManager.getWaypointsCount(); i++) {
+            const leg = this.geometry.legs.get(i);
+            if (!leg) {
+                continue;
+            }
+
             const inboundTransition = this.geometry.transitions.get(i - 1);
 
             totalDistance += Geometry.completeLegPathLengths(
