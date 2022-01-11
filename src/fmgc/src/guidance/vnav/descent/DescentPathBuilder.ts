@@ -42,7 +42,7 @@ export class DescentPathBuilder {
 
         if (tocCheckpoint) {
             // Estimate ToD checkpoint
-            const todEstimateDistanceFromStart = Math.min(tocCheckpoint.distanceFromStart, todEstimate);
+            const todEstimateDistanceFromStart = Math.max(tocCheckpoint.distanceFromStart, todEstimate);
 
             profile.checkpoints.push({
                 reason: VerticalCheckpointReason.TopOfDescent,
