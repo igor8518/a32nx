@@ -149,18 +149,19 @@ export class VnavDriver implements GuidanceComponent {
     }
 
     private computeVerticalProfileForNd(geometry: Geometry) {
-        const obeySpeedConstraints = this.shouldObeySpeedConstraints();
-        const obeyAltitudeConstraints = this.shouldObeyAltitudeConstraints();
-
-        this.currentNdGeometryProfile = obeyAltitudeConstraints
+        this.currentNdGeometryProfile = this.isInManagedNav()
             ? new NavGeometryProfile(geometry, this.flightPlanManager, this.guidanceController.activeLegIndex)
             : new SelectedGeometryProfile();
+
+        if (!this.shouldObeyAltitudeConstraints()) {
+            this.currentNdGeometryProfile.maxAltitudeConstraints = [];
+        }
 
         if (geometry.legs.size <= 0 || !this.computationParametersObserver.canComputeProfile()) {
             return;
         }
 
-        const speedProfile = obeySpeedConstraints
+        const speedProfile = this.shouldObeySpeedConstraints()
             ? this.currentClimbSpeedProfile
             : new NdSpeedProfile(this.computationParametersObserver.get(), this.currentNdGeometryProfile.distanceToPresentPosition, this.currentNdGeometryProfile.maxSpeedConstraints);
 
