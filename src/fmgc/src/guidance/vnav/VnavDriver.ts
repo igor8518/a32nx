@@ -126,7 +126,7 @@ export class VnavDriver implements GuidanceComponent {
         if (geometry.legs.size > 0 && this.computationParametersObserver.canComputeProfile()) {
             this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, this.currentClimbSpeedProfile, cruiseAltitude);
 
-            if (this.decelPathBuilder.canCompute(geometry)) {
+            if (this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
                 this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentClimbSpeedProfile);
             }
 
