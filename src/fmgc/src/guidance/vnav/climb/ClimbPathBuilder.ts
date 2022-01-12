@@ -267,7 +267,8 @@ export class ClimbPathBuilder {
         const { zeroFuelWeight, perfFactor, tropoPause } = this.computationParametersObserver.get();
 
         const midwayAltitudeClimb = (startingAltitude + targetAltitude) / 2;
-        const machClimb = this.atmosphericConditions.computeMachFromCas(midwayAltitudeClimb, climbSpeed);
+        // TODO: Use actual value
+        const machClimb = 0.76;
 
         const estimatedTat = this.atmosphericConditions.totalAirTemperatureFromMach(midwayAltitudeClimb, machClimb);
         const predictedN1 = this.getClimbThrustN1Limit(estimatedTat, midwayAltitudeClimb);
@@ -291,7 +292,8 @@ export class ClimbPathBuilder {
 
     private computeLevelFlightSegmentPrediction(stepSize: Feet, altitude: Feet, speed: Knots, fuelWeight: number): StepResults {
         const { zeroFuelWeight } = this.computationParametersObserver.get();
-        const machClimb = this.atmosphericConditions.computeMachFromCas(altitude, speed);
+        // TODO: Use actual value
+        const machClimb = 0.76;
 
         return Predictions.levelFlightStep(
             altitude,
