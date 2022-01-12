@@ -75,9 +75,11 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
     public override maxSpeedConstraints: MaxSpeedConstraint[] = [];
 
+    public waypointCount: number = 0;
+
     constructor(
         public geometry: Geometry,
-        private flightPlanManager: FlightPlanManager,
+        flightPlanManager: FlightPlanManager,
         activeLegIndex: number,
     ) {
         super();
@@ -106,8 +108,9 @@ export class NavGeometryProfile extends BaseGeometryProfile {
         const { legs, transitions } = this.geometry;
 
         this.distanceToPresentPosition = -flightPlanManager.getDistanceToActiveWaypoint();
+        this.waypointCount = flightPlanManager.getWaypointsCount();
 
-        for (let i = 0; i < this.flightPlanManager.getWaypointsCount(); i++) {
+        for (let i = 0; i < this.waypointCount; i++) {
             const leg = legs.get(i);
 
             if (!leg) {
@@ -171,7 +174,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
         let totalDistance = 0;
 
-        for (let i = 0; i < this.flightPlanManager.getWaypointsCount(); i++) {
+        for (let i = 0; i < this.waypointCount; i++) {
             const leg = this.geometry.legs.get(i);
             if (!leg) {
                 continue;

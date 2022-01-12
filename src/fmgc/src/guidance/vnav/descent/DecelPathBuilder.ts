@@ -6,6 +6,7 @@ import { TFLeg } from '@fmgc/guidance/lnav/legs/TF';
 import { Predictions, StepResults, VnavStepError } from '@fmgc/guidance/vnav/Predictions';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
+import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
 
 const ALTITUDE_ADJUSTMENT_FACTOR = 1.4;
 
@@ -49,7 +50,7 @@ export class DecelPathBuilder {
         const F = 143;
         const Vapp = 135;
 
-        if (!this.canCompute(profile.geometry)) {
+        if (!this.canCompute(profile.geometry, profile.waypointCount)) {
             return;
         }
 
@@ -341,10 +342,29 @@ export class DecelPathBuilder {
     /**
      * Only compute if the last leg is a destination airport / runway
      */
-    canCompute(geometry: Geometry): boolean {
-        const lastLeg = geometry.legs.get(geometry.legs.size - 1);
+    canCompute(geometry: Geometry, wptCount: number): boolean {
+        let lastLeg = geometry.legs.get(wptCount - 1);
 
-        return lastLeg instanceof TFLeg && (lastLeg.to.isRunway || lastLeg.to.type === 'A');
+        // If somehow this wasn't the last leg, we find it the hard way.
+        if (!lastLeg) {
+            lastLeg = this.findLastLeg(geometry);
+        }
+
+        return lastLeg && lastLeg instanceof TFLeg && (lastLeg.to.isRunway || lastLeg.to.type === 'A');
+    }
+
+    findLastLeg(geometry: Geometry): Leg {
+        let lastLeg = undefined;
+        let maxIndex = -Infinity;
+
+        for (const [i, leg] of geometry.legs) {
+            if (i > maxIndex) {
+                lastLeg = leg;
+                maxIndex = i;
+            }
+        }
+
+        return lastLeg;
     }
 
     /**
