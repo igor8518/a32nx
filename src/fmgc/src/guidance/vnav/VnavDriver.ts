@@ -15,6 +15,7 @@ import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { McduSpeedProfile, ExpediteSpeedProfile, NdSpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { SelectedGeometryProfile } from '@fmgc/guidance/vnav/profile/SelectedGeometryProfile';
 import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
+import { StepCoordinator } from '@fmgc/guidance/vnav/StepCoordinator';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile } from './profile/NavGeometryProfile';
@@ -49,6 +50,8 @@ export class VnavDriver implements GuidanceComponent {
         [10_000, undefined],
     ])
 
+    stepCoordinator: StepCoordinator;
+
     constructor(
         private readonly guidanceController: GuidanceController,
         private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
@@ -61,6 +64,7 @@ export class VnavDriver implements GuidanceComponent {
         this.descentPathBuilder = new DescentPathBuilder(computationParametersObserver);
         this.decelPathBuilder = new DecelPathBuilder();
         this.cruiseToDescentCoordinator = new CruiseToDescentCoordinator(this.cruisePathBuilder, this.descentPathBuilder, this.decelPathBuilder);
+        this.stepCoordinator = new StepCoordinator(this.flightPlanManager);
     }
 
     init(): void {
