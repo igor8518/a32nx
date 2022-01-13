@@ -1,5 +1,6 @@
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
+import { Constants } from '@shared/Constants';
 import { EngineModel } from '../EngineModel';
 import { FlapConf } from '../common';
 import { Predictions, StepResults } from '../Predictions';
@@ -8,8 +9,6 @@ import { BaseGeometryProfile } from '../profile/BaseGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
 
 export class ClimbPathBuilder {
-    static TONS_TO_POUNDS = 2204.62;
-
     constructor(private computationParametersObserver: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions) { }
 
     /**
@@ -166,7 +165,7 @@ export class ClimbPathBuilder {
             climbSpeed,
             machClimb,
             predictedN1,
-            zeroFuelWeight * ClimbPathBuilder.TONS_TO_POUNDS,
+            zeroFuelWeight * Constants.TONS_TO_POUNDS,
             remainingFuelOnBoard,
             0,
             this.atmosphericConditions.isaDeviation,
@@ -187,7 +186,7 @@ export class ClimbPathBuilder {
             stepSize,
             speed,
             machClimb,
-            zeroFuelWeight * ClimbPathBuilder.TONS_TO_POUNDS,
+            zeroFuelWeight * Constants.TONS_TO_POUNDS,
             fuelWeight,
             0,
             this.atmosphericConditions.isaDeviation,

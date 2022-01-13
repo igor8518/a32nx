@@ -6,7 +6,7 @@ import { Predictions, StepResults } from '@fmgc/guidance/vnav/Predictions';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
-import { ClimbPathBuilder } from '@fmgc/guidance/vnav/climb/ClimbPathBuilder';
+import { Constants } from '@shared/Constants';
 
 export class DescentPathBuilder {
     private atmosphericConditions: AtmosphericConditions = new AtmosphericConditions();
@@ -120,7 +120,7 @@ export class DescentPathBuilder {
             climbSpeed,
             machClimb,
             predictedN1,
-            zeroFuelWeight * ClimbPathBuilder.TONS_TO_POUNDS,
+            zeroFuelWeight * Constants.TONS_TO_POUNDS,
             remainingFuelOnBoard,
             0,
             this.atmosphericConditions.isaDeviation,
