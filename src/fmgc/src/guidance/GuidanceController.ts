@@ -11,6 +11,7 @@ import { EfisSide, Mode, rangeSettings } from '@shared/NavigationDisplay';
 import { TaskCategory, TaskQueue } from '@fmgc/guidance/TaskQueue';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
+import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { LnavDriver } from './lnav/LnavDriver';
 import { FlightPlanManager, FlightPlans } from '../flightplanning/FlightPlanManager';
 import { GuidanceManager } from './GuidanceManager';
@@ -33,6 +34,7 @@ export interface Fmgc {
     getManagedCruiseSpeedMach(): Mach,
     getSpeedLimit(): SpeedLimit,
     getPreSelectedClbSpeed(): Knots,
+    getTakeoffFlapsSetting(): FlapConf | undefined
 }
 
 export class GuidanceController {
