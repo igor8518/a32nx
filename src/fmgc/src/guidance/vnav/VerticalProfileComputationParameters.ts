@@ -1,4 +1,5 @@
 import { Fmgc } from '@fmgc/guidance/GuidanceController';
+import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
 import { ArmedLateralMode, ArmedVerticalMode, LateralMode, VerticalMode } from '@shared/autopilot';
 
@@ -30,6 +31,7 @@ export interface VerticalProfileComputationParameters {
     speedLimit: SpeedLimit,
     flightPhase: FlightPhase,
     preselectedClbSpeed: Knots,
+    takeoffFlapsSetting?: FlapConf
 }
 
 export class VerticalProfileComputationParametersObserver {
@@ -68,6 +70,7 @@ export class VerticalProfileComputationParametersObserver {
             speedLimit: this.fmgc.getSpeedLimit(),
             flightPhase: this.fmgc.getFlightPhase(),
             preselectedClbSpeed: this.fmgc.getPreSelectedClbSpeed(),
+            takeoffFlapsSetting: this.fmgc.getTakeoffFlapsSetting(),
         };
     }
 
