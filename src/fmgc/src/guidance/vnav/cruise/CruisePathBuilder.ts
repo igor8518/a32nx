@@ -1,4 +1,5 @@
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
+import { Constants } from '@shared/Constants';
 import { Predictions, StepResults } from '../Predictions';
 import { NavGeometryProfile, VerticalCheckpointReason } from '../profile/NavGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
@@ -12,8 +13,6 @@ export interface CruisePathBuilderResults {
 }
 
 export class CruisePathBuilder {
-    private static TONS_TO_POUNDS = 2204.62;
-
     private atmosphericConditions: AtmosphericConditions = new AtmosphericConditions();
 
     constructor(private computationParametersObserver: VerticalProfileComputationParametersObserver) { }
@@ -54,7 +53,7 @@ export class CruisePathBuilder {
             distance,
             managedCruiseSpeed,
             managedCruiseSpeedMach,
-            zeroFuelWeight * CruisePathBuilder.TONS_TO_POUNDS,
+            zeroFuelWeight * Constants.TONS_TO_POUNDS,
             remainingFuelOnBoard,
             0,
             this.atmosphericConditions.isaDeviation,
