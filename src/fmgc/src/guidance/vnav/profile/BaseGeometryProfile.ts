@@ -319,6 +319,17 @@ export abstract class BaseGeometryProfile {
 
         return this.checkpoints.filter((checkpoint) => CHECKPOINTS_TO_PUT_IN_MCDU.has(checkpoint.reason));
     }
+
+    addPresentPositionCheckpoint(presentPosition: LatLongAlt, remainingFuelOnBoard: number) {
+        this.checkpoints.push({
+            reason: VerticalCheckpointReason.PresentPosition,
+            distanceFromStart: this.distanceToPresentPosition,
+            secondsFromPresent: 0,
+            altitude: presentPosition.alt,
+            remainingFuelOnBoard,
+            speed: SimVar.GetSimVarValue('AIRSPEED INDICATED', 'knots'),
+        });
+    }
 }
 
 type HasAtLeast<T, U extends keyof T> = Pick<T, U> & Partial<Omit<T, U>>
