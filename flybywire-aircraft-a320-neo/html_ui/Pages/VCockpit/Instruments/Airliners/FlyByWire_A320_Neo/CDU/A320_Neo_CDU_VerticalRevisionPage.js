@@ -50,6 +50,8 @@ class CDUVerticalRevisionPage {
 
             const altError = this.formatAltErrorTitleAndValue(waypoint, verticalWaypoint);
 
+            const isCruiseAltEntered = mcdu._cruiseEntered && mcdu._cruiseFlightLevel;
+
             mcdu.setTemplate([
                 ["VERT REV {small}AT{end}{green} " + waypointIdent + "{end}"],
                 [""],
@@ -61,7 +63,7 @@ class CDUVerticalRevisionPage {
                 ["MACH/START WPT[color]inop", altError[0]],
                 [`\xa0{inop}[\xa0]/{small}${waypointIdent}{end}{end}`, altError[1]],
                 [""],
-                ["<WIND", "STEP ALTS>[color]inop"],
+                ["<WIND", isCruiseAltEntered ? "STEP ALTS>" : ""],
                 [""],
                 ["<RETURN"]
             ]);
@@ -160,7 +162,15 @@ class CDUVerticalRevisionPage {
                 };
                 CDUWindPage.ShowPage(mcdu);
             }; // WIND
-            mcdu.onRightInput[4] = () => {}; // STEP ALTS
+            mcdu.onRightInput[4] = () => {
+                if (!isCruiseAltEntered) {
+                    return;
+                }
+                CDUStepAltsPage.Return = () => {
+                    CDUVerticalRevisionPage.ShowPage(mcdu, waypoint, verticalWaypoint);
+                };
+                CDUStepAltsPage.ShowPage(mcdu);
+            }; // STEP ALTS
             mcdu.onLeftInput[5] = () => {
                 CDUFlightPlanPage.ShowPage(mcdu);
             };
