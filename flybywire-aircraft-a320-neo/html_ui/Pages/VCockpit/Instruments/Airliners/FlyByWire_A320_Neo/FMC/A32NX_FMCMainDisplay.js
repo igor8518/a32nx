@@ -4361,6 +4361,10 @@ class FMCMainDisplay extends BaseAirliners {
         this.managedSpeedLimit = speedLimit;
         this.managedSpeedLimitAlt = speedLimitAlt;
     }
+
+    getTakeoffFlapsSetting() {
+        this.flaps;
+    }
 }
 
 FMCMainDisplay.clrValue = "\xa0\xa0\xa0\xa0\xa0CLR";
