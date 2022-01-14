@@ -519,7 +519,7 @@ class CDUPerformancePage {
             ["ACT MODE"],
             [actModeCell + "[color]green"],
             ["\xa0CI"],
-            ["\xa0" + costIndexCell + "[color]cyan", predToCell, "\xa0\xa0\xa0{small}PRED TO{end}"],
+            [costIndexCell + "[color]cyan", predToCell, "\xa0\xa0\xa0{small}PRED TO{end}"],
             ["\xa0MANAGED", "DIST", timeLabel],
             ["\xa0" + managedSpeedCell + "[color]green", !isSelected ? predToDistanceCell : "", !isSelected ? predToTimeCell : ""],
             ["\xa0" + selectedSpeedTitle],

@@ -27,7 +27,7 @@ export class ClimbPathBuilder {
         }
 
         if (speedProfile.shouldTakeSpeedLimitIntoAccount()) {
-            this.addSpeedLimitAsCheckpoint(profile);
+            this.addSpeedLimitAsCheckpoint(profile, speedProfile);
         }
 
         this.addSpeedConstraintsAsCheckpoints(profile);
@@ -205,7 +205,7 @@ export class ClimbPathBuilder {
         }
     }
 
-    addSpeedLimitAsCheckpoint(profile: BaseGeometryProfile) {
+    addSpeedLimitAsCheckpoint(profile: BaseGeometryProfile, speedProfile: SpeedProfile) {
         const { speedLimit: { underAltitude }, presentPosition: { alt }, cruiseAltitude } = this.computationParametersObserver.get();
 
         if (underAltitude <= alt || underAltitude > cruiseAltitude) {
@@ -214,7 +214,7 @@ export class ClimbPathBuilder {
 
         const distance = profile.interpolateDistanceAtAltitude(underAltitude);
 
-        profile.addInterpolatedCheckpoint(distance, { reason: VerticalCheckpointReason.CrossingSpeedLimit });
+        profile.addInterpolatedCheckpoint(distance, { reason: VerticalCheckpointReason.CrossingSpeedLimit, speed: speedProfile.get(distance, underAltitude - 1) });
     }
 
     private addFcuAltitudeAsCheckpoint(profile: BaseGeometryProfile) {
