@@ -6,7 +6,7 @@ export interface Step {
     location: LatLongAlt
 }
 
-class GeographicalStep implements Step {
+class GeographicStep implements Step {
     constructor(private waypoint: WayPoint, public waypointIndex: number, public toAltitude: Feet) {}
 
     get ident(): string {
@@ -23,14 +23,14 @@ export class StepCoordinator {
 
     constructor(private flightPlanManager: FlightPlanManager) {}
 
-    requestToAddGeometricStep(waypointIdent: string, toAltitude: Feet): boolean {
+    requestToAddGeographicStep(waypointIdent: string, toAltitude: Feet): boolean {
         const [index, waypoint] = this.findWaypoint(waypointIdent);
 
         if (!waypoint) {
             return false;
         }
 
-        this.steps.push(new GeographicalStep(waypoint, index, toAltitude));
+        this.steps.push(new GeographicStep(waypoint, index, toAltitude));
 
         return true;
     }
