@@ -1,6 +1,7 @@
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { Constants } from '@shared/Constants';
+import { ArmedVerticalMode, VerticalMode } from '@shared/autopilot';
 import { EngineModel } from '../EngineModel';
 import { FlapConf } from '../common';
 import { Predictions, StepResults } from '../Predictions';
@@ -17,7 +18,7 @@ export class ClimbPathBuilder {
      * @returns
      */
     computeClimbPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, targetAltitude: Feet) {
-        const { speedLimit } = this.computationParametersObserver.get();
+        const { speedLimit, fcuVerticalMode, fcuArmedVerticalMode } = this.computationParametersObserver.get();
         const lastCheckpoint = profile.lastCheckpoint;
 
         if (speedProfile.shouldTakeSpeedLimitIntoAccount() && speedLimit.underAltitude > lastCheckpoint.altitude && speedLimit.underAltitude < targetAltitude) {
@@ -25,7 +26,11 @@ export class ClimbPathBuilder {
         }
 
         this.addClimbSteps(profile, speedProfile, targetAltitude, VerticalCheckpointReason.TopOfClimb);
-        this.addFcuAltitudeAsCheckpoint(profile);
+
+        if (this.shouldAddFcuAltAsCheckpoint(fcuVerticalMode, fcuArmedVerticalMode)) {
+            this.addFcuAltitudeAsCheckpoint(profile);
+        }
+
         this.addSpeedConstraintsAsCheckpoints(profile);
     }
 
@@ -213,5 +218,18 @@ export class ClimbPathBuilder {
         const distance = profile.interpolateDistanceAtAltitude(fcuAltitude);
 
         profile.addInterpolatedCheckpoint(distance, { reason: VerticalCheckpointReason.CrossingFcuAltitude });
+    }
+
+    private shouldAddFcuAltAsCheckpoint(verticalMode: VerticalMode, armedVerticalMode: ArmedVerticalMode) {
+        const verticalModesToShowLevelOffArrowFor = [
+            VerticalMode.OP_CLB,
+            VerticalMode.VS,
+            VerticalMode.FPA,
+            VerticalMode.CLB,
+            VerticalMode.SRS,
+            VerticalMode.SRS_GA,
+        ];
+
+        return ((armedVerticalMode & ArmedVerticalMode.CLB) === ArmedVerticalMode.CLB) || verticalModesToShowLevelOffArrowFor.includes(verticalMode);
     }
 }
