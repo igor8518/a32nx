@@ -18,17 +18,16 @@ export class ClimbPathBuilder {
      * @returns
      */
     computeClimbPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, targetAltitude: Feet) {
-        const { speedLimit, fcuVerticalMode, fcuArmedVerticalMode } = this.computationParametersObserver.get();
-        const lastCheckpoint = profile.lastCheckpoint;
-
-        if (speedProfile.shouldTakeSpeedLimitIntoAccount() && speedLimit.underAltitude > lastCheckpoint.altitude && speedLimit.underAltitude < targetAltitude) {
-            this.addClimbSteps(profile, speedProfile, speedLimit.underAltitude, VerticalCheckpointReason.CrossingSpeedLimit);
-        }
+        const { fcuVerticalMode, fcuArmedVerticalMode } = this.computationParametersObserver.get();
 
         this.addClimbSteps(profile, speedProfile, targetAltitude, VerticalCheckpointReason.TopOfClimb);
 
         if (this.shouldAddFcuAltAsCheckpoint(fcuVerticalMode, fcuArmedVerticalMode)) {
             this.addFcuAltitudeAsCheckpoint(profile);
+        }
+
+        if (speedProfile.shouldTakeSpeedLimitIntoAccount()) {
+            this.addSpeedLimitAsCheckpoint(profile);
         }
 
         this.addSpeedConstraintsAsCheckpoints(profile);
@@ -206,6 +205,18 @@ export class ClimbPathBuilder {
         for (const { distanceFromStart, maxSpeed } of profile.maxSpeedConstraints) {
             profile.addInterpolatedCheckpoint(distanceFromStart, { reason: VerticalCheckpointReason.SpeedConstraint, speed: maxSpeed });
         }
+    }
+
+    addSpeedLimitAsCheckpoint(profile: BaseGeometryProfile) {
+        const { speedLimit: { underAltitude }, presentPosition: { alt }, cruiseAltitude } = this.computationParametersObserver.get();
+
+        if (underAltitude <= alt || underAltitude > cruiseAltitude) {
+            return;
+        }
+
+        const distance = profile.interpolateDistanceAtAltitude(underAltitude);
+
+        profile.addInterpolatedCheckpoint(distance, { reason: VerticalCheckpointReason.CrossingSpeedLimit });
     }
 
     private addFcuAltitudeAsCheckpoint(profile: BaseGeometryProfile) {
