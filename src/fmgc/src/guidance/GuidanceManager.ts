@@ -164,6 +164,11 @@ export class GuidanceManager {
                 if (oldLeg instanceof XFLeg && newLeg instanceof XFLeg) {
                     oldLeg.fix.endsInDiscontinuity = newLeg.fix.endsInDiscontinuity;
                     oldLeg.fix.discontinuityCanBeCleared = newLeg.fix.discontinuityCanBeCleared;
+
+                    oldLeg.fix.legAltitude1 = newLeg.fix.legAltitude1;
+                    oldLeg.fix.legAltitude2 = newLeg.fix.legAltitude1;
+                    oldLeg.fix.legAltitudeDescription = newLeg.fix.legAltitudeDescription;
+                    oldLeg.fix.speedConstraint = newLeg.fix.speedConstraint;
                 }
 
                 // Sync T-P (FIXME with proper DIRECT TO)
