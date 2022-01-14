@@ -3,6 +3,7 @@
 !/.vscode/**
 !/.github/**
 !/.husky/**
+!/msfs-avionics-mirror/**
 !/flybywire-aircraft-a320-neo/**
 /flybywire-aircraft-a320-neo/layout.json
 /flybywire-aircraft-a320-neo/manifest.json
@@ -59,3 +60,6 @@ src/instruments/buildSrc/custom/*
 /flybywire-aircraft-a320-neo/MCDU SERVER/
 /src/mcdu-server/client/build
 !/flybywire-aircraft-a320-neo/CORS SERVER/*
+/**/.rollup.cache
+tsconfig.tsbuildinfo
+/**/package-lock.json
