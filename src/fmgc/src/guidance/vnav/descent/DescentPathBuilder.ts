@@ -107,10 +107,9 @@ export class DescentPathBuilder {
     }
 
     private computeIdlePathSegmentPrediction(startingAltitude: Feet, targetAltitude: Feet, climbSpeed: Knots, remainingFuelOnBoard: number): StepResults {
-        const { zeroFuelWeight, perfFactor, tropoPause } = this.computationParametersObserver.get();
+        const { zeroFuelWeight, perfFactor, tropoPause, managedDescentSpeedMach } = this.computationParametersObserver.get();
 
         const midwayAltitudeClimb = (startingAltitude + targetAltitude) / 2;
-        const machClimb = this.atmosphericConditions.computeMachFromCas(midwayAltitudeClimb, climbSpeed);
 
         const predictedN1 = 26 + ((targetAltitude / midwayAltitudeClimb) * (30 - 26));
 
@@ -118,7 +117,7 @@ export class DescentPathBuilder {
             startingAltitude,
             targetAltitude - startingAltitude,
             climbSpeed,
-            machClimb,
+            managedDescentSpeedMach,
             predictedN1,
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             remainingFuelOnBoard,
