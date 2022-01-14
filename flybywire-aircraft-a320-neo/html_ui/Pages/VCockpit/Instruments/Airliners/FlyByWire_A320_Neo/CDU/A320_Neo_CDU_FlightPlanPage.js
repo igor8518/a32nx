@@ -562,7 +562,7 @@ class CDUFlightPlanPage {
                     color,
                     distance: pwp.flightPlanInfo && pwp.flightPlanInfo.distanceFromLastFix ? Math.round(pwp.flightPlanInfo.distanceFromLastFix).toString() : "",
                     spdColor: pwp.flightPlanInfo ? "green" : "white",
-                    speedConstraint: pwp.flightPlanInfo ? Math.round(pwp.flightPlanInfo.speed) : "---",
+                    speedConstraint: pwp.flightPlanInfo ? Math.round(pwp.flightPlanInfo.speed).toFixed(0) : "---",
                     altColor: pwp.flightPlanInfo ? "green" : "white",
                     altitudeConstraint: { alt: pwp.flightPlanInfo ? formatAltitudeOrLevel(pwp.flightPlanInfo.altitude) : "-----", altPrefix: "\xa0" },
                     timeCell,
