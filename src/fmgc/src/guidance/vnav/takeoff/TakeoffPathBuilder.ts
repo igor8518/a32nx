@@ -72,16 +72,15 @@ export class TakeoffPathBuilder {
         const startingAltitude = lastCheckpoint.altitude;
         const midwayAltitude = (startingAltitude + accelerationAltitude) / 2;
 
-        const machClimb = 0.76;
-
-        const estimatedTat = this.atmosphericConditions.totalAirTemperatureFromMach(midwayAltitude, machClimb);
+        const v2PlusTenMach = this.atmosphericConditions.computeMachFromCas(midwayAltitude, speed);
+        const estimatedTat = this.atmosphericConditions.totalAirTemperatureFromMach(midwayAltitude, v2PlusTenMach);
         const predictedN1 = EngineModel.tableInterpolation(EngineModel.maxClimbThrustTableLeap, estimatedTat, midwayAltitude);
 
         const { fuelBurned, distanceTraveled, timeElapsed } = Predictions.altitudeStep(
             startingAltitude,
             accelerationAltitude - startingAltitude,
             speed,
-            machClimb,
+            1, // We never want to compute this in Mach, so we set the critical Mach to 1
             predictedN1,
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             lastCheckpoint.remainingFuelOnBoard,

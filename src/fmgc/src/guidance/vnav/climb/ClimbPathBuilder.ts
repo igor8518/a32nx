@@ -154,20 +154,20 @@ export class ClimbPathBuilder {
      * @returns
      */
     private computeClimbSegmentPrediction(startingAltitude: Feet, targetAltitude: Feet, climbSpeed: Knots, remainingFuelOnBoard: number): StepResults {
-        const { zeroFuelWeight, perfFactor, tropoPause } = this.computationParametersObserver.get();
+        const { zeroFuelWeight, perfFactor, tropoPause, managedClimbSpeedMach } = this.computationParametersObserver.get();
 
         const midwayAltitudeClimb = (startingAltitude + targetAltitude) / 2;
-        // TODO: Use actual value
-        const machClimb = 0.76;
 
-        const estimatedTat = this.atmosphericConditions.totalAirTemperatureFromMach(midwayAltitudeClimb, machClimb);
+        // This Mach number is the Mach number for the predicted climb speed, not the Mach to use after crossover altitude.
+        const climbSpeedMach = this.atmosphericConditions.computeMachFromCas(midwayAltitudeClimb, climbSpeed);
+        const estimatedTat = this.atmosphericConditions.totalAirTemperatureFromMach(midwayAltitudeClimb, climbSpeedMach);
         const predictedN1 = this.getClimbThrustN1Limit(estimatedTat, midwayAltitudeClimb);
 
         return Predictions.altitudeStep(
             startingAltitude,
             targetAltitude - startingAltitude,
             climbSpeed,
-            machClimb,
+            managedClimbSpeedMach,
             predictedN1,
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             remainingFuelOnBoard,
@@ -181,15 +181,13 @@ export class ClimbPathBuilder {
     }
 
     private computeLevelFlightSegmentPrediction(stepSize: Feet, altitude: Feet, speed: Knots, fuelWeight: number): StepResults {
-        const { zeroFuelWeight } = this.computationParametersObserver.get();
-        // TODO: Use actual value
-        const machClimb = 0.76;
+        const { zeroFuelWeight, managedClimbSpeedMach } = this.computationParametersObserver.get();
 
         return Predictions.levelFlightStep(
             altitude,
             stepSize,
             speed,
-            machClimb,
+            managedClimbSpeedMach,
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             fuelWeight,
             0,

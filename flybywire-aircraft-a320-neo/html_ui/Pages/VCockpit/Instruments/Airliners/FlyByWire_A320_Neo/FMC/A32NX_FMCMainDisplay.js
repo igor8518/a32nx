@@ -4324,6 +4324,10 @@ class FMCMainDisplay extends BaseAirliners {
         return this.managedSpeedClimb;
     }
 
+    getManagedClimbSpeedMach() {
+        return this.managedSpeedClimbMach;
+    }
+
     getManagedCruiseSpeed() {
         return this.managedSpeedCruise;
     }
@@ -4363,7 +4367,15 @@ class FMCMainDisplay extends BaseAirliners {
     }
 
     getTakeoffFlapsSetting() {
-        this.flaps;
+        return this.flaps;
+    }
+
+    getManagedDescentSpeed() {
+        return this.managedSpeedDescend;
+    }
+
+    getManagedDescentSpeedMach() {
+        return this.managedSpeedDescendMach;
     }
 }
 
