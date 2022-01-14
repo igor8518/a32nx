@@ -109,7 +109,7 @@ class CDUStepAltsPage {
             return false;
         }
 
-        if (!coordinator.requestToAddGeometricStep(waypointInput, alt)) {
+        if (!coordinator.requestToAddGeographicStep(waypointInput, alt)) {
             mcdu.addNewMessage(NXSystemMessages.formatError);
             return false;
         }
