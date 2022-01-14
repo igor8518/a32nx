@@ -23,6 +23,7 @@ export interface VerticalProfileComputationParameters {
     v2Speed: Knots,
     tropoPause: Feet,
     managedClimbSpeed: Knots,
+    managedClimbSpeedMach: Mach,
     perfFactor: number,
     originAirfieldElevation: Feet,
     accelerationAltitude: Feet,
@@ -32,6 +33,9 @@ export interface VerticalProfileComputationParameters {
     flightPhase: FlightPhase,
     preselectedClbSpeed: Knots,
     takeoffFlapsSetting?: FlapConf
+
+    managedDescentSpeed: Knots,
+    managedDescentSpeedMach: Mach,
 }
 
 export class VerticalProfileComputationParametersObserver {
@@ -62,6 +66,7 @@ export class VerticalProfileComputationParametersObserver {
             v2Speed: this.fmgc.getV2Speed(),
             tropoPause: this.fmgc.getTropoPause(),
             managedClimbSpeed: this.fmgc.getManagedClimbSpeed(),
+            managedClimbSpeedMach: this.fmgc.getManagedClimbSpeedMach(),
             perfFactor: 0, // FIXME: Use actual value,
             originAirfieldElevation: SimVar.GetSimVarValue('L:A32NX_DEPARTURE_ELEVATION', 'feet'),
             accelerationAltitude: this.fmgc.getAccelerationAltitude(),
@@ -71,6 +76,9 @@ export class VerticalProfileComputationParametersObserver {
             flightPhase: this.fmgc.getFlightPhase(),
             preselectedClbSpeed: this.fmgc.getPreSelectedClbSpeed(),
             takeoffFlapsSetting: this.fmgc.getTakeoffFlapsSetting(),
+
+            managedDescentSpeed: this.fmgc.getManagedDescentSpeed(),
+            managedDescentSpeedMach: this.fmgc.getManagedDescentSpeedMach(),
         };
     }
 

@@ -26,6 +26,7 @@ export interface Fmgc {
     getV2Speed(): Knots;
     getTropoPause(): Feet;
     getManagedClimbSpeed(): Knots;
+    getManagedClimbSpeedMach(): Mach;
     getAccelerationAltitude(): Feet,
     getThrustReductionAltitude(): Feet,
     getCruiseAltitude(): Feet,
@@ -35,6 +36,8 @@ export interface Fmgc {
     getSpeedLimit(): SpeedLimit,
     getPreSelectedClbSpeed(): Knots,
     getTakeoffFlapsSetting(): FlapConf | undefined
+    getManagedDescentSpeed(): Knots,
+    getManagedDescentSpeedMach(): Mach,
 }
 
 export class GuidanceController {
