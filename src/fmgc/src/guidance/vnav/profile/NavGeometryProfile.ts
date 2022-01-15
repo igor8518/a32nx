@@ -33,6 +33,12 @@ export enum VerticalCheckpointReason {
     SpeedConstraint = 'SpeedConstraint',
     CrossingFcuAltitude = 'FcuAltitude',
 
+    // Cruise
+    StepClimb = 'StepClimb',
+    TopOfStepClimb = 'TopOfStepClimb',
+    StepDescent = 'StepDescent',
+    BottomOfStepDescent = 'BottomOfStepDescent', // I don't think this actually exists?
+
     // Descent
     TopOfDescent = 'TopOfDescent',
     IdlePathAtmosphericConditions = 'IdlePathAtmosphericConditions',
