@@ -4,7 +4,7 @@ export interface Step {
     ident: string,
     toAltitude: Feet,
     location: LatLongAlt
-    orderIndex(): number;
+    get distanceFromStart(): NauticalMiles;
 }
 
 class GeographicStep implements Step {
@@ -18,7 +18,7 @@ class GeographicStep implements Step {
         return this.waypoint.infos.coordinates;
     }
 
-    orderIndex(): number {
+    get distanceFromStart(): NauticalMiles {
         return this.waypoint.cumulativeDistanceInFP;
     }
 }
@@ -49,13 +49,13 @@ export class StepCoordinator {
     }
 
     insertStep(step: Step) {
-        if (this.steps.length <= 0 || step.orderIndex() < this.steps[0].orderIndex()) {
+        if (this.steps.length <= 0 || step.distanceFromStart < this.steps[0].distanceFromStart) {
             this.steps.unshift(step);
             return;
         }
 
         for (let i = 0; i < this.steps.length - 1; i++) {
-            if (step.orderIndex() >= this.steps[i].orderIndex() && step.orderIndex() < this.steps[i + 1].orderIndex()) {
+            if (step.distanceFromStart >= this.steps[i].distanceFromStart && step.distanceFromStart < this.steps[i + 1].distanceFromStart) {
                 this.steps.splice(i + 1, 0, step);
                 return;
             }

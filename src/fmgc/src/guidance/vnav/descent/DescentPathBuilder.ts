@@ -47,7 +47,7 @@ export class DescentPathBuilder {
                 reason: VerticalCheckpointReason.TopOfDescent,
                 distanceFromStart: todEstimateDistanceFromStart,
                 secondsFromPresent: profile.interpolateTimeAtDistance(todEstimateDistanceFromStart),
-                altitude: tocCheckpoint.altitude,
+                altitude: cruiseAltitude,
                 remainingFuelOnBoard: profile.interpolateFuelAtDistance(todEstimateDistanceFromStart),
                 speed: tocCheckpoint.speed,
             });
