@@ -28,9 +28,18 @@ class CDUStepAltsPage {
             mcdu.onLeftInput[i] = (value) => CDUStepAltsPage.tryParseLeftInput(mcdu, coordinator, i, value);
         }
 
+        mcdu.onLeftInput[4] = () => { };
+
         mcdu.onLeftInput[5] = () => {
             CDUStepAltsPage.Return();
         };
+
+        mcdu.onRightInput[0] = () => { };
+        mcdu.onRightInput[1] = () => { };
+        mcdu.onRightInput[2] = () => { };
+        mcdu.onRightInput[3] = () => { };
+        mcdu.onRightInput[4] = () => { };
+        mcdu.onRightInput[5] = () => { };
     }
 
     static formatFl(altitude, transAlt) {
