@@ -364,9 +364,9 @@ export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, en
         showIdent = false;
         elements.push(
             <>
-                <path d="M 0, 0 h 15.5 l 12, 12 m -4, 0 l 4, 0 l 0, -4" strokeWidth={1.8} className="shadow" />
+                <path d="M 0, 0 h 21 l 17 17 m -5, 0 l 5, 0 l 0, -5" strokeWidth={1.8} className="shadow" />
 
-                <path d="M 0, 0 h 15.5 l 12, 12 m -4, 0 l 4, 0 l 0, -4" strokeWidth={1.5} className="White" />
+                <path d="M 0, 0 h 21 l 17 17 m -5, 0 l 5, 0 l 0, -5" strokeWidth={1.5} className="White" />
             </>,
         );
     } else if (type & (NdSymbolTypeFlags.PwpCdaFlap1)) {
@@ -403,27 +403,36 @@ export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, en
         showIdent = false;
         elements.push(
             <g transform="translate(-31.5, 17)">
-                <path d="M 0, 0 l 15.5 -12 l 12, 0 m -4, -4 l 4 4 l -4 4" strokeWidth={1.8} className="shadow" />
+                <path d="M -38, 17 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.8} className="shadow" />
 
-                <path d="M 0, 0 l 15.5 -12 l 12, 0 m -4, -4 l 4 4 l -4 4" strokeWidth={1.5} className="Cyan" />
+                <path d="M -38, 17 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.5} className="Cyan" />
             </g>,
         );
     } else if (type & (NdSymbolTypeFlags.PwpLevelOffForRestriction)) {
         showIdent = false;
         elements.push(
             <>
-                <path d="M -38, 20 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.8} className="shadow" />
+                <path d="M -38, 17 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.8} className="shadow" />
 
-                <path d="M -38, 20 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.5} className="Magenta" />
+                <path d="M -38, 17 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.5} className="Magenta" />
             </>,
         );
     } else if (type & (NdSymbolTypeFlags.PwpContinueClimb)) {
         showIdent = false;
         elements.push(
             <>
-                <path d="M 0, 3 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.8} className="shadow" />
+                <path d="M 0, 0 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.8} className="shadow" />
 
-                <path d="M 0, 3 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.5} className="Cyan" />
+                <path d="M 0, 0 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.5} className="Cyan" />
+            </>,
+        );
+    } else if (type & (NdSymbolTypeFlags.PwpStartOfClimb)) {
+        showIdent = false;
+        elements.push(
+            <>
+                <path d="M 0, 0 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.8} className="shadow" />
+
+                <path d="M 0, 0 h 21 l 17 -17 m -5, 0 l 5, 0 l 0, 5" strokeWidth={1.5} className="White" />
             </>,
         );
     } else if (type & (NdSymbolTypeFlags.PwpTimeMarker)) {
