@@ -4,13 +4,14 @@ import { DecelPathBuilder } from '@fmgc/guidance/vnav/descent/DecelPathBuilder';
 import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { TheoreticalDescentPathCharacteristics } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
+import { ClimbStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
 
 export class CruiseToDescentCoordinator {
     constructor(private cruisePathBuilder: CruisePathBuilder, private descentPathBuilder: DescentPathBuilder, private decelPathBuilder: DecelPathBuilder) {
 
     }
 
-    coordinate(profile: NavGeometryProfile, speedProfile: SpeedProfile) {
+    coordinate(profile: NavGeometryProfile, speedProfile: SpeedProfile, climbStrategy: ClimbStrategy) {
         // - Start with initial guess for fuel on board at destination
         // - Compute descent profile to get distance to T/D and burnt fuel during descent
         // - Compute cruise profile to T/D -> guess new guess for fuel at start T/D, use fuel burn to get new estimate for fuel at destination
@@ -54,21 +55,13 @@ export class CruiseToDescentCoordinator {
                 return;
             }
 
-            const cruisePath = this.cruisePathBuilder.computeCruisePath(profile);
+            const cruisePath = this.cruisePathBuilder.computeCruisePath(profile, climbStrategy);
 
             if (!cruisePath) {
                 return;
             }
 
-            const {
-                remainingFuelOnBoardAtTopOfDescent: remainingFuelOnBoardAtTopOfDescentComputedForwards,
-                distanceTraveled,
-                timeElapsed,
-            } = cruisePath;
-
-            if (DEBUG) {
-                console.log(`[FMS/VNAV] Cruise segment was ${distanceTraveled} nm long and took ${timeElapsed} min`);
-            }
+            const { remainingFuelOnBoardAtTopOfDescent: remainingFuelOnBoardAtTopOfDescentComputedForwards } = cruisePath;
 
             estimatedFuelAtDestination = remainingFuelOnBoardAtTopOfDescentComputedForwards - descentPath.fuelBurnedDuringDescent;
             error = remainingFuelOnBoardAtTopOfDescentComputedForwards - descentPath.remainingFuelOnBoardAtTopOfDescent;
