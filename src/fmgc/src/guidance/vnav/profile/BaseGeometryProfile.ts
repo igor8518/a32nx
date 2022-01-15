@@ -251,6 +251,24 @@ export abstract class BaseGeometryProfile {
         });
     }
 
+    addCheckpointAtDistanceFromStart(distanceFromStart: NauticalMiles, checkpoint: Omit<VerticalCheckpoint, 'distanceFromStart'>) {
+        if (distanceFromStart <= this.checkpoints[0].distanceFromStart) {
+            this.checkpoints.unshift({ distanceFromStart, ...checkpoint });
+
+            return;
+        }
+
+        for (let i = 0; i < this.checkpoints.length - 1; i++) {
+            if (distanceFromStart > this.checkpoints[i].distanceFromStart && distanceFromStart <= this.checkpoints[i + 1].distanceFromStart) {
+                this.checkpoints.splice(i + 1, 0, { distanceFromStart, ...checkpoint });
+
+                return;
+            }
+        }
+
+        this.checkpoints.push({ distanceFromStart, ...checkpoint });
+    }
+
     sortCheckpoints() {
         this.checkpoints.sort((a, b) => a.distanceFromStart - b.distanceFromStart);
     }
