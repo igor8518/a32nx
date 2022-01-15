@@ -9,7 +9,7 @@ import { Geometry } from '@fmgc/guidance/Geometry';
 import { GuidanceController } from '@fmgc/guidance/GuidanceController';
 import { PathVector, PathVectorType } from '@fmgc/guidance/lnav/PathVector';
 import { Geo } from '@fmgc/utils/Geo';
-import { SegmentType } from '@fmgc/wtsdk';
+import { NavGeometryProfile, VerticalWaypointPrediction } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { LegType, RunwaySurface, VorType } from '../types/fstypes/FSEnums';
 import { NearbyFacilities } from './NearbyFacilities';
 
@@ -111,6 +111,12 @@ export class EfisSymbols {
             }
             return false;
         };
+
+        let waypointPredictions = new Map<number, VerticalWaypointPrediction>();
+        // Check we are in an AP mode where constraints are not ignored
+        if (this.guidanceController.vnavDriver.shouldObeyAltitudeConstraints() && this.guidanceController.vnavDriver.currentNdGeometryProfile instanceof NavGeometryProfile) {
+            waypointPredictions = this.guidanceController.vnavDriver.currentNdGeometryProfile?.computePredictionsAtWaypoints();
+        }
 
         for (const side of EfisSymbols.sides) {
             const range = rangeSettings[SimVar.GetSimVarValue(`L:A32NX_EFIS_${side}_ND_RANGE`, 'number')];
@@ -294,8 +300,6 @@ export class EfisSymbols {
                 }
             }
 
-            const waypointPredictions = this.guidanceController.vnavDriver.currentNavGeometryProfile?.computePredictionsAtWaypoints();
-
             // TODO don't send the waypoint before active once FP sequencing is properly implemented
             // (currently sequences with guidance which is too early)
             for (let i = activeFp.length - 1; i >= (activeFp.activeWaypointIndex - 1) && i >= 0; i--) {
@@ -328,7 +332,7 @@ export class EfisSymbols {
                 }
 
                 if (wp.legAltitudeDescription !== 0) {
-                    const predictionAtWaypoint = waypointPredictions?.get(i);
+                    const predictionAtWaypoint = waypointPredictions.get(i);
 
                     if (!predictionAtWaypoint) {
                         type |= NdSymbolTypeFlags.ConstraintUnknown;

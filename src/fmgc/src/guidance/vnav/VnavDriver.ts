@@ -210,7 +210,7 @@ export class VnavDriver implements GuidanceComponent {
         return this.isInManagedNav() && fcuSpeed <= 0;
     }
 
-    private shouldObeyAltitudeConstraints(): boolean {
+    shouldObeyAltitudeConstraints(): boolean {
         const { fcuArmedLateralMode, fcuVerticalMode } = this.computationParametersObserver.get();
 
         const isNavArmed = (fcuArmedLateralMode & ArmedLateralMode.NAV) === ArmedLateralMode.NAV;
