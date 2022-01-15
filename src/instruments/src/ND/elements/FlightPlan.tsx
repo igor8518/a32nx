@@ -402,7 +402,7 @@ export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, en
     } else if (type & (NdSymbolTypeFlags.PwpTopOfClimb)) {
         showIdent = false;
         elements.push(
-            <g transform="translate(-31.5, 17)">
+            <g>
                 <path d="M -38, 17 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.8} className="shadow" />
 
                 <path d="M -38, 17 l 17, -17 h 21 m -5, -5 l 5, 5 l -5, 5" strokeWidth={1.5} className="Cyan" />
