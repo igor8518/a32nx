@@ -324,6 +324,9 @@ export abstract class BaseGeometryProfile {
             VerticalCheckpointReason.TopOfClimb,
             VerticalCheckpointReason.CrossingSpeedLimit,
 
+            VerticalCheckpointReason.StepClimb,
+            VerticalCheckpointReason.StepDescent,
+
             // Descent
             VerticalCheckpointReason.TopOfDescent,
 

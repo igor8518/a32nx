@@ -15,6 +15,8 @@ const PWP_IDENT_CLIMB_CONSTRAINT_LEVEL_OFF = 'Level off for climb constraint';
 const PWP_IDENT_CONTINUE_CLIMB = 'Continue climb';
 const PWP_SPEED_CHANGE = 'Speed change';
 const PWP_IDENT_TOC = '(T/C)';
+const PWP_IDENT_STEP_CLIMB = '(S/C)';
+const PWP_IDENT_STEP_DESCENT = '(S/D)';
 const PWP_IDENT_SPD_LIM = '(LIM)';
 const PWP_IDENT_TOD = '(T/D)';
 const PWP_IDENT_DECEL = '(DECEL)';
@@ -32,6 +34,8 @@ const CHECKPOINT_REASONS_FOR_PWP: VerticalCheckpointReason[] = [
     ...CHECKPOINT_REASONS_BEFORE_FCU_ALT_FOR_PWP,
     VerticalCheckpointReason.CrossingFcuAltitude,
     VerticalCheckpointReason.TopOfClimb,
+    VerticalCheckpointReason.StepClimb,
+    VerticalCheckpointReason.StepDescent,
     VerticalCheckpointReason.TopOfDescent,
     VerticalCheckpointReason.Decel,
 ];
@@ -396,6 +400,36 @@ export class PseudoWaypoints implements GuidanceComponent {
                     distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
                 },
                 displayedOnNd: false,
+            };
+        case VerticalCheckpointReason.StepClimb:
+            return {
+                ident: PWP_IDENT_STEP_CLIMB,
+                alongLegIndex,
+                distanceFromLegTermination,
+                efisSymbolFlag: NdSymbolTypeFlags.PwpStartOfClimb,
+                efisSymbolLla,
+                distanceFromStart: checkpoint.distanceFromStart,
+                displayedOnMcdu: true,
+                flightPlanInfo: {
+                    ...checkpoint,
+                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                },
+                displayedOnNd: true,
+            };
+        case VerticalCheckpointReason.StepDescent:
+            return {
+                ident: PWP_IDENT_STEP_DESCENT,
+                alongLegIndex,
+                distanceFromLegTermination,
+                efisSymbolFlag: NdSymbolTypeFlags.PwpTopOfDescent,
+                efisSymbolLla,
+                distanceFromStart: checkpoint.distanceFromStart,
+                displayedOnMcdu: true,
+                flightPlanInfo: {
+                    ...checkpoint,
+                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                },
+                displayedOnNd: true,
             };
         case VerticalCheckpointReason.TopOfDescent:
             return {
