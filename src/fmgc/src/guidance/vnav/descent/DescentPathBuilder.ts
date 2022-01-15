@@ -20,19 +20,18 @@ export class DescentPathBuilder {
         this.atmosphericConditions.update();
     }
 
-    computeDescentPath(profile: NavGeometryProfile, speedProfile: SpeedProfile): TheoreticalDescentPathCharacteristics {
+    computeDescentPath(profile: NavGeometryProfile, speedProfile: SpeedProfile, cruiseAltitude: Feet): TheoreticalDescentPathCharacteristics {
         const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);
 
         if (!decelCheckpoint) {
             return { tod: undefined, fuelBurnedDuringDescent: undefined, remainingFuelOnBoardAtTopOfDescent: undefined };
         }
 
-        const cruiseAlt = SimVar.GetSimVarValue('L:AIRLINER_CRUISE_ALTITUDE', 'number');
-        const verticalDistance = cruiseAlt - decelCheckpoint.altitude;
+        const verticalDistance = cruiseAltitude - decelCheckpoint.altitude;
         const fpa = 3;
 
         if (DEBUG) {
-            console.log(cruiseAlt);
+            console.log(cruiseAltitude);
             console.log(verticalDistance);
         }
 

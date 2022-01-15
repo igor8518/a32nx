@@ -1,5 +1,6 @@
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { Constants } from '@shared/Constants';
+import { StepCoordinator } from '@fmgc/guidance/vnav/StepCoordinator';
 import { Predictions, StepResults } from '../Predictions';
 import { NavGeometryProfile, VerticalCheckpointReason } from '../profile/NavGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
@@ -13,9 +14,9 @@ export interface CruisePathBuilderResults {
 }
 
 export class CruisePathBuilder {
-    private atmosphericConditions: AtmosphericConditions = new AtmosphericConditions();
-
-    constructor(private computationParametersObserver: VerticalProfileComputationParametersObserver) { }
+    constructor(private computationParametersObserver: VerticalProfileComputationParametersObserver,
+        private atmosphericConditions: AtmosphericConditions,
+        private stepCoordinator: StepCoordinator) { }
 
     update() {
         this.atmosphericConditions.update();
@@ -58,5 +59,15 @@ export class CruisePathBuilder {
             0,
             this.atmosphericConditions.isaDeviation,
         );
+    }
+
+    getFinalCruiseAltitude(): Feet {
+        const { cruiseAltitude } = this.computationParametersObserver.get();
+
+        if (this.stepCoordinator.steps.length === 0) {
+            return cruiseAltitude;
+        }
+
+        return this.stepCoordinator.steps[this.stepCoordinator.steps.length - 1].toAltitude;
     }
 }

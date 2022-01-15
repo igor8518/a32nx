@@ -41,7 +41,7 @@ export class CruiseToDescentCoordinator {
                     throw new Error('[FMS/VNAV/CruiseToDescentCoordinator] Cannot find decel point');
                 }
 
-                descentPath = this.descentPathBuilder.computeDescentPath(profile, speedProfile);
+                descentPath = this.descentPathBuilder.computeDescentPath(profile, speedProfile, this.cruisePathBuilder.getFinalCruiseAltitude());
 
                 const { remainingFuelOnBoardAtEndOfIdlePath } = descentPath;
 
