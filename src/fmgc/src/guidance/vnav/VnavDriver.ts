@@ -19,6 +19,7 @@ import { StepCoordinator } from '@fmgc/guidance/vnav/StepCoordinator';
 import { TakeoffPathBuilder } from '@fmgc/guidance/vnav/takeoff/TakeoffPathBuilder';
 import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { Constants } from '@shared/Constants';
+import { ClimbThrustClimbStrategy, VerticalSpeedClimbStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile } from './profile/NavGeometryProfile';
@@ -135,6 +136,8 @@ export class VnavDriver implements GuidanceComponent {
             this.currentNavGeometryProfile.maxSpeedConstraints,
         );
 
+        const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
+
         const { cruiseAltitude, fuelOnBoard, presentPosition } = this.computationParametersObserver.get();
 
         if (geometry.legs.size > 0 && this.computationParametersObserver.canComputeProfile()) {
@@ -145,7 +148,7 @@ export class VnavDriver implements GuidanceComponent {
                 this.currentNavGeometryProfile.addPresentPositionCheckpoint(presentPosition, fuelOnBoard * Constants.TONS_TO_POUNDS);
             }
 
-            this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, this.currentClimbSpeedProfile, cruiseAltitude);
+            this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, climbStrategy, this.currentClimbSpeedProfile, cruiseAltitude);
 
             if (this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
                 this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentClimbSpeedProfile);
@@ -170,7 +173,7 @@ export class VnavDriver implements GuidanceComponent {
     }
 
     private computeVerticalProfileForNd(geometry: Geometry) {
-        const { fcuAltitude, presentPosition, fuelOnBoard } = this.computationParametersObserver.get();
+        const { fcuAltitude, fcuVerticalMode, presentPosition, fuelOnBoard, fcuVerticalSpeed } = this.computationParametersObserver.get();
 
         this.currentNdGeometryProfile = this.isInManagedNav()
             ? new NavGeometryProfile(geometry, this.flightPlanManager, this.guidanceController.activeLegIndex)
@@ -191,11 +194,15 @@ export class VnavDriver implements GuidanceComponent {
             return;
         }
 
+        const climbStrategy = fcuVerticalMode === VerticalMode.VS
+            ? new VerticalSpeedClimbStrategy(this.computationParametersObserver, this.atmosphericConditions, fcuVerticalSpeed)
+            : new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
+
         const speedProfile = this.shouldObeySpeedConstraints()
             ? this.currentClimbSpeedProfile
             : new NdSpeedProfile(this.computationParametersObserver.get(), this.currentNdGeometryProfile.distanceToPresentPosition, this.currentNdGeometryProfile.maxSpeedConstraints);
 
-        this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile, speedProfile, fcuAltitude);
+        this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile, climbStrategy, speedProfile, fcuAltitude);
         this.currentNdGeometryProfile.finalizeProfile();
 
         if (VnavConfig.DEBUG_PROFILE) {
@@ -226,18 +233,19 @@ export class VnavDriver implements GuidanceComponent {
     }
 
     computeVerticalProfileForExpediteClimb(): SelectedGeometryProfile | undefined {
+        const { fcuAltitude, presentPosition, fuelOnBoard } = this.computationParametersObserver.get();
+
         const greenDotSpeed = Simplane.getGreenDotSpeed();
         if (!greenDotSpeed) {
             return undefined;
         }
 
         const selectedSpeedProfile = new ExpediteSpeedProfile(greenDotSpeed);
-
         const expediteGeometryProfile = new SelectedGeometryProfile();
-        const { fcuAltitude, presentPosition, fuelOnBoard } = this.computationParametersObserver.get();
+        const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
 
         this.currentNavGeometryProfile.addPresentPositionCheckpoint(presentPosition, fuelOnBoard * Constants.TONS_TO_POUNDS);
-        this.climbPathBuilder.computeClimbPath(expediteGeometryProfile, selectedSpeedProfile, fcuAltitude);
+        this.climbPathBuilder.computeClimbPath(expediteGeometryProfile, climbStrategy, selectedSpeedProfile, fcuAltitude);
 
         expediteGeometryProfile.finalizeProfile();
 
