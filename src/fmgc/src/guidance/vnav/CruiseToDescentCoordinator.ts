@@ -4,14 +4,14 @@ import { DecelPathBuilder } from '@fmgc/guidance/vnav/descent/DecelPathBuilder';
 import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { TheoreticalDescentPathCharacteristics } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
-import { ClimbStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
+import { ClimbStrategy, DescentStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
 
 export class CruiseToDescentCoordinator {
     constructor(private cruisePathBuilder: CruisePathBuilder, private descentPathBuilder: DescentPathBuilder, private decelPathBuilder: DecelPathBuilder) {
 
     }
 
-    coordinate(profile: NavGeometryProfile, speedProfile: SpeedProfile, climbStrategy: ClimbStrategy) {
+    coordinate(profile: NavGeometryProfile, speedProfile: SpeedProfile, stepClimbStrategy: ClimbStrategy, stepDescentStrategy: DescentStrategy) {
         // - Start with initial guess for fuel on board at destination
         // - Compute descent profile to get distance to T/D and burnt fuel during descent
         // - Compute cruise profile to T/D -> guess new guess for fuel at start T/D, use fuel burn to get new estimate for fuel at destination
@@ -55,7 +55,7 @@ export class CruiseToDescentCoordinator {
                 return;
             }
 
-            const cruisePath = this.cruisePathBuilder.computeCruisePath(profile, climbStrategy);
+            const cruisePath = this.cruisePathBuilder.computeCruisePath(profile, stepClimbStrategy, stepDescentStrategy);
 
             if (!cruisePath) {
                 return;
