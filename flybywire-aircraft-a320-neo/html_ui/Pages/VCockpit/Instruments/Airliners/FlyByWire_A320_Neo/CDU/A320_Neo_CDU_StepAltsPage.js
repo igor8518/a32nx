@@ -6,7 +6,7 @@ class CDUStepAltsPage {
         const isFlying = flightPhase >= 5 && flightPhase <= 7;
         const transitionAltitude = mcdu.flightPlanManager.originTransitionAltitude;
         const coordinator = mcdu.guidanceController.vnavDriver.stepCoordinator;
-        const predictions = mcdu.guidanceController.vnavDriver.currentNavGeometryProfile.computePredictionsAtWaypoints();
+        const predictions = mcdu.guidanceController.vnavDriver.currentNavGeometryProfile.waypointPredictions;
 
         mcdu.setTemplate([
             ["STEP ALTS {small}FROM{end} {green}FL" + mcdu._cruiseFlightLevel + "{end}"],

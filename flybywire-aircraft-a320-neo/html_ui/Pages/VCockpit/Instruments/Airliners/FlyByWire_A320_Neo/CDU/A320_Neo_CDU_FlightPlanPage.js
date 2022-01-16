@@ -96,7 +96,7 @@ class CDUFlightPlanPage {
 
         let vnavPredictionsMapByWaypoint = null;
         if (fmsGeometryProfile && fmsGeometryProfile.isReadyToDisplay) {
-            vnavPredictionsMapByWaypoint = fmsGeometryProfile.computePredictionsAtWaypoints();
+            vnavPredictionsMapByWaypoint = fmsGeometryProfile.waypointPredictions;
         }
 
         // Primary F-PLAN
