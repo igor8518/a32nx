@@ -245,7 +245,7 @@ export class VnavDriver implements GuidanceComponent {
         const expediteGeometryProfile = new SelectedGeometryProfile();
         const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
 
-        this.currentNavGeometryProfile.addPresentPositionCheckpoint(presentPosition, fuelOnBoard * Constants.TONS_TO_POUNDS);
+        expediteGeometryProfile.addPresentPositionCheckpoint(presentPosition, fuelOnBoard * Constants.TONS_TO_POUNDS);
         this.climbPathBuilder.computeClimbPath(expediteGeometryProfile, climbStrategy, selectedSpeedProfile, fcuAltitude);
 
         expediteGeometryProfile.finalizeProfile();
