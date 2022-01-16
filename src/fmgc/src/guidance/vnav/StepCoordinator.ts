@@ -1,14 +1,16 @@
+import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { FlightPlanManager } from '@fmgc/wtsdk';
 
 export interface Step {
     ident: string,
     toAltitude: Feet,
-    location: LatLongAlt
-    get distanceFromStart(): NauticalMiles;
+    location: LatLongAlt,
+    isIgnored: boolean,
+    get distanceFromStart(): NauticalMiles
 }
 
 class GeographicStep implements Step {
-    constructor(private waypoint: WayPoint, public waypointIndex: number, public toAltitude: Feet) {}
+    constructor(private waypoint: WayPoint, public waypointIndex: number, public toAltitude: Feet, public isIgnored: boolean) {}
 
     get ident(): string {
         return this.waypoint.ident;
@@ -24,6 +26,8 @@ class GeographicStep implements Step {
 }
 
 export class StepCoordinator {
+    private currentNavGeometryProfile?: NavGeometryProfile;
+
     steps: Step[] = [];
 
     constructor(private flightPlanManager: FlightPlanManager) {}
@@ -35,7 +39,17 @@ export class StepCoordinator {
             return false;
         }
 
-        this.insertStep(new GeographicStep(waypoint, index, toAltitude));
+        const topOfDescent = this.currentNavGeometryProfile.findLastVerticalCheckpoint(VerticalCheckpointReason.TopOfDescent);
+        const waypointPrediction = this.currentNavGeometryProfile.waypointPredictions.get(index);
+
+        let isIgnored = false;
+        if (topOfDescent && waypointPrediction) {
+            if (waypointPrediction.distanceFromStart - topOfDescent.distanceFromStart < 50) {
+                isIgnored = true;
+            }
+        }
+
+        this.insertStep(new GeographicStep(waypoint, index, toAltitude, isIgnored));
 
         return true;
     }
@@ -78,5 +92,9 @@ export class StepCoordinator {
         }
 
         return [-1, undefined];
+    }
+
+    updateGeometryProfile(newProfile: NavGeometryProfile) {
+        this.currentNavGeometryProfile = newProfile;
     }
 }

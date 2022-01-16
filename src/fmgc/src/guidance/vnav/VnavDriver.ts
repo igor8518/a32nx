@@ -89,6 +89,8 @@ export class VnavDriver implements GuidanceComponent {
         this.computeVerticalProfileForMcdu(geometry);
         this.computeVerticalProfileForNd(geometry);
 
+        this.stepCoordinator.updateGeometryProfile(this.currentNavGeometryProfile);
+
         this.version++;
     }
 
@@ -106,6 +108,8 @@ export class VnavDriver implements GuidanceComponent {
 
             this.computeVerticalProfileForMcdu(this.guidanceController.activeGeometry);
             this.computeVerticalProfileForNd(this.guidanceController.activeGeometry);
+
+            this.stepCoordinator.updateGeometryProfile(this.currentNavGeometryProfile);
 
             this.version++;
         }

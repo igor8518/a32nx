@@ -40,6 +40,11 @@ export class CruisePathBuilder {
 
         const steps = this.stepCoordinator.steps;
         for (const step of steps) {
+            // If the step is too close to T/D
+            if (step.isIgnored) {
+                continue;
+            }
+
             // TODO: What happens if the step is at cruise altitude?
             const isClimbVsDescent = step.toAltitude > altitude;
 
