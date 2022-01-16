@@ -18,6 +18,11 @@ export enum PseudoWaypointSequencingAction {
      */
     APPROACH_PHASE_AUTO_ENGAGE,
 
+    /**
+     * Used to delete the step waypoint
+     */
+    STEP_REACHED,
+
 }
 
 export interface PseudoWaypoint {

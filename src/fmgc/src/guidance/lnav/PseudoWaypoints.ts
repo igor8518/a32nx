@@ -215,6 +215,10 @@ export class PseudoWaypoints implements GuidanceComponent {
                 ]);
             }
             break;
+        case PseudoWaypointSequencingAction.STEP_REACHED:
+            // Since you cannot have steps behind you, the one getting sequenced should always be the first one
+            this.guidanceController.vnavDriver.stepCoordinator.removeStep(0);
+            break;
         default:
         }
     }
@@ -404,6 +408,7 @@ export class PseudoWaypoints implements GuidanceComponent {
         case VerticalCheckpointReason.StepClimb:
             return {
                 ident: PWP_IDENT_STEP_CLIMB,
+                sequencingType: PseudoWaypointSequencingAction.STEP_REACHED,
                 alongLegIndex,
                 distanceFromLegTermination,
                 efisSymbolFlag: NdSymbolTypeFlags.PwpStartOfClimb,
@@ -419,6 +424,7 @@ export class PseudoWaypoints implements GuidanceComponent {
         case VerticalCheckpointReason.StepDescent:
             return {
                 ident: PWP_IDENT_STEP_DESCENT,
+                sequencingType: PseudoWaypointSequencingAction.STEP_REACHED,
                 alongLegIndex,
                 distanceFromLegTermination,
                 efisSymbolFlag: NdSymbolTypeFlags.PwpTopOfDescent,
