@@ -19,7 +19,7 @@ import { StepCoordinator } from '@fmgc/guidance/vnav/StepCoordinator';
 import { TakeoffPathBuilder } from '@fmgc/guidance/vnav/takeoff/TakeoffPathBuilder';
 import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { Constants } from '@shared/Constants';
-import { ClimbThrustClimbStrategy, VerticalSpeedClimbStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
+import { ClimbThrustClimbStrategy, VerticalSpeedStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile } from './profile/NavGeometryProfile';
@@ -137,6 +137,7 @@ export class VnavDriver implements GuidanceComponent {
         );
 
         const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
+        const descentStrategy = new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, -1000);
 
         const { cruiseAltitude, fuelOnBoard, presentPosition } = this.computationParametersObserver.get();
 
@@ -151,7 +152,7 @@ export class VnavDriver implements GuidanceComponent {
             this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, climbStrategy, this.currentClimbSpeedProfile, cruiseAltitude);
 
             if (this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
-                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentClimbSpeedProfile, climbStrategy);
+                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentClimbSpeedProfile, climbStrategy, descentStrategy);
             }
 
             this.currentNavGeometryProfile.finalizeProfile();
@@ -195,7 +196,7 @@ export class VnavDriver implements GuidanceComponent {
         }
 
         const climbStrategy = fcuVerticalMode === VerticalMode.VS
-            ? new VerticalSpeedClimbStrategy(this.computationParametersObserver, this.atmosphericConditions, fcuVerticalSpeed)
+            ? new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, fcuVerticalSpeed)
             : new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
 
         const speedProfile = this.shouldObeySpeedConstraints()

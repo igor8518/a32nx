@@ -85,7 +85,7 @@ export class ClimbPathBuilder {
             const targetAltitudeForSegment = Math.min(altitude + 1500, targetAltitude);
             const remainingFuelOnBoard = lastCheckpoint.remainingFuelOnBoard;
 
-            const { distanceTraveled, fuelBurned, timeElapsed } = climbStrategy.predictClimb(altitude, targetAltitudeForSegment, climbSpeed, managedClimbSpeedMach, remainingFuelOnBoard);
+            const { distanceTraveled, fuelBurned, timeElapsed } = climbStrategy.predict(altitude, targetAltitudeForSegment, climbSpeed, managedClimbSpeedMach, remainingFuelOnBoard);
 
             profile.checkpoints.push({
                 reason: VerticalCheckpointReason.AtmosphericConditions,
