@@ -109,6 +109,16 @@ if (GIT_BRANCH === 'master') {
             }
             console.log('copying ' + YELLOW_DDS + ` to ` + TARGET_DSS + "failed: " + err);
         });
+} else if (edition === 'igor') {
+    const GREEN_DDS = '/Textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-green.dds';
+    // destination will be created or overwritten by default.
+    fs.copyFile(path.join(SRC_FOLDER, GREEN_DDS), path.join(A32NX, TARGET_DSS),
+        (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log('copying ' + GREEN_DDS + ` to ` + TARGET_DSS + "failed: " + err);
+        });
 } else if (edition !== 'stable') {
     const RED_DDS = '/Textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-red.dds';
     // destination will be created or overwritten by default.
