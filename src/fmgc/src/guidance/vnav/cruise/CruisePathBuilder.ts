@@ -2,7 +2,7 @@ import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vna
 import { Constants } from '@shared/Constants';
 import { StepCoordinator } from '@fmgc/guidance/vnav/StepCoordinator';
 import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
-import { ClimbStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
+import { ClimbStrategy, DescentStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
 import { Predictions, StepResults } from '../Predictions';
 import { NavGeometryProfile, VerticalCheckpointReason } from '../profile/NavGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
@@ -20,7 +20,7 @@ export class CruisePathBuilder {
         this.atmosphericConditions.update();
     }
 
-    computeCruisePath(profile: NavGeometryProfile, climbStrategy: ClimbStrategy): CruisePathBuilderResults {
+    computeCruisePath(profile: NavGeometryProfile, stepClimbStrategy: ClimbStrategy, stepDescentStrategy: DescentStrategy): CruisePathBuilderResults {
         const topOfClimb = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
         const topOfDescent = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfDescent);
 
@@ -42,13 +42,6 @@ export class CruisePathBuilder {
         for (const step of steps) {
             // TODO: What happens if the step is at cruise altitude?
             const isClimbVsDescent = step.toAltitude > altitude;
-            if (!isClimbVsDescent) {
-                if (VnavConfig.DEBUG_PROFILE) {
-                    console.warn(`[FMS/VNAV] Ignoring step descent at ${step.ident} because they are not supported yet.`);
-                }
-
-                continue;
-            }
 
             const stepDistanceFromStart = step.distanceFromStart;
 
@@ -77,9 +70,9 @@ export class CruisePathBuilder {
                 speed: managedCruiseSpeed,
             });
 
-            const { fuelBurned: fuelBurnedStep, timeElapsed: timeElapsedStep, distanceTraveled: distanceTraveledStep } = climbStrategy.predictClimb(
-                altitude, step.toAltitude, managedCruiseSpeed, managedCruiseSpeedMach, remainingFuelOnBoard,
-            );
+            const { fuelBurned: fuelBurnedStep, timeElapsed: timeElapsedStep, distanceTraveled: distanceTraveledStep } = isClimbVsDescent
+                ? stepClimbStrategy.predict(altitude, step.toAltitude, managedCruiseSpeed, managedCruiseSpeedMach, remainingFuelOnBoard)
+                : stepDescentStrategy.predict(altitude, step.toAltitude, managedCruiseSpeed, managedCruiseSpeed, remainingFuelOnBoard);
 
             distanceFromStart += distanceTraveledStep;
             remainingFuelOnBoard -= fuelBurnedStep;

@@ -15,13 +15,26 @@ export interface ClimbStrategy {
      * @param fuelOnBoard Remainging fuel on board at the start of the climb
      * @returns `StepResults`
      */
-    predictClimb(initialAltitude: number, finalAltitude: number, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
+    predict(initialAltitude: number, finalAltitude: number, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
 }
 
-export class VerticalSpeedClimbStrategy implements ClimbStrategy {
+export interface DescentStrategy {
+    /**
+     * Computes predictions for a single segment using the atmospheric conditions in the middle.
+     * @param initialAltitude Altitude at the start of climb
+     * @param finalAltitude Altitude to terminate the climb
+     * @param speed
+     * @param mach
+     * @param fuelOnBoard Remainging fuel on board at the start of the climb
+     * @returns `StepResults`
+     */
+    predict(initialAltitude: number, finalAltitude: number, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
+}
+
+export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {
     constructor(private observer: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions, private verticalSpeed: FeetPerMinute) { }
 
-    predictClimb(initialAltitude: Feet, finalAltitude: Feet, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
+    predict(initialAltitude: Feet, finalAltitude: Feet, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
         const { zeroFuelWeight, perfFactor } = this.observer.get();
 
         return Predictions.verticalSpeedStep(
@@ -41,7 +54,7 @@ export class VerticalSpeedClimbStrategy implements ClimbStrategy {
 export class ClimbThrustClimbStrategy implements ClimbStrategy {
     constructor(private observer: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions) { }
 
-    predictClimb(initialAltitude: Feet, finalAltitude: Feet, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
+    predict(initialAltitude: Feet, finalAltitude: Feet, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
         const { zeroFuelWeight, tropoPause, perfFactor } = this.observer.get();
 
         return Predictions.altitudeStep(
