@@ -44,7 +44,7 @@ export class StepCoordinator {
 
         let isIgnored = false;
         if (topOfDescent && waypointPrediction) {
-            if (waypointPrediction.distanceFromStart - topOfDescent.distanceFromStart < 50) {
+            if (topOfDescent.distanceFromStart - waypointPrediction.distanceFromStart < 50) {
                 isIgnored = true;
             }
         }
