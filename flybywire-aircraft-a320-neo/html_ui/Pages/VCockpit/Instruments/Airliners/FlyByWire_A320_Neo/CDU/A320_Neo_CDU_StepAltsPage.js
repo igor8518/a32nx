@@ -88,7 +88,9 @@ class CDUStepAltsPage {
                 }
             }
 
-            return ["{cyan}" + CDUStepAltsPage.formatFl(step.toAltitude, transitionAltitude) + "/" + step.ident + "{end}", distanceCell + "\xa0" + timeCell];
+            const lastColumn = step.isIgnored ? "IGNORED" : distanceCell + "\xa0" + timeCell;
+
+            return ["{cyan}" + CDUStepAltsPage.formatFl(step.toAltitude, transitionAltitude) + "/" + step.ident + "{end}", lastColumn];
         }
     }
 
