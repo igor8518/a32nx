@@ -83,6 +83,8 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
     public waypointCount: number = 0;
 
+    public waypointPredictions: Map<number, VerticalWaypointPrediction> = new Map();
+
     constructor(
         public geometry: Geometry,
         flightPlanManager: FlightPlanManager,
@@ -171,7 +173,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
     /**
      * This is used to display predictions in the MCDU
      */
-    computePredictionsAtWaypoints(): Map<number, VerticalWaypointPrediction> {
+    private computePredictionsAtWaypoints(): Map<number, VerticalWaypointPrediction> {
         const predictions = new Map<number, VerticalWaypointPrediction>();
 
         if (!this.isReadyToDisplay) {
@@ -215,9 +217,8 @@ export class NavGeometryProfile extends BaseGeometryProfile {
     override findDistancesToSpeedChanges(): NauticalMiles[] {
         const result: NauticalMiles[] = [];
 
-        const predictions = this.computePredictionsAtWaypoints();
         if (VnavConfig.DEBUG_PROFILE) {
-            console.log(predictions);
+            console.log(this.waypointPredictions);
         }
 
         const speedLimitCrossing = this.findSpeedLimitCrossing();
@@ -231,13 +232,13 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
         const [speedLimitDistance, speedLimitSpeed] = speedLimitCrossing;
 
-        for (const [i, prediction] of predictions) {
-            if (!predictions.has(i + 1)) {
+        for (const [i, prediction] of this.waypointPredictions) {
+            if (!this.waypointPredictions.has(i + 1)) {
                 continue;
             }
 
-            if (prediction.distanceFromStart < speedLimitDistance && predictions.get(i + 1).distanceFromStart > speedLimitDistance) {
-                if (speedLimitSpeed < predictions.get(i + 1).speed) {
+            if (prediction.distanceFromStart < speedLimitDistance && this.waypointPredictions.get(i + 1).distanceFromStart > speedLimitDistance) {
+                if (speedLimitSpeed < this.waypointPredictions.get(i + 1).speed) {
                     result.push(speedLimitDistance);
                 }
             }
@@ -314,5 +315,11 @@ export class NavGeometryProfile extends BaseGeometryProfile {
             console.error('Invalid altitude constraint type');
             return 0;
         }
+    }
+
+    override finalizeProfile(): void {
+        super.finalizeProfile();
+
+        this.waypointPredictions = this.computePredictionsAtWaypoints();
     }
 }
