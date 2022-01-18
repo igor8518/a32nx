@@ -43,6 +43,8 @@ export enum VerticalCheckpointReason {
     TopOfDescent = 'TopOfDescent',
     IdlePathAtmosphericConditions = 'IdlePathAtmosphericConditions',
     IdlePathEnd = 'IdlePathEnd',
+    GeometricPathStart = 'GeometricPathStart',
+    GeometricPathEnd = 'GeometricPathStart',
 
     // Approach
     Decel = 'Decel',
@@ -72,6 +74,11 @@ export interface MaxSpeedConstraint {
     maxSpeed: Feet,
 }
 
+export interface DescentAltitudeConstraint {
+    distanceFromStart: NauticalMiles,
+    constraint: AltitudeConstraint,
+}
+
 export class NavGeometryProfile extends BaseGeometryProfile {
     public totalFlightPlanDistance: NauticalMiles = 0;
 
@@ -79,7 +86,11 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
     public override maxAltitudeConstraints: MaxAltitudeConstraint[] = [];
 
+    public override descentAltitudeConstraints: DescentAltitudeConstraint[] = [];
+
     public override maxSpeedConstraints: MaxSpeedConstraint[] = [];
+
+    public override descentSpeedConstraints: MaxSpeedConstraint[] = [];
 
     public waypointCount: number = 0;
 
@@ -136,22 +147,36 @@ export class NavGeometryProfile extends BaseGeometryProfile {
                 this.distanceToPresentPosition += legDistance;
             }
 
-            if (leg.segment !== SegmentType.Origin && leg.segment !== SegmentType.Departure) {
-                continue;
-            }
+            if (leg.segment === SegmentType.Origin || leg.segment === SegmentType.Departure) {
+                if (leg.altitudeConstraint && leg.altitudeConstraint.type !== AltitudeConstraintType.atOrAbove) {
+                    if (this.maxAltitudeConstraints.length < 1 || leg.altitudeConstraint.altitude1 >= this.maxAltitudeConstraints[this.maxAltitudeConstraints.length - 1].maxAltitude) {
+                        this.maxAltitudeConstraints.push({
+                            distanceFromStart: this.totalFlightPlanDistance,
+                            maxAltitude: leg.altitudeConstraint.altitude1,
+                        });
+                    }
+                }
 
-            if (leg.altitudeConstraint && leg.altitudeConstraint.type !== AltitudeConstraintType.atOrAbove) {
-                if (this.maxAltitudeConstraints.length < 1 || leg.altitudeConstraint.altitude1 >= this.maxAltitudeConstraints[this.maxAltitudeConstraints.length - 1].maxAltitude) {
-                    this.maxAltitudeConstraints.push({
+                // atOrAbove speed constraints don't exist
+                if (leg.speedConstraint?.speed > 100 && leg.speedConstraint.type !== SpeedConstraintType.atOrAbove) {
+                    if (this.maxSpeedConstraints.length < 1 || leg.speedConstraint.speed >= this.maxSpeedConstraints[this.maxSpeedConstraints.length - 1].maxSpeed) {
+                        this.maxSpeedConstraints.push({
+                            distanceFromStart: this.totalFlightPlanDistance,
+                            maxSpeed: leg.speedConstraint.speed,
+                        });
+                    }
+                }
+            } else if (leg.segment === SegmentType.Arrival || leg.segment === SegmentType.Approach) {
+                if (leg.altitudeConstraint) {
+                    this.descentAltitudeConstraints.push({
                         distanceFromStart: this.totalFlightPlanDistance,
-                        maxAltitude: leg.altitudeConstraint.altitude1,
+                        constraint: leg.altitudeConstraint,
                     });
                 }
-            }
 
-            if (leg.speedConstraint?.speed > 100 && leg.speedConstraint.type !== SpeedConstraintType.atOrAbove) {
-                if (this.maxSpeedConstraints.length < 1 || leg.speedConstraint.speed >= this.maxSpeedConstraints[this.maxSpeedConstraints.length - 1].maxSpeed) {
-                    this.maxSpeedConstraints.push({
+                // atOrAbove speed constraints don't exist
+                if (leg.speedConstraint?.speed > 100 && leg.speedConstraint.type !== SpeedConstraintType.atOrAbove) {
+                    this.descentSpeedConstraints.push({
                         distanceFromStart: this.totalFlightPlanDistance,
                         maxSpeed: leg.speedConstraint.speed,
                     });
