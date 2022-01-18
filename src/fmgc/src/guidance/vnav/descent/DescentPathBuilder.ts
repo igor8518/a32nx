@@ -7,13 +7,16 @@ import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { Constants } from '@shared/Constants';
+import { GeometricPathBuilder } from '@fmgc/guidance/vnav/descent/GeometricPathBuilder';
 
 export class DescentPathBuilder {
-    private atmosphericConditions: AtmosphericConditions = new AtmosphericConditions();
+    private geometricPathBuilder: GeometricPathBuilder;
 
     constructor(
         private computationParametersObserver: VerticalProfileComputationParametersObserver,
+        private atmosphericConditions: AtmosphericConditions,
     ) {
+        this.geometricPathBuilder = new GeometricPathBuilder(computationParametersObserver, atmosphericConditions);
     }
 
     update() {
@@ -24,8 +27,10 @@ export class DescentPathBuilder {
         const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);
 
         if (!decelCheckpoint) {
-            return { tod: undefined, fuelBurnedDuringDescent: undefined, remainingFuelOnBoardAtTopOfDescent: undefined };
+            return { tod: undefined, fuelBurnedDuringDescent: undefined, remainingFuelOnBoardAtTopOfDescent: undefined, remainingFuelOnBoardAtEndOfIdlePath: undefined };
         }
+
+        this.geometricPathBuilder.buildGeometricPath(profile);
 
         const verticalDistance = cruiseAltitude - decelCheckpoint.altitude;
         const fpa = 3;
@@ -35,12 +40,12 @@ export class DescentPathBuilder {
             console.log(verticalDistance);
         }
 
-        const todEstimate = decelCheckpoint.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
-
         const tocCheckpoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
+        const geometricPathStart = profile.findVerticalCheckpoint(VerticalCheckpointReason.GeometricPathStart);
 
-        if (tocCheckpoint) {
+        if (tocCheckpoint && geometricPathStart) {
             // Estimate ToD checkpoint
+            const todEstimate = decelCheckpoint.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
             const todEstimateDistanceFromStart = Math.max(tocCheckpoint.distanceFromStart, todEstimate);
 
             profile.checkpoints.push({
@@ -54,15 +59,17 @@ export class DescentPathBuilder {
 
             const todEstimateCheckpoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfDescent);
 
-            this.buildIdlePath(profile, speedProfile, todEstimateCheckpoint.altitude, decelCheckpoint.altitude);
+            this.buildIdlePath(profile, speedProfile, todEstimateCheckpoint.altitude, geometricPathStart.altitude);
 
+            // TODO: This should not be here ideally
             profile.sortCheckpoints();
 
-            const lastIdlePathCheckpoint = profile.findLastVerticalCheckpoint(VerticalCheckpointReason.IdlePathAtmosphericConditions);
+            const lastIdlePathCheckpoint = profile.findLastVerticalCheckpoint(VerticalCheckpointReason.IdlePathEnd);
 
             // Check that the idle path ends before our reference point (at the moment, always DECEL)
-            if (lastIdlePathCheckpoint.distanceFromStart > decelCheckpoint.distanceFromStart) {
+            if (lastIdlePathCheckpoint.distanceFromStart > geometricPathStart.distanceFromStart) {
                 // If so, do not do an idle path for now TODO insert a vertical discontinuity ?
+                console.error('[FMS/VNAV] Idle path construction failed');
                 profile.purgeVerticalCheckpoints(VerticalCheckpointReason.IdlePathAtmosphericConditions);
             }
 
@@ -103,6 +110,8 @@ export class DescentPathBuilder {
                 speed: speedProfile.get(lastCheckpoint.distanceFromStart + distanceTraveled, targetAltitudeForSegment),
             });
         }
+
+        profile.lastCheckpoint.reason = VerticalCheckpointReason.IdlePathEnd;
     }
 
     private computeIdlePathSegmentPrediction(startingAltitude: Feet, targetAltitude: Feet, climbSpeed: Knots, remainingFuelOnBoard: number): StepResults {

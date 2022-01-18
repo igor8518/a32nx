@@ -166,7 +166,7 @@ export class GuidanceManager {
                     oldLeg.fix.discontinuityCanBeCleared = newLeg.fix.discontinuityCanBeCleared;
 
                     oldLeg.fix.legAltitude1 = newLeg.fix.legAltitude1;
-                    oldLeg.fix.legAltitude2 = newLeg.fix.legAltitude1;
+                    oldLeg.fix.legAltitude2 = newLeg.fix.legAltitude2;
                     oldLeg.fix.legAltitudeDescription = newLeg.fix.legAltitudeDescription;
                     oldLeg.fix.speedConstraint = newLeg.fix.speedConstraint;
                 }

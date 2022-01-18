@@ -1,10 +1,14 @@
 import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
-import { MaxAltitudeConstraint, MaxSpeedConstraint, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
+import { DescentAltitudeConstraint, MaxAltitudeConstraint, MaxSpeedConstraint, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 
 export class SelectedGeometryProfile extends BaseGeometryProfile {
     public override maxAltitudeConstraints: MaxAltitudeConstraint[] = [];
 
+    public override descentAltitudeConstraints: DescentAltitudeConstraint[];
+
     public override maxSpeedConstraints: MaxSpeedConstraint[] = [];
+
+    public override descentSpeedConstraints: MaxSpeedConstraint[] = [];
 
     public override distanceToPresentPosition: number = 0;
 
