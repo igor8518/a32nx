@@ -1,7 +1,7 @@
 import { Common } from '@fmgc/guidance/vnav/common';
 import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { PseudoWaypointFlightPlanInfo } from '@fmgc/guidance/PseudoWaypoint';
-import { MaxAltitudeConstraint, MaxSpeedConstraint, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
+import { DescentAltitudeConstraint, MaxAltitudeConstraint, MaxSpeedConstraint, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 
 export interface PerformancePagePrediction {
     altitude: Feet,
@@ -14,9 +14,13 @@ export abstract class BaseGeometryProfile {
 
     public checkpoints: VerticalCheckpoint[] = [];
 
+    abstract maxAltitudeConstraints: MaxAltitudeConstraint[];
+
+    abstract descentAltitudeConstraints: DescentAltitudeConstraint[];
+
     abstract maxSpeedConstraints: MaxSpeedConstraint[];
 
-    abstract maxAltitudeConstraints: MaxAltitudeConstraint[];
+    abstract descentSpeedConstraints: MaxSpeedConstraint[];
 
     abstract distanceToPresentPosition: NauticalMiles;
 
