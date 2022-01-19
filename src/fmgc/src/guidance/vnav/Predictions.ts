@@ -101,10 +101,10 @@ export class Predictions {
         do {
             const drag = FlightModel.getDrag(midStepWeight, mach, delta, speedbrakesExtended, false, flapsConfig);
 
-            const pathAngle = FlightModel.getAvailableGradient(thrust, drag, midStepWeight);
+            pathAngle = FlightModel.getAvailableGradient(thrust, drag, midStepWeight);
 
             verticalSpeed = 101.268 * tas * Math.sin(pathAngle); // in feet per minute
-            stepTime = stepSize / verticalSpeed; // in minutes
+            stepTime = verticalSpeed !== 0 ? stepSize / verticalSpeed : 0; // in minutes
             distanceTraveled = (tas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
             fuelBurned = (fuelFlow / 60) * stepTime;
             // const endStepWeight = zeroFuelWeight + (initialFuelWeight - fuelBurned); <- not really needed
@@ -476,7 +476,7 @@ export class Predictions {
             );
 
             verticalSpeed = 101.268 * tas * Math.sin(fpaRadians); // in feet per minute
-            stepTime = (finalAltitude - initialAltitude) / verticalSpeed; // in minutes
+            stepTime = verticalSpeed !== 0 ? (finalAltitude - initialAltitude) / verticalSpeed : 0; // in minutes
 
             // Divide by 2 to get thrust per engine
             const correctedThrust = (thrust / delta2) / 2;

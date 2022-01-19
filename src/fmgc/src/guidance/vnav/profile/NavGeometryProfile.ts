@@ -44,7 +44,9 @@ export enum VerticalCheckpointReason {
     IdlePathAtmosphericConditions = 'IdlePathAtmosphericConditions',
     IdlePathEnd = 'IdlePathEnd',
     GeometricPathStart = 'GeometricPathStart',
-    GeometricPathEnd = 'GeometricPathStart',
+    GeometricPathConstraint = 'GeometricPathConstraint',
+    GeometricPathTooSteep = 'GeometricPathTooSteep',
+    GeometricPathEnd = 'GeometricPathEnd',
 
     // Approach
     Decel = 'Decel',
@@ -104,11 +106,6 @@ export class NavGeometryProfile extends BaseGeometryProfile {
         super();
 
         this.extractGeometryInformation(flightPlanManager, activeLegIndex);
-
-        if (VnavConfig.DEBUG_PROFILE) {
-            console.log('[FMS/VNAV] Altitude constraints:', this.maxAltitudeConstraints);
-            console.log('[FMS/VNAV] Speed constraints:', this.maxSpeedConstraints);
-        }
     }
 
     get lastCheckpoint(): VerticalCheckpoint | null {
