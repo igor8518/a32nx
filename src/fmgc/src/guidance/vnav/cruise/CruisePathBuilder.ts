@@ -9,6 +9,7 @@ import { AtmosphericConditions } from '../AtmosphericConditions';
 
 export interface CruisePathBuilderResults {
     remainingFuelOnBoardAtTopOfDescent: number,
+    secondsFromPresentAtTopOfDescent: number
 }
 
 export class CruisePathBuilder {
@@ -98,7 +99,7 @@ export class CruisePathBuilder {
         remainingFuelOnBoard -= fuelBurned;
         secondsFromPresent += timeElapsed * 60;
 
-        return { remainingFuelOnBoardAtTopOfDescent: remainingFuelOnBoard };
+        return { remainingFuelOnBoardAtTopOfDescent: remainingFuelOnBoard, secondsFromPresentAtTopOfDescent: secondsFromPresent };
     }
 
     private computeCruiseSegment(distance: NauticalMiles, remainingFuelOnBoard: number): StepResults {
