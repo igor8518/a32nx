@@ -31,7 +31,7 @@ export interface DecelPathCharacteristics {
 }
 
 export class DecelPathBuilder {
-    computeDecelPath(profile: NavGeometryProfile, estimatedFuelOnBoardAtDestination: number) {
+    computeDecelPath(profile: NavGeometryProfile, estimatedFuelOnBoardAtDestination: number, estimatedSecondsFromPresentAtDestination: number) {
         // TO GET FPA:
         // If approach exists, use approach alt constraints to get FPA and glidepath
         // If no approach but arrival, use arrival alt constraints, if any
@@ -68,7 +68,7 @@ export class DecelPathBuilder {
             FlapConf.CONF_FULL,
         );
 
-        let timeElapsed = -vappSegment.timeElapsed;
+        let timeElapsed = estimatedSecondsFromPresentAtDestination - vappSegment.timeElapsed;
         let fuelWeight = estimatedFuelOnBoardAtDestination + vappSegment.fuelBurned;
         let distance = vappSegment.distanceTraveled;
 

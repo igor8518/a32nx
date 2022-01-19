@@ -1,7 +1,6 @@
 //  Copyright (c) 2021 FlyByWire Simulations
 //  SPDX-License-Identifier: GPL-3.0
 
-import { TheoreticalDescentPathCharacteristics } from '@fmgc/guidance/vnav/descent/TheoreticalDescentPath';
 import { DecelPathBuilder, DecelPathCharacteristics } from '@fmgc/guidance/vnav/descent/DecelPathBuilder';
 import { DescentPathBuilder } from '@fmgc/guidance/vnav/descent/DescentPathBuilder';
 import { GuidanceController } from '@fmgc/guidance/GuidanceController';
@@ -47,8 +46,6 @@ export class VnavDriver implements GuidanceComponent {
     currentSelectedGeometryProfile?: SelectedGeometryProfile;
 
     currentNdGeometryProfile?: BaseGeometryProfile;
-
-    currentDescentProfile: TheoreticalDescentPathCharacteristics
 
     currentApproachProfile: DecelPathCharacteristics;
 
