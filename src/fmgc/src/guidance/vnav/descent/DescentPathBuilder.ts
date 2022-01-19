@@ -30,9 +30,10 @@ export class DescentPathBuilder {
             return { tod: undefined, fuelBurnedDuringDescent: undefined, remainingFuelOnBoardAtTopOfDescent: undefined, remainingFuelOnBoardAtEndOfIdlePath: undefined };
         }
 
-        this.geometricPathBuilder.buildGeometricPath(profile);
+        this.geometricPathBuilder.buildGeometricPath(profile, speedProfile);
+        const geometricPathStart = profile.findVerticalCheckpoint(VerticalCheckpointReason.GeometricPathStart);
 
-        const verticalDistance = cruiseAltitude - decelCheckpoint.altitude;
+        const verticalDistance = cruiseAltitude - geometricPathStart.altitude;
         const fpa = 3;
 
         if (DEBUG) {
@@ -41,11 +42,10 @@ export class DescentPathBuilder {
         }
 
         const tocCheckpoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
-        const geometricPathStart = profile.findVerticalCheckpoint(VerticalCheckpointReason.GeometricPathStart);
 
         if (tocCheckpoint && geometricPathStart) {
             // Estimate ToD checkpoint
-            const todEstimate = decelCheckpoint.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
+            const todEstimate = geometricPathStart.distanceFromStart - (verticalDistance / Math.tan((fpa * Math.PI) / 180)) * 0.000164579;
             const todEstimateDistanceFromStart = Math.max(tocCheckpoint.distanceFromStart, todEstimate);
 
             profile.checkpoints.push({
@@ -88,7 +88,7 @@ export class DescentPathBuilder {
 
     private buildIdlePath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, startingAltitude: Feet, targetAltitude: Feet): void {
         if (targetAltitude > startingAltitude) {
-            throw new Error('[FMS/VNAV/DescentPathBuilder] targetAltitude was greater than startingAltitude.');
+            throw new Error(`[FMS/VNAV/DescentPathBuilder] targetAltitude was greater than startingAltitude. (${targetAltitude} > ${startingAltitude})`);
         }
 
         for (let altitude = startingAltitude; altitude > targetAltitude; altitude = Math.max(altitude - 1500, targetAltitude)) {

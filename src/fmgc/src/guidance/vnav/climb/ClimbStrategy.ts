@@ -44,7 +44,7 @@ export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {
             speed,
             mach,
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
-            fuelOnBoard * Constants.TONS_TO_POUNDS,
+            fuelOnBoard,
             this.atmosphericConditions.isaDeviation,
             perfFactor,
         );

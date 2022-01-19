@@ -353,9 +353,6 @@ class CDUFlightPlanPage {
                     }
                     altitudeConstraint = altitudeConstraint.padStart(5,"\xa0");
                 } else if (ident !== "MANUAL") {
-                    const firstRouteIndex = 1 + fpm.getDepartureWaypointsCount();
-                    const lastRouteIndex = fpm.getLastIndexBeforeApproach();
-                    //const departureWp = firstRouteIndex > 1 && fpm.getDepartureWaypoints().indexOf(wp) !== -1;
                     let altitudeToFormat = wp.legAltitude1;
 
                     if (wp.legAltitudeDescription !== 0 && ident !== "(DECEL)") {
@@ -370,62 +367,6 @@ class CDUFlightPlanPage {
                         } else {
                             altColor = "magenta";
                             slashColor = "magenta";
-                        }
-
-                        /*
-                    } else if (departureWp) {
-                        altitudeConstraint = Math.floor(wp.cumulativeDistanceInFP * 0.14 * 6076.118 / 10).toString();
-                        altitudeConstraint = altitudeConstraint.padStart(5,"\xa0");
-                        // Waypoint is the first or the last of the actual route
-                        */
-                    } else if ((fpIndex === firstRouteIndex - 1) || (fpIndex === lastRouteIndex + 1)) {
-                        if (Object.is(NaN, mcdu.cruiseFlightLevel)) {
-                            altitudeConstraint = "-----";
-                        } else {
-                            altitudeConstraint = `FL${mcdu.cruiseFlightLevel.toString().padStart(3,"0")}`;
-                        }
-                        if (fpIndex !== -42) {
-                            mcdu.leftInputDelay[rowI] = (value) => {
-                                if (value === "") {
-                                    if (waypoint) {
-                                        return mcdu.getDelaySwitchPage();
-                                    }
-                                }
-                                return mcdu.getDelayBasic();
-                            };
-                            mcdu.onLeftInput[rowI] = async (value, scratchpadCallback) => {
-                                if (value === "") {
-                                    if (waypoint) {
-                                        CDULateralRevisionPage.ShowPage(mcdu, waypoint, fpIndex);
-                                    }
-                                } else if (value === FMCMainDisplay.clrValue) {
-                                    mcdu.removeWaypoint(fpIndex, () => {
-                                        CDUFlightPlanPage.ShowPage(mcdu, offset);
-                                    });
-                                } else if (value.length > 0) {
-                                    mcdu.insertWaypoint(value, fpIndex, (success) => {
-                                        if (!success) {
-                                            scratchpadCallback();
-                                        }
-                                        CDUFlightPlanPage.ShowPage(mcdu, offset);
-                                    });
-                                }
-                            };
-                            mcdu.rightInputDelay[rowI] = () => {
-                                return mcdu.getDelaySwitchPage();
-                            };
-                            mcdu.onRightInput[rowI] = async () => {
-                                if (waypoint) {
-                                    CDUVerticalRevisionPage.ShowPage(mcdu, waypoint, verticalWaypoint);
-                                }
-                            };
-                        }
-                    // Waypoint is in between on the route
-                    } else if (fpIndex <= lastRouteIndex && fpIndex >= firstRouteIndex) {
-                        if (Object.is(NaN, mcdu.cruiseFlightLevel)) {
-                            altitudeConstraint = "-----";
-                        } else {
-                            altitudeConstraint = `FL${mcdu.cruiseFlightLevel.toString().padStart(3,"0")}`;
                         }
                     // Waypoint with no alt constraint.
                     // In this case `altitudeConstraint is actually just the predictedAltitude`
