@@ -101,7 +101,7 @@ export const FlightPlan: FC<FlightPathProps> = memo(({ x = 0, y = 0, side, range
                         arcSweep={symbol.arcSweepAngle}
                         arcRadius={radius}
                         mapParams={mapParams}
-                        ndRange={range}
+                        // ndRange={range}
                     />
                 );
             })}
@@ -235,7 +235,7 @@ interface SymbolMarkerProps {
     arcSweep?: Degrees,
     arcRadius?: number,
     mapParams: MapParameters,
-    ndRange: number,
+    // ndRange: number,
 }
 
 export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arcRadius, arcSweep, type, constraints, length, direction, radials, radii, mapParams }) => {
@@ -315,7 +315,7 @@ export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, en
         elements.push(<NdbMarker colour={colour} />);
         showIdent = true;
     } else if (type & NdSymbolTypeFlags.Runway) {
-        if (ndRange > 80) {
+        if (mapParams.nmRadius > 80) {
             elements.push(<RunwayMarkerFar
                 ident={ident}
                 mapParams={mapParams}
