@@ -162,21 +162,19 @@ class CDUFlightPlanPage {
                 let ident = wp.ident;
                 const isOverfly = wp.additionalData && wp.additionalData.overfly;
 
+                let verticalWaypoint = null;
+                if (vnavPredictionsMapByWaypoint) {
+                    verticalWaypoint = vnavPredictionsMapByWaypoint.get(fpIndex);
+                }
+
                 // Time
-                let time;
                 let timeCell = "----[s-text]";
-                if (ident !== "MANUAL") {
-                    if (isFlying) {
-                        if (fpIndex === fpm.getDestinationIndex() || isFinite(wp.liveUTCTo) || isFinite(wp.waypointReachedAt)) {
-                            time = (fpIndex === fpm.getDestinationIndex() || wpActive || ident === "(DECEL)") ? stats.get(fpIndex).etaFromPpos : wp.waypointReachedAt;
-                            timeCell = `${FMCMainDisplay.secondsToUTC(time)}[s-text]`;
-                        }
-                    } else {
-                        if (fpIndex === fpm.getDestinationIndex() || isFinite(wp.liveETATo)) {
-                            time = (fpIndex === fpm.getDestinationIndex() || wpActive || ident === "(DECEL)") ? stats.get(fpIndex).timeFromPpos : 0;
-                            timeCell = `${FMCMainDisplay.secondsTohhmm(time)}[s-text]`;
-                        }
-                    }
+                let timeColor = "white";
+                if (ident !== "MANUAL" && verticalWaypoint && isFinite(verticalWaypoint.secondsFromPresent)) {
+                    timeCell = isFlying
+                        ? `${FMCMainDisplay.secondsToUTC(verticalWaypoint.secondsFromPresent)}[s-text]`
+                        : `${FMCMainDisplay.secondsTohhmm(verticalWaypoint.secondsFromPresent)}[s-text]`;
+                    timeColor = "green";
                 }
 
                 // Color
@@ -310,11 +308,6 @@ class CDUFlightPlanPage {
                 let speedConstraint = "---";
                 let speedPrefix = "";
 
-                let verticalWaypoint = null;
-                if (vnavPredictionsMapByWaypoint) {
-                    verticalWaypoint = vnavPredictionsMapByWaypoint.get(fpIndex);
-                }
-
                 if (verticalWaypoint && verticalWaypoint.speed) {
                     speedConstraint = Math.round(verticalWaypoint.speed);
 
@@ -398,7 +391,7 @@ class CDUFlightPlanPage {
                     altColor: altColor,
                     altitudeConstraint: { alt: altitudeConstraint, altPrefix: altPrefix },
                     timeCell: timeCell,
-                    timeColor: color,
+                    timeColor,
                     fixAnnotation: fixAnnotation,
                     bearingTrack: bearingTrack,
                     isOverfly: isOverfly,
