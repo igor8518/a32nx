@@ -8,6 +8,7 @@ class CDUMenuPage {
         let textAIDS;
         let textCFDS;
         let textMaint;
+        let textIF;
         let selectedFMGC = false;
         let selectedATSU = false;
         let selectedAIDS = false;
@@ -19,9 +20,15 @@ class CDUMenuPage {
             textATSU = "<ATSU";
             textAIDS = "<AIDS";
             textCFDS = "<CFDS";
+            textIF = "*INIT FLIGHT";
             textMaint = "MCDU MAINT>";
             if (activeSystem === "FMGC") {
                 textFMGC = "<FMGC (REQ)[color]green";
+            }
+            if (SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 0 || SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 20) {
+                textIF = "*INIT FLIGHT[color]cyan";
+            } else {
+                textIF = " INIT FLIGHT[color]red";
             }
             if (activeSystem === "ATSU") {
                 textATSU = "<ATSU[color]green";
@@ -62,13 +69,22 @@ class CDUMenuPage {
                 [""],
                 [textCFDS],
                 [""],
-                [""],
+                [textIF],
                 [""],
                 [""]
             ]);
         };
 
         updateView();
+
+        A32NX_InitFlight.MCDU = mcdu;
+        A32NX_InitFlight.UPDATE_VIEW = updateView;
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_LOADFUEL", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 0);
 
         mcdu.setScratchpadMessage(NXSystemMessages.selectDesiredSystem);
 
@@ -110,6 +126,15 @@ class CDUMenuPage {
                 mcdu.removeScratchpadMessage(NXSystemMessages.waitForSystemResponse.text);
                 CDUCfdsMainMenu.ShowPage(mcdu);
             }, Math.floor(Math.random() * 400) + 400);
+        };
+
+        mcdu.onLeftInput[4] = async () => {
+            if (SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 0 || SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 20) {
+                A32NX_InitFlight.MCDU = mcdu;
+                A32NX_InitFlight.UPDATE_VIEW = updateView;
+                await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 1);
+                updateView();
+            }
         };
     }
 }
