@@ -94,7 +94,6 @@ async fn systems(mut gauge: msfs::Gauge) -> Result<(), Box<dyn Error>> {
             .provides_aircraft_variable("PLANE LATITUDE", "degree latitude", 0)?
             .provides_aircraft_variable("PLANE LONGITUDE", "degree longitude", 0)?
             .provides_aircraft_variable("PUSHBACK STATE", "Enum", 0)?
-            .provides_aircraft_variable("PUSHBACK ANGLE", "Radians", 0)?
             .provides_aircraft_variable("SEA LEVEL PRESSURE", "Millibars", 0)?
             .provides_aircraft_variable("SIM ON GROUND", "Bool", 0)?
             .provides_aircraft_variable("TOTAL AIR TEMPERATURE", "celsius", 0)?
