@@ -93,5 +93,12 @@ const NXFictionalMessages = {
     noAtc:                  new McduMessage("NO ACTIVE ATC", false, false),
     noHoppieConnection:     new McduMessage("NO HOPPIE CONNECTION", false, false),
     unknownAtsuMessage:     new McduMessage("UNKNOWN ATSU MESSAGE", false, false),
-    reverseProxy:           new McduMessage("REVERSE PROXY ERROR", false, false)
+    reverseProxy:           new McduMessage("REVERSE PROXY ERROR", false, false),
+    fetchSimbrief:          new McduMessage("FETCH SIMBRIEF"),
+    upLink:                 new McduMessage("UPLINK"),
+    loadFuel:               new McduMessage("LOAD FUEL"),
+    loadPayload:            new McduMessage("LOAD PAYLOAD"),
+    loadPax:                new McduMessage("LOAD PAX"),
+    prepareCDU:             new McduMessage("PREPARE CDU"),
+    done:                   new McduMessage("DONE")
 };
