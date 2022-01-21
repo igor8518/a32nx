@@ -76,5 +76,12 @@ const NXFictionalMessages = {
     noRefWpt:               new McduMessage("NO REF WAYPOINT", false, false),
     noWptInfos:             new McduMessage("NO WAYPOINT INFOS", false, false),
     emptyMessage:           new McduMessage(""),
-    reloadPlaneApply:       new McduMessage("RELOAD A/C TO APPLY", true, true)
+    reloadPlaneApply:       new McduMessage("RELOAD A/C TO APPLY", true, true),
+    fetchSimbrief:          new McduMessage("FETCH SIMBRIEF"),
+    upLink:                 new McduMessage("UPLINK"),
+    loadFuel:               new McduMessage("LOAD FUEL"),
+    loadPayload:            new McduMessage("LOAD PAYLOAD"),
+    loadPax:                new McduMessage("LOAD PAX"),
+    prepareCDU:             new McduMessage("PREPARE CDU"),
+    done:                   new McduMessage("DONE")
 };
