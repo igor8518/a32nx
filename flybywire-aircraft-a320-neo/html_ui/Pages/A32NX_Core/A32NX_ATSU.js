@@ -141,9 +141,11 @@ const insertUplink = (mcdu) => {
 
             await mcdu.tryUpdateAltDestination(alternateIcao);
 
+            SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 1);
             setTimeout(async () => {
                 await uplinkRoute(mcdu);
                 mcdu.addNewMessage(NXSystemMessages.aocActFplnUplink);
+                SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 2);
             }, mcdu.getDelayRouteChange());
 
             if (mcdu.page.Current === mcdu.page.InitPageA) {
@@ -151,17 +153,20 @@ const insertUplink = (mcdu) => {
             }
         }
     });
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 1);
     mcdu.updateFlightNo(callsign, (result) => {
         if (result) {
             if (mcdu.page.Current === mcdu.page.InitPageA) {
                 CDUInitPage.ShowPage1(mcdu);
             }
         }
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 2);
     });
 
     /**
      * INIT PAGE DATA UPLINK
     */
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 1);
     setTimeout(() => {
         mcdu.setCruiseFlightLevelAndTemperature(cruiseAltitude);
         mcdu.tryUpdateCostIndex(costIndex);
@@ -169,6 +174,7 @@ const insertUplink = (mcdu) => {
         if (mcdu.page.Current === mcdu.page.InitPageA) {
             CDUInitPage.ShowPage1(mcdu);
         }
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 2);
     }, mcdu.getDelayHigh());
 };
 
@@ -1069,6 +1075,7 @@ const uplinkRoute = async (mcdu) => {
             }
         }*/
     }
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 3);
 };
 
 /**
