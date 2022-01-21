@@ -45,14 +45,15 @@ class CDUAocOfpData {
 
         let zfwcg = "__._[color]amber";
         let requestButton = "SEND*[color]cyan";
-        let loadButton = "START*[color]cyan";
+        const loadButton = "START*[color]cyan";
 
         if (mcdu.simbrief.sendStatus !== "READY" && mcdu.simbrief.sendStatus !== "DONE") {
             requestButton = "SEND [color]cyan";
         }
 
         if (boardingStartedByUser) {
-            loadButton = "STOP*[color]yellow";
+            lo;
+            adButton = "STOP*[color]yellow";
         }
 
         function buildStationValue(station) {
@@ -228,4 +229,89 @@ class CDUAocOfpData {
             CDUAocOfpData.ShowPage(mcdu);
         };
     }
+}
+
+async function setTargetPax(numberOfPax) {
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 1);
+    let paxRemaining = parseInt(numberOfPax);
+
+    async function fillStation(station, percent, paxToFill) {
+
+        const pax = Math.min(Math.trunc(percent * paxToFill), station.seats);
+        station.pax = pax;
+
+        await SimVar.SetSimVarValue(`L:${station.simVar}_DESIRED`, "Number", parseInt(pax));
+
+        paxRemaining -= pax;
+    }
+
+    await fillStation(paxStations['rows22_29'], .28 , numberOfPax);
+    await fillStation(paxStations['rows14_21'], .28, numberOfPax);
+    await fillStation(paxStations['rows7_13'], .25 , numberOfPax);
+    await fillStation(paxStations['rows1_6'], 1 , paxRemaining);
+
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 2);
+    return;
+}
+
+async function setTargetCargo(numberOfPax, simbriefFreight) {
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETCARGO", "Number", 1);
+    const BAG_WEIGHT = SimVar.GetSimVarValue("L:A32NX_WB_PER_BAG_WEIGHT", "Number");
+    const bagWeight = numberOfPax * BAG_WEIGHT;
+    const maxLoadInCargoHold = 9435; // from flight_model.cfg
+    const loadableCargoWeight = Math.min(bagWeight + parseInt(simbriefFreight), maxLoadInCargoHold);
+
+    let remainingWeight = loadableCargoWeight;
+
+    async function fillCargo(station, percent, loadableCargoWeight) {
+        const weight = Math.round(percent * loadableCargoWeight);
+        station.load = weight;
+        remainingWeight -= weight;
+        await SimVar.SetSimVarValue(`L:${station.simVar}_DESIRED`, "Number", parseInt(weight));
+    }
+
+    await fillCargo(cargoStations['fwdBag'], .361 , loadableCargoWeight);
+    await fillCargo(cargoStations['aftBag'], .220, loadableCargoWeight);
+    await fillCargo(cargoStations['aftCont'], .251, loadableCargoWeight);
+    await fillCargo(cargoStations['aftBulk'], 1, remainingWeight);
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETCARGO", "Number", 2);
+    return;
+}
+
+async function loadFuel(mcdu, updateView) {
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_LOADFUEL", "Number", 1);
+    const currentBlockFuel = Number(/*mcdu.aocWeight.blockFuel ||*/ mcdu.simbrief.blockFuel);
+    SimVar.SetSimVarValue(`L:A32NX_SET_FUEL_DESIRED`, "Number", currentBlockFuel);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_DESIRED`, "Number", currentBlockFuel);
+    mcdu.aocWeight.loading = true;
+    updateView();
+
+    const outerTankCapacity = 228 + (1 * 2); // Left and Right // Value from flight_model.cfg (plus the unusable fuel capacity (GALLONS))
+    const innerTankCapacity = 1816 + (7 * 2); // Left and Right // Value from flight_model.cfg (plus the unusable fuel capacity (GALLONS))
+    const centerTankCapacity = 2179 + 6; // Center // Value from flight_model.cfg (plus the unusable fuel capacity (GALLONS))
+
+    const fuelWeightPerGallon = SimVar.GetSimVarValue("FUEL WEIGHT PER GALLON", "kilograms");
+    let currentBlockFuelInGallons = currentBlockFuel / fuelWeightPerGallon;
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_DESIRED_PERCENT`, "Number", (currentBlockFuelInGallons / 6267) * 100);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_TOTAL_DESIRED`, "Number", currentBlockFuelInGallons);
+
+    const outerTankFill = Math.min(outerTankCapacity, currentBlockFuelInGallons / 2);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_LEFT_AUX_DESIRED`, "Number", outerTankFill);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_RIGHT_AUX_DESIRED`, "Number", outerTankFill);
+    currentBlockFuelInGallons -= outerTankFill * 2;
+
+    const innerTankFill = Math.min(innerTankCapacity, currentBlockFuelInGallons / 2);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_LEFT_MAIN_DESIRED`, "Number", innerTankFill);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_RIGHT_MAIN_DESIRED`, "Number", innerTankFill);
+    currentBlockFuelInGallons -= innerTankFill * 2;
+
+    const centerTankFill = Math.min(centerTankCapacity, currentBlockFuelInGallons);
+    SimVar.SetSimVarValue(`L:A32NX_FUEL_CENTER_DESIRED`, "Number", centerTankFill);
+    currentBlockFuelInGallons -= centerTankFill;
+
+    //mcdu.updateFuelVars();
+    SimVar.SetSimVarValue("L:A32NX_REFUEL_STARTED_BY_USR", "Bool", true);
+    mcdu.aocWeight.loading = false;
+    updateView();
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_LOADFUEL", "Number", 2);
 }
