@@ -238,7 +238,7 @@ interface SymbolMarkerProps {
     ndRange: number,
 }
 
-export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arcRadius, arcSweep, type, constraints, length, direction, radials, radii, mapParams }) => {
+export const SymbolMarker: FC<SymbolMarkerProps> = memo(({ ident, x, y, endX, endY, arcRadius, arcSweep, type, constraints, length, direction, radials, radii, mapParams, ndRange }) => {
     let colour = 'White';
     let shadow = true;
     // todo airport as well if in flightplan
