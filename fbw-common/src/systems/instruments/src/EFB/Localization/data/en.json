@@ -556,7 +556,9 @@
       "PilotAvatar": "Show Pilot Avatar",
       "SeparateTillerFromRudderInputs": "Separate Tiller from Rudder Inputs",
       "SyncEfis": "Sync EFIS controls between Captain and FO",
-      "Title": "Realism"
+      "Title": "Realism",
+      "DeleteDiscpntinuityMode": "Auto delete discontinuity",
+      "SidStarMode": "Auto load SID/STAR from SimBrief"
     },
     "SimOptions": {
       "Active": "Active",

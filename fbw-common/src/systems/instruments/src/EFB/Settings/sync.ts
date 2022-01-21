@@ -46,6 +46,8 @@ const settingsToSync: Map<string, SimVar> = new Map([
     ['CONFIG_A32NX_FWC_RADIO_AUTO_CALL_OUT_PINS', ['L:A32NX_FWC_RADIO_AUTO_CALL_OUT_PINS', 'number', DEFAULT_RADIO_AUTO_CALL_OUTS.toString()]],
     ['CONFIG_USING_PORTABLE_DEVICES', ['L:A32NX_CONFIG_USING_PORTABLE_DEVICES', 'bool', '1']],
     ['REFUEL_RATE_SETTING', ['L:A32NX_EFB_REFUEL_RATE_SETTING', 'number', '0']],
+    ['AUTO_DELETE_DISCONTINUITY', ['L:A32NX_AUTO_DELETE_DISCONTINUITY', 'number', '1']],
+    ['AUTO_SID_STAR', ['L:A32NX_AUTO_SID_STAR', 'number', '1']],
 ]);
 
 const settingEnumToSync: Map<string, SimVarEnum> = new Map([
