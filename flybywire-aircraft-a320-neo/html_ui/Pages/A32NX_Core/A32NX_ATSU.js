@@ -233,9 +233,11 @@ const insertUplink = (mcdu) => {
 
             await mcdu.tryUpdateAltDestination(alternateIcao);
 
+            SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 1);
             setTimeout(async () => {
                 await uplinkRoute(mcdu);
                 mcdu.addNewMessage(NXSystemMessages.aocActFplnUplink);
+                SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 2);
             }, mcdu.getDelayRouteChange());
 
             if (mcdu.page.Current === mcdu.page.InitPageA) {
@@ -243,17 +245,20 @@ const insertUplink = (mcdu) => {
             }
         }
     });
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 1);
     mcdu.updateFlightNo(fltNbr, (result) => {
         if (result) {
             if (mcdu.page.Current === mcdu.page.InitPageA) {
                 CDUInitPage.ShowPage1(mcdu);
             }
         }
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 2);
     });
 
     /**
      * INIT PAGE DATA UPLINK
     */
+    SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 1);
     setTimeout(() => {
         mcdu.setCruiseFlightLevelAndTemperature(cruiseAltitude);
         mcdu.tryUpdateCostIndex(costIndex);
@@ -261,6 +266,7 @@ const insertUplink = (mcdu) => {
         if (mcdu.page.Current === mcdu.page.InitPageA) {
             CDUInitPage.ShowPage1(mcdu);
         }
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 2);
     }, mcdu.getDelayHigh());
 };
 
@@ -407,12 +413,12 @@ const AddSID = (RWEnd, fix, mcdu) => {
 };
 
 const uplinkRoute = async (mcdu) => {
-    let initRunwaySet = 0;
-    let initSidSet = 0;
-    let initSidTransSet = 0;
     const fpm = mcdu.flightPlanManager;
     const ass = await SimVar.GetSimVarValue("L:A32NX_AUTO_SID_STAR", "Number");
     const add = await SimVar.GetSimVarValue("L:A32NX_AUTO_DELETE_DISCONTINUITY", "Number");
+    let initRunwaySet = await SimVar.GetSimVarValue("L:A32NX_SET_RUNWAY_ORIGIN", "Number");
+    let initSidSet = await SimVar.GetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number");
+    let initSidTransSet = await SimVar.GetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number");
     let OrigSids = [];
     let wp;
     let wps;
@@ -551,6 +557,7 @@ const uplinkRoute = async (mcdu) => {
 
         }
     }
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 3);
 };
 
 /**
