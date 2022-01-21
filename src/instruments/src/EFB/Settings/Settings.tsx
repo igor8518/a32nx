@@ -370,6 +370,8 @@ const RealismPage = () => {
     const [homeCockpit, setHomeCockpit] = usePersistentProperty('HOME_COCKPIT_ENABLED', '0');
     const [datalinkTransmissionTime, setDatalinkTransmissionTime] = usePersistentProperty('CONFIG_DATALINK_TRANSMISSION_TIME', 'FAST');
     const [, setDatalinkTransmissionTimeSimVar] = useSimVar('L:A32NX_CONFIG_DATALINK_TIME', 'number', 0);
+    const [autoDeleteDiscontinuity, setAutoDeleteDiscontinuity] = usePersistentProperty('AUTO_DELETE_DISCONTINUITY', '1');
+    const [autoSidStar, setAutoSidStar] = usePersistentProperty('AUTO_SID_STAR', '1');
 
     const adirsAlignTimeButtons: (ButtonType & SimVarButton)[] = [
         { name: 'Instant', setting: 'INSTANT', simVarValue: 1 },
@@ -398,6 +400,16 @@ const RealismPage = () => {
         { name: 'Instant', setting: 'INSTANT', simVarValue: 1 },
         { name: 'Fast', setting: 'FAST', simVarValue: 2 },
         { name: 'Real', setting: 'REAL', simVarValue: 0 },
+    ];
+
+    const autoDeleteDiscontinuityButtons: (ButtonType & SimVarButton)[] = [
+        { name: 'Disabled', setting: '0', simVarValue: 0 },
+        { name: 'Enabled', setting: '1', simVarValue: 1 },
+    ];
+
+    const autoSidStarButtons: (ButtonType & SimVarButton)[] = [
+        { name: 'Disabled', setting: '0', simVarValue: 0 },
+        { name: 'Enabled', setting: '1', simVarValue: 1 },
     ];
 
     return (
@@ -513,6 +525,36 @@ const RealismPage = () => {
                                         setDatalinkTransmissionTimeSimVar(button.simVarValue);
                                     }}
                                     selected={datalinkTransmissionTime === button.setting}
+                                >
+                                    {button.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </div>
+
+                    <div className="py-4 flex flex-row justify-between items-center">
+                        <span className="text-lg text-gray-300 mr-1">Automatic delete discontimuity on flightplan SimBrief init</span>
+                        <SelectGroup>
+                            {autoDeleteDiscontinuityButtons.map((button) => (
+                                <SelectItem
+                                    enabled
+                                    onSelect={() => setAutoDeleteDiscontinuity(button.setting)}
+                                    selected={autoDeleteDiscontinuity === button.setting}
+                                >
+                                    {button.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </div>
+
+                    <div className="py-4 flex flex-row justify-between items-center">
+                        <span className="text-lg text-gray-300 mr-1">Automatic load or generated SID/STAR</span>
+                        <SelectGroup>
+                            {autoSidStarButtons.map((button) => (
+                                <SelectItem
+                                    enabled
+                                    onSelect={() => setAutoSidStar(button.setting)}
+                                    selected={autoSidStar === button.setting}
                                 >
                                     {button.name}
                                 </SelectItem>
