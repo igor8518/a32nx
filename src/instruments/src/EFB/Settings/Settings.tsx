@@ -357,6 +357,8 @@ const RealismPage = () => {
     const [mcduTimeout, setMcduTimeout] = usePersistentProperty('CONFIG_MCDU_KB_TIMEOUT', '60');
     const [realisticTiller, setRealisticTiller] = usePersistentProperty('REALISTIC_TILLER_ENABLED', '0');
     const [homeCockpit, setHomeCockpit] = usePersistentProperty('HOME_COCKPIT_ENABLED', '0');
+    const [autoDeleteDiscontinuity, setAutoDeleteDiscontinuity] = usePersistentProperty('AUTO_DELETE_DISCONTINUITY', '1');
+    const [autoSidStar, setAutoSidStar] = usePersistentProperty('AUTO_SID_STAR', '1');
 
     const adirsAlignTimeButtons: (ButtonType & SimVarButton)[] = [
         { name: 'Instant', setting: 'INSTANT', simVarValue: 1 },
@@ -377,6 +379,16 @@ const RealismPage = () => {
     ];
 
     const steeringSeparationButtons: (ButtonType & SimVarButton)[] = [
+        { name: 'Disabled', setting: '0', simVarValue: 0 },
+        { name: 'Enabled', setting: '1', simVarValue: 1 },
+    ];
+
+    const autoDeleteDiscontinuityButtons: (ButtonType & SimVarButton)[] = [
+        { name: 'Disabled', setting: '0', simVarValue: 0 },
+        { name: 'Enabled', setting: '1', simVarValue: 1 },
+    ];
+
+    const autoSidStarButtons: (ButtonType & SimVarButton)[] = [
         { name: 'Disabled', setting: '0', simVarValue: 0 },
         { name: 'Enabled', setting: '1', simVarValue: 1 },
     ];
@@ -481,6 +493,36 @@ const RealismPage = () => {
                     <div className="py-4 flex flex-row justify-between items-center">
                         <span className="text-lg text-gray-300 mr-1">Home Cockpit Mode</span>
                         <Toggle value={homeCockpit === '1'} onToggle={(value) => setHomeCockpit(value ? '1' : '0')} />
+                    </div>
+
+                    <div className="py-4 flex flex-row justify-between items-center">
+                        <span className="text-lg text-gray-300 mr-1">Automatic delete discontimuity on flightplan SimBrief init</span>
+                        <SelectGroup>
+                            {autoDeleteDiscontinuityButtons.map((button) => (
+                                <SelectItem
+                                    enabled
+                                    onSelect={() => setAutoDeleteDiscontinuity(button.setting)}
+                                    selected={autoDeleteDiscontinuity === button.setting}
+                                >
+                                    {button.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </div>
+
+                    <div className="py-4 flex flex-row justify-between items-center">
+                        <span className="text-lg text-gray-300 mr-1">Automatic load or generated SID/STAR</span>
+                        <SelectGroup>
+                            {autoSidStarButtons.map((button) => (
+                                <SelectItem
+                                    enabled
+                                    onSelect={() => setAutoSidStar(button.setting)}
+                                    selected={autoSidStar === button.setting}
+                                >
+                                    {button.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
                     </div>
                 </div>
             </>
