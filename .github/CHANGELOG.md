@@ -22,6 +22,7 @@
 1. [PFD] Graphical improvements and updates to the FMA - @BravoMike99 (bruno_pt99)
 1. [PFD] Hide '+' sign on V/S & FPA FMA if selected value is 0 - @BravoMike99 (bruno_pt99)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
 
 ## 0.11.0
 
