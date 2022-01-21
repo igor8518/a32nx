@@ -55,9 +55,11 @@ const getSimBriefOfp = (mcdu, updateView, callback = () => {}) => {
             mcdu.simbrief["route"] = data.general.route;
             mcdu.simbrief["cruiseAltitude"] = data.general.initial_altitude;
             mcdu.simbrief["originIcao"] = data.origin.icao_code;
+            mcdu.simbrief["originRwy"] = data.origin.plan_rwy;
             mcdu.simbrief["originTransAlt"] = parseInt(data.origin.trans_alt, 10);
             mcdu.simbrief["originTransLevel"] = parseInt(data.origin.trans_level, 10);
             mcdu.simbrief["destinationIcao"] = data.destination.icao_code;
+            mcdu.simbrief["destinationRwy"] = data.destination.plan_rwy;
             mcdu.simbrief["destinationTransAlt"] = parseInt(data.destination.trans_alt, 10);
             mcdu.simbrief["destinationTransLevel"] = parseInt(data.destination.trans_level, 10);
             mcdu.simbrief["blockFuel"] = mcdu.simbrief["units"] === 'kgs' ? data.fuel.plan_ramp : lbsToKg(data.fuel.plan_ramp);
@@ -220,10 +222,116 @@ const addLatLonWaypoint = async (mcdu, lat, lon) => {
     }
 };
 
+const AddSID = (RWEnd, fix, mcdu) => {
+    const SIDss = [];
+    let SIDName = "";
+    let TRANSITIONName = "";
+
+    const fixx = fix;
+    let rwy = "";
+    let shortRwy = "";
+
+    let j, r, t, gr = -1;
+    let FindSid = false;
+    let FindTrans = false;
+
+    const originAirport = mcdu.flightPlanManager.getOrigin();
+    const originAirportInfo = originAirport.infos;
+
+    const originRunways = originAirportInfo.oneWayRunways;
+
+    for (let i = 0; i < originRunways.length; i++) {
+        rwy = originRunways[i].designation;
+        shortRwy = rwy;
+        const re = /[0-9]+/;
+        const rwyDig = rwy.match(re);
+        if (rwyDig < 10) {
+
+            rwy = "0" + rwy;
+        }
+        if (mcdu.simbrief.originRwy === rwy) {
+            gr = i;
+            break;
+        }
+    }
+    //Not found rwy in navdata
+    if (gr < 0) {
+        return SIDss;
+    }
+
+    for (j = 0; j < originAirportInfo.departures.length; j++) {
+        const departure = originAirportInfo.departures[j];
+        for (r = 0; r < departure.runwayTransitions.length; r++) {
+            const runwayTransition = departure.runwayTransitions[r];
+            if (shortRwy.indexOf(runwayTransition.name.slice(2,runwayTransition.name.length)) !== -1) {
+                if (departure.commonLegs.length > 0) {
+                    if (departure.commonLegs[departure.commonLegs.length - 1].fixIcao.substr(7, 12).trim() === fixx) {
+                        t = -1;
+                        FindSid = true;
+                        break;
+                    } else {
+
+                        for (t = 0; t < departure.enRouteTransitions.length; t++) {
+                            const enRouteTransition = departure.enRouteTransitions[t];
+                            if (enRouteTransition.commonLegs[enRouteTransition.commonLegs.length - 1].fixIcao.substr(7, 12).trim() === fixx) {
+                                FindSid = true;
+                                FindTrans = true;
+                                break;
+                            }
+                        }
+
+                    }
+                } else if (runwayTransition.legs.length > 0) {
+                    if (runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim() === fixx) {
+                        t = -1;
+                        FindSid = true;
+                        break;
+                    } else {
+
+                        for (t = 0; t < departure.enRouteTransitions.length; t++) {
+                            const enRouteTransition = departure.enRouteTransitions[t];
+                            if (enRouteTransition.commonLegs[enRouteTransition.commonLegs.length - 1].fixIcao.substr(7, 12).trim() === fixx) {
+                                FindSid = true;
+                                FindTrans = true;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        if (FindSid) {
+            SIDName = originAirportInfo.departures[j].name;
+            if (FindTrans) {
+                TRANSITIONName = originAirportInfo.departures[j].enRouteTransitions[t].name;
+            }
+            SIDss.push({r: gr, t: t, tr: r, j: j, SIDName: SIDName, TRANSITIONName: TRANSITIONName, RWName: RWEnd});
+            FindSid = false;
+            FindTrans = false;
+        }
+    }
+    return SIDss;
+};
+
 const uplinkRoute = async (mcdu) => {
+    const fpm = mcdu.flightPlanManager;
+    const ass = await SimVar.GetSimVarValue("L:A32NX_AUTO_SID_STAR", "Number");
+    const add = await SimVar.GetSimVarValue("L:A32NX_AUTO_DELETE_DISCONTINUITY", "Number");
+    let initRunwaySet = 0;
+    let initSidSet = 0;
+    let initSidTransSet = 0;
+    let OrigSids = [];
+    let wp;
+    let wps;
     const {navlog} = mcdu.simbrief;
 
     const procedures = new Set(navlog.filter(fix => fix.is_sid_star === "1").map(fix => fix.via_airway));
+
+    let SimBriefSID = "";
+    let FixSID = "";
+    let SimBriefSTAR = "";
+    let FixSTAR = "";
 
     for (let i = 0; i < navlog.length; i++) {
         const fix = navlog[i];
@@ -250,6 +358,8 @@ const uplinkRoute = async (mcdu) => {
         if (procedures.has(fix.via_airway) || (i == 0)) {
             console.log("Inserting waypoint last of DEP: " + fix.ident);
             await addWaypointAsync(fix, mcdu, fix.ident);
+            SimBriefSID = fix.via_airway;
+            FixSID = fix.ident;
             continue;
         } else {
             if (fix.via_airway === 'DCT' || fix.via_airway.match(/^NAT[A-Z]$/)) {
@@ -266,6 +376,83 @@ const uplinkRoute = async (mcdu) => {
                 await addWaypointAsync(fix, mcdu, fix.ident, fix.via_airway);
                 continue;
             }
+        }
+        if (procedures.has(nextFix.via_airway)) {
+            SimBriefSTAR = nextFix.via_airway;
+            FixSTAR = fix.ident;
+            continue;
+        }
+    }
+    if (ass === 1) {
+        OrigSids = AddSID(mcdu.simbrief.originRwy, FixSID, mcdu);
+        let findSID = -1;
+        for (let i = 0; i < OrigSids.length; i++) {
+            if (OrigSids[i].SIDName === SimBriefSID) {
+                findSID = i;
+            }
+        }
+
+        if (OrigSids.length > 0) {
+            if (initRunwaySet == 0) {
+                initRunwaySet = 1;
+                mcdu.setOriginRunwayIndex(OrigSids[findSID].r, () => {
+                    SimVar.SetSimVarValue("L:A32NX_SET_RUNWAY_ORIGIN", "Number", 1);
+                    initRunwaySet = 2;
+                    if ((initRunwaySet === 2) && (initSidSet === 0)) {
+                        initSidSet = 1;
+                        mcdu.setRunwayIndex(OrigSids[findSID].tr, () => {
+                            mcdu.setDepartureIndex(OrigSids[findSID].j, () => {
+                                SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 1);
+                                initSidSet = 2;
+                                if ((initSidSet == 2) && (initSidTransSet == 0)) {
+                                    initSidTransSet = 1;
+                                    fpm.setDepartureEnRouteTransitionIndex(OrigSids[findSID].t, () => {
+                                        initSidTransSet = 2;
+                                        if (initSidTransSet == 2) {
+                                            SimVar.SetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number", 1);
+                                            initSidTransSet = 3;
+                                            mcdu.updateConstraints();
+                                            mcdu.onToRwyChanged();
+                                            CDUPerformancePage.UpdateThrRedAccFromOrigin(mcdu, true, true);
+                                            CDUPerformancePage.UpdateEngOutAccFromOrigin(mcdu);
+                                            mcdu.insertTemporaryFlightPlan(() => {
+                                                if (add === 1) {
+                                                    let first = 0;
+                                                    let countWaypoints = fpm.getWaypointsCount();
+                                                    for (let i = 0; i < countWaypoints; i++) {
+                                                        wp = fpm.getWaypoint(i);
+                                                        if (wp.ident === FixSID) {
+                                                            if (first === 0) {
+                                                                first = 1;
+                                                                continue;
+                                                            } else if (first === 1) {
+                                                                fpm.removeWaypoint(i);
+                                                                countWaypoints = fpm.getWaypointsCount();
+                                                                first = -1;
+                                                            }
+                                                        } else {
+                                                            first = 0;
+                                                        }
+                                                    }
+                                                    for (let i = 0; i < fpm.getWaypointsCount(); i++) {
+                                                        wp = fpm.getWaypoint(i);
+                                                        if (wp.endsInDiscontinuity) {
+                                                            fpm.clearDiscontinuity(i);
+                                                        }
+                                                    }
+                                                    SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
+                                                }
+                                                CDUFlightPlanPage.ShowPage(mcdu, 0);
+                                            });
+                                        }
+                                    }).catch(console.error);
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+
         }
     }
 };
