@@ -40,6 +40,7 @@
 1. [FMGC] Constraints for waypoints behind the aircraft are no longer sent - @tracernz (Mike)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
