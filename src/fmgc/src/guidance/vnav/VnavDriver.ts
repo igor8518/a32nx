@@ -137,6 +137,12 @@ export class VnavDriver implements GuidanceComponent {
             this.currentNavGeometryProfile.maxSpeedConstraints,
         );
 
+        const descentSpeedProfile = new McduSpeedProfile(
+            this.computationParametersObserver.get(),
+            this.currentNavGeometryProfile.distanceToPresentPosition,
+            this.currentNavGeometryProfile.descentSpeedConstraints,
+        );
+
         const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
         const descentStrategy = new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, -1000);
 
@@ -153,7 +159,7 @@ export class VnavDriver implements GuidanceComponent {
             this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, climbStrategy, this.currentMcduSpeedProfile, cruiseAltitude);
 
             if (this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
-                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentMcduSpeedProfile, climbStrategy, descentStrategy);
+                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, descentSpeedProfile, climbStrategy, descentStrategy);
             }
 
             this.currentNavGeometryProfile.finalizeProfile();
