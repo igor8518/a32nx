@@ -28,6 +28,8 @@ export const RealismPage = () => {
     const [syncEfis, setFoEfis] = usePersistentNumberProperty('FO_SYNC_EFIS_ENABLED', 0);
     const [pilotAvatar, setPilotAvatar] = usePersistentNumberProperty('CONFIG_PILOT_AVATAR_VISIBLE', 0);
     const [firstOfficerAvatar, setFirstOfficerAvatar] = usePersistentNumberProperty('CONFIG_FIRST_OFFICER_AVATAR_VISIBLE', 0);
+    const [autoDeleteDiscontinuity, setAutoDeleteDiscpntinuity] = usePersistentNumberProperty('AUTO_DELETE_DISCONTINUITY', 1);
+    const [autoSidStar, setAutoSidStar] = usePersistentNumberProperty('AUTO_SID_STAR', 1);
 
     const adirsAlignTimeButtons: (ButtonType & SimVarButton)[] = [
         { name: t('Settings.Instant'), setting: 'INSTANT', simVarValue: 1 },
@@ -140,6 +142,14 @@ export const RealismPage = () => {
             <SettingItem name={t('Settings.Realism.FirstOfficerAvatar')}>
                 <Toggle value={!!firstOfficerAvatar} onToggle={(value) => setFirstOfficerAvatar(value ? 1 : 0)} />
             </SettingItem>
+            <SettingItem name={t('Settings.Realism.SidStarMode')}>
+                <Toggle value={autoSidStar === 1} onToggle={(value) => setAutoSidStar(value ? 1 : 0)} />
+            </SettingItem>
+            {autoSidStar && (
+                <SettingItem name={t('Settings.Realism.DeleteDiscpntinuityMode')}>
+                    <Toggle value={autoDeleteDiscontinuity === 1} onToggle={(value) => setAutoDeleteDiscpntinuity(value ? 1 : 0)} />
+                </SettingItem>
+            )}
 
             <SettingGroup>
                 <SettingItem name={t('Settings.Realism.PauseAtTod')} unrealistic groupType="parent">
