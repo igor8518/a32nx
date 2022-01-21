@@ -93,6 +93,7 @@
 1. [FWC] Improved LDG LT memo to take into account light position - @BravoMike99 (bruno_pt99)
 1. [PRESS] Add pressurization system failures - @mjuhe (Miquel Juhe)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
 
 ## 0.11.0
 
