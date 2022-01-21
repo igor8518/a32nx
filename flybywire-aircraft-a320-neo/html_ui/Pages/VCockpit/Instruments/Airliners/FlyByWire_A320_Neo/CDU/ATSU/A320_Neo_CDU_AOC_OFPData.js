@@ -239,6 +239,29 @@ class CDUAocOfpData {
     }
 }
 
+async function setTargetPax(numberOfPax) {
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 1);
+    let paxRemaining = parseInt(numberOfPax);
+
+    async function fillStation(station, percent, paxToFill) {
+
+        const pax = Math.min(Math.trunc(percent * paxToFill), station.seats);
+        station.pax = pax;
+
+        await SimVar.SetSimVarValue(`L:${station.simVar}_DESIRED`, "Number", parseInt(pax));
+
+        paxRemaining -= pax;
+    }
+
+    await fillStation(paxStations['rows22_29'], .28 , numberOfPax);
+    await fillStation(paxStations['rows14_21'], .28, numberOfPax);
+    await fillStation(paxStations['rows7_13'], .25 , numberOfPax);
+    await fillStation(paxStations['rows1_6'], 1 , paxRemaining);
+
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 2);
+    return;
+}
+
 const payloadConstruct = new A32NX_PayloadConstructor();
 const paxStations = payloadConstruct.paxStations;
 const cargoStations = payloadConstruct.cargoStations;
