@@ -34,6 +34,11 @@ class A32NX_Core {
                 updateInterval: 150,
             },
             {
+                name: 'InitFlight',
+                module: new A32NX_InitFlight(),
+                updateInterval: 150,
+            },
+            {
                 name: 'LocalVars',
                 module: new A32NX_LocalVarUpdater(),
                 updateInterval: 50,
