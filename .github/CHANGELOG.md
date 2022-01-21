@@ -19,6 +19,7 @@
 1. [ND] Mask the map below the TCAS/WXR and FM messages - @tracernz (Mike)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
 
 ## 0.10.0
 
