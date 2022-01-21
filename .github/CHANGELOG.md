@@ -38,6 +38,7 @@
 1. [EFB] Fix default unit to match UI and other consumers - @tracernz (Mike)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
 
 ## 0.8.0
 
