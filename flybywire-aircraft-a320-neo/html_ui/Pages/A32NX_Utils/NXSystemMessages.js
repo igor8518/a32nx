@@ -117,5 +117,12 @@ const NXFictionalMessages = {
     reloadPlaneApply:       new TypeIIMessage("RELOAD A/C TO APPLY", true),
     noHoppieConnection:     new TypeIMessage("NO HOPPIE CONNECTION"),
     unknownAtsuMessage:     new TypeIMessage("UNKNOWN ATSU MESSAGE"),
-    reverseProxy:           new TypeIMessage("REVERSE PROXY ERROR")
+    reverseProxy:           new TypeIMessage("REVERSE PROXY ERROR"),
+    fetchSimbrief:          new TypeIMessage("FETCH SIMBRIEF"),
+    upLink:                 new TypeIMessage("UPLINK"),
+    loadFuel:               new TypeIMessage("LOAD FUEL"),
+    loadPayload:            new TypeIMessage("LOAD PAYLOAD"),
+    loadPax:                new TypeIMessage("LOAD PAX"),
+    prepareCDU:             new TypeIMessage("PREPARE CDU"),
+    done:                   new TypeIMessage("DONE")
 };
