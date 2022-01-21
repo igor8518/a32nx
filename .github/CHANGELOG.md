@@ -93,6 +93,7 @@
 1. [LIGHTS] Redid all cockpit interior lighting and fixed exterior wing lights - @FinalLightNL (FinalLight#2113)
 1. [MODEL] Add passenger cabin - @igor8518 (Igor Milovidov)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
+1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
 
 ## 0.9.0
 
