@@ -33,7 +33,8 @@ export interface Fmgc {
     getFlightPhase(): FlightPhase,
     getManagedCruiseSpeed(): Knots,
     getManagedCruiseSpeedMach(): Mach,
-    getSpeedLimit(): SpeedLimit,
+    getClimbSpeedLimit(): SpeedLimit,
+    getDescentSpeedLimit(): SpeedLimit,
     getPreSelectedClbSpeed(): Knots,
     getTakeoffFlapsSetting(): FlapConf | undefined
     getManagedDescentSpeed(): Knots,
