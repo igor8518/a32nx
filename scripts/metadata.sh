@@ -12,17 +12,17 @@ if [ -z "${GITHUB_EVENT_NAME}" ]; then
     GITHUB_EVENT_NAME="manual"
 fi
 if [ -z "${GITHUB_REF}" ]; then
-    GITHUB_REF="$(git show-ref HEAD)"
+    GITHUB_REF="$(git symbolic-ref --short HEAD)"
 fi
 if [ -z "${GITHUB_SHA}" ]; then
-    GITHUB_SHA="$(git show-ref -s HEAD)"
+    GITHUB_SHA="$(git rev-parse  HEAD)"
 fi
 GITHUB_RELEASE_PRETTY_NAME="$(node scripts/pretty-release-name.js)"
 GITHUB_BUILT="$(date -u -Iseconds)"
 
 jq -n \
     --arg built "${GITHUB_BUILT}" \
-    --arg ref "${GITHUB_REF##*/}" \
+    --arg ref "${GITHUB_REF}" \
     --arg sha "${GITHUB_SHA}" \
     --arg actor "${GITHUB_ACTOR}" \
     --arg event_name "${GITHUB_EVENT_NAME}" \
