@@ -1,21 +1,23 @@
-name: experimental
+#15.05.2022
+name: igor-experimental-22-05-15
 on:
   push:
     branches:
-      - experimental
+      - igor-experimental-22-05-15
 
 jobs:
   build:
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'igor8518'
     runs-on: ubuntu-latest
     env:
       A32NX_PRODUCTION_BUILD: 1
       A32NX_INSTRUMENTS_BUILD_WORKERS: 2
-      EXPERIMENTAL_PRE_RELEASE_ID: 66067853
-      EXPERIMENTAL_PRE_RELEASE_TAG: assets/experimental
-      EXPERIMENTAL_ZIP_NAME: A32NX-experimental.zip
+      EXPERIMENTAL_PRE_RELEASE_ID: 66882377
+      EXPERIMENTAL_PRE_RELEASE_TAG: A32NX-igor-v-ex-22.05.15.0
+      EXPERIMENTAL_ZIP_NAME: A32NX-igor-v-ex-22.05.15.0.zip
       BUILD_DIR_NAME: experimental
+      # https://api.github.com/repos/igor8518/a32nx/releases
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -45,7 +47,7 @@ jobs:
       - name: Upload to CloudFlare CDN
         env:
           CLOUDFLARE_BUCKET_PASSWORD: ${{ secrets.CLOUDFLARE_BUCKET_PASSWORD }}
-          CDN_BUCKET_DESTINATION: addons/a32nx/experimental
+          CDN_BUCKET_DESTINATION: addons/a32nx/igor-experimental
         run: |
           ./scripts/cf-cdn.sh $CDN_BUCKET_DESTINATION ./build-modules
       - name: Delete old GitHub Pre-Release assets
