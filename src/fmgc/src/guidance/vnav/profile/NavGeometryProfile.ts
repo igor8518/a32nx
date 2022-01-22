@@ -163,7 +163,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
                         });
                     }
                 }
-            } else if (leg.segment === SegmentType.Arrival || leg.segment === SegmentType.Approach) {
+            } else if (leg.segment === SegmentType.Arrival || leg.segment === SegmentType.Approach || leg.segment === SegmentType.Enroute) {
                 if (leg.altitudeConstraint) {
                     this.descentAltitudeConstraints.push({
                         distanceFromStart: this.totalFlightPlanDistance,

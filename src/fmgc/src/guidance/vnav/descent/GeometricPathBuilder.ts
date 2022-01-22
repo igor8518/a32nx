@@ -2,7 +2,7 @@ import { AltitudeConstraintType } from '@fmgc/guidance/lnav/legs';
 import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
-import { Predictions, StepResults } from '@fmgc/guidance/vnav/Predictions';
+import { Predictions, StepResults, VnavStepError } from '@fmgc/guidance/vnav/Predictions';
 import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
 import { DescentAltitudeConstraint, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
@@ -46,6 +46,8 @@ class GeometricPathPlanner {
      */
     private maxAltitudeConstraints: Feet[];
 
+    private speedBrakeRequests: boolean[];
+
     constructor(
         private observer: VerticalProfileComputationParametersObserver,
         private atmosphericConditions: AtmosphericConditions,
@@ -57,6 +59,7 @@ class GeometricPathPlanner {
 
         this.altitudeAvailableByConstraint = new Array(this.constraints.length);
         this.steps = new Array(this.constraints.length);
+        this.speedBrakeRequests = new Array(this.constraints.length);
 
         this.maxAltitudeConstraints = this.findCumulativeMaxAltitudes(this.constraints.slice().reverse());
         // TODO: Sort this while computing
@@ -73,12 +76,18 @@ class GeometricPathPlanner {
         if (constraintAlongTrack.constraint.type === AltitudeConstraintType.at) {
             this.stepToAtConstraint();
         } else if (constraintAlongTrack.constraint.type === AltitudeConstraintType.atOrAbove) {
+            if (!this.speedBrakeRequests[this.currentConstraintIndex]) {
+                this.speedBrakeRequests[this.currentConstraintIndex] = false;
+            }
+
             this.prepareIdleStep();
 
-            const endsUpTooHigh = this.currentCheckpoint.altitude > this.maxAltitudeConstraints[this.currentConstraintIndex - 1];
-            if (endsUpTooHigh) {
+            const endsUpTooHighForUpcomingConstraint = this.currentCheckpoint.altitude > this.maxAltitudeConstraints[this.currentConstraintIndex - 1];
+            if (endsUpTooHighForUpcomingConstraint) {
                 this.resetToIndex(this.currentConstraintIndex - 1);
                 this.prepareGeometricStep(this.maxAltitudeConstraints[this.currentConstraintIndex - 1]);
+
+                return;
             }
 
             const altError = this.currentCheckpoint.altitude - constraintAlongTrack.constraint.altitude1;
@@ -87,16 +96,18 @@ class GeometricPathPlanner {
                 return;
             }
 
-            // Constraint not met
-            const index = this.findLowerAvailableAltitude(altError);
-            this.resetToIndex(index);
-
-            // If this doesn't work
+            // If this doesn't work, try speed brakes
+            if (!this.speedBrakeRequests[this.currentConstraintIndex - 1]) {
+                this.speedBrakeRequests[this.currentConstraintIndex - 1] = true;
+                this.resetToIndex(this.currentConstraintIndex - 1);
+            } else {
+                // Insert path too steep at this point
+                this.steps[this.currentConstraintIndex - 1].error = VnavStepError.AVAILABLE_GRADIENT_INSUFFICIENT;
+            }
         } else if (constraintAlongTrack.constraint.type === AltitudeConstraintType.atOrBelow) {
             this.prepareIdleStep();
 
             const endsUpTooHigh = this.currentCheckpoint.altitude > constraintAlongTrack.constraint.altitude1;
-
             if (endsUpTooHigh) {
                 this.resetToIndex(this.currentConstraintIndex - 1);
                 this.prepareGeometricStep(constraintAlongTrack.constraint.altitude1);
@@ -110,6 +121,15 @@ class GeometricPathPlanner {
             if (endsUpTooHigh) {
                 this.resetToIndex(this.currentConstraintIndex - 1);
                 this.prepareGeometricStep(constraintAlongTrack.constraint.altitude1);
+            } else if (endsUpTooLow) {
+                // If this doesn't work, try speed brakes
+                if (!this.speedBrakeRequests[this.currentConstraintIndex - 1]) {
+                    this.speedBrakeRequests[this.currentConstraintIndex - 1] = true;
+                    this.resetToIndex(this.currentConstraintIndex - 1);
+                } else {
+                    // Insert path too steep at this point
+                    this.steps[this.currentConstraintIndex - 1].error = VnavStepError.AVAILABLE_GRADIENT_INSUFFICIENT;
+                }
             }
         } else {
             throw new Error('[FMS/VNAV] Unknown constraint type');
@@ -141,8 +161,8 @@ class GeometricPathPlanner {
     }
 
     resetToIndex(index: number) {
-        this.steps.splice(index, this.steps.length - index);
-        this.altitudeAvailableByConstraint.splice(index, this.steps.length - index);
+        this.steps.splice(index);
+        this.altitudeAvailableByConstraint.splice(index);
         this.currentConstraintIndex = index;
 
         this.currentCheckpoint = this.startingPoint;
@@ -154,9 +174,9 @@ class GeometricPathPlanner {
     findLowerAvailableAltitude(requestedAltitude: Feet): number {
         let totalAvailableAltitude = 0;
 
-        for (let i = this.currentConstraintIndex; i > 0; i--) {
+        for (let i = this.currentConstraintIndex - 1; i > 0; i--) {
             for (let j = 0; j < this.altitudeAvailableByConstraint[i].length; j++) {
-                totalAvailableAltitude -= Math.min(this.altitudeAvailableByConstraint[i][j], 0);
+                totalAvailableAltitude += Math.min(this.altitudeAvailableByConstraint[i][j], 0);
 
                 if (totalAvailableAltitude < requestedAltitude) {
                     return i;
@@ -170,7 +190,7 @@ class GeometricPathPlanner {
     findHigherAvailableAltitude(requestedAltitude: Feet): number {
         let totalAvailableAltitude = 0;
 
-        for (let i = this.currentConstraintIndex; i > 0; i--) {
+        for (let i = this.currentConstraintIndex - 1; i > 0; i--) {
             for (let j = 0; j < this.altitudeAvailableByConstraint[i].length; j++) {
                 totalAvailableAltitude += Math.max(this.altitudeAvailableByConstraint[i][j], 0);
 
@@ -201,6 +221,7 @@ class GeometricPathPlanner {
             0,
             this.atmosphericConditions.isaDeviation,
             tropoPause,
+            this.speedBrakeRequests[this.currentConstraintIndex],
         );
 
         this.steps[this.currentConstraintIndex] = step;
