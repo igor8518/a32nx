@@ -107,20 +107,23 @@ class GeometricPathPlanner {
         } else if (constraintAlongTrack.constraint.type === AltitudeConstraintType.atOrBelow) {
             this.prepareIdleStep();
 
-            const endsUpTooHigh = this.currentCheckpoint.altitude > constraintAlongTrack.constraint.altitude1;
+            const maxAltitude = Math.min(this.maxAltitudeConstraints[this.currentConstraintIndex - 1], constraintAlongTrack.constraint.altitude1);
+            const endsUpTooHigh = this.currentCheckpoint.altitude > maxAltitude;
             if (endsUpTooHigh) {
                 this.resetToIndex(this.currentConstraintIndex - 1);
-                this.prepareGeometricStep(constraintAlongTrack.constraint.altitude1);
+                this.prepareGeometricStep(maxAltitude);
             }
         } else if (constraintAlongTrack.constraint.type === AltitudeConstraintType.range) {
             this.prepareIdleStep();
 
-            const endsUpTooHigh = this.currentCheckpoint.altitude > constraintAlongTrack.constraint.altitude1;
+            const maxAltitude = Math.min(this.maxAltitudeConstraints[this.currentConstraintIndex - 1], constraintAlongTrack.constraint.altitude1);
+
+            const endsUpTooHigh = this.currentCheckpoint.altitude > maxAltitude;
             const endsUpTooLow = this.currentCheckpoint.altitude < constraintAlongTrack.constraint.altitude2;
 
             if (endsUpTooHigh) {
                 this.resetToIndex(this.currentConstraintIndex - 1);
-                this.prepareGeometricStep(constraintAlongTrack.constraint.altitude1);
+                this.prepareGeometricStep(maxAltitude);
             } else if (endsUpTooLow) {
                 // If this doesn't work, try speed brakes
                 if (!this.speedBrakeRequests[this.currentConstraintIndex - 1]) {
