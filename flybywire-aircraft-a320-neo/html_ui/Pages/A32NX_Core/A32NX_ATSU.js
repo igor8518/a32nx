@@ -341,7 +341,6 @@ const AddSID = (RWEnd, fix, mcdu) => {
 
             rwy = "0" + rwy;
         }
-        //if (mcdu.simbrief.originRwy.indexOf(originRunways[i].designation) !== -1) {
         if (mcdu.simbrief.originRwy === rwy) {
             gr = i;
             break;
@@ -351,10 +350,6 @@ const AddSID = (RWEnd, fix, mcdu) => {
     if (gr < 0) {
         return SIDss;
     }
-
-    // for (let i = 5; i > fixx.length; i--) {
-    //     fixx = fixx + " ";
-    // }
 
     for (j = 0; j < originAirportInfo.departures.length; j++) {
         const departure = originAirportInfo.departures[j];
@@ -399,10 +394,6 @@ const AddSID = (RWEnd, fix, mcdu) => {
             }
         }
         if (FindSid) {
-
-            if (t >= 0) {
-
-            }
             SIDName = originAirportInfo.departures[j].name;
             if (FindTrans) {
                 TRANSITIONName = originAirportInfo.departures[j].enRouteTransitions[t].name;
@@ -410,17 +401,18 @@ const AddSID = (RWEnd, fix, mcdu) => {
             SIDss.push({r: gr, t: t, tr: r, j: j, SIDName: SIDName, TRANSITIONName: TRANSITIONName, RWName: RWEnd});
             FindSid = false;
             FindTrans = false;
-        //break;
         }
     }
     return SIDss;
 };
 
 const uplinkRoute = async (mcdu) => {
-    //const fpm = mcdu.flightPlanManager;
     let initRunwaySet = 0;
     let initSidSet = 0;
     let initSidTransSet = 0;
+    const fpm = mcdu.flightPlanManager;
+    const ass = await SimVar.GetSimVarValue("L:A32NX_AUTO_SID_STAR", "Number");
+    const add = await SimVar.GetSimVarValue("L:A32NX_AUTO_DELETE_DISCONTINUITY", "Number");
     let OrigSids = [];
     let wp;
     let wps;
@@ -483,74 +475,81 @@ const uplinkRoute = async (mcdu) => {
             continue;
         }
     }
-
-    OrigSids = AddSID(mcdu.simbrief.originRwy, FixSID, mcdu);
-    let findSID = -1;
-    for (let i = 0; i < OrigSids.length; i++) {
-        if (OrigSids[i].SIDName === SimBriefSID) {
-            findSID = i;
+    if (ass === 1) {
+        OrigSids = AddSID(mcdu.simbrief.originRwy, FixSID, mcdu);
+        let findSID = -1;
+        for (let i = 0; i < OrigSids.length; i++) {
+            if (OrigSids[i].SIDName === SimBriefSID) {
+                findSID = i;
+            }
         }
-    }
 
-    if (OrigSids.length > 0) {
-        if (initRunwaySet == 0) {
-            initRunwaySet = 1;
-            mcdu.setOriginRunwayIndex(OrigSids[findSID].r, () => {
-                SimVar.SetSimVarValue("L:A32NX_SET_RUNWAY_ORIGIN", "Number", 1);
-                initRunwaySet = 2;
-                if ((initRunwaySet === 2) && (initSidSet === 0)) {
-                    initSidSet = 1;
-                    mcdu.setRunwayIndex(OrigSids[findSID].tr, () => {
-                        mcdu.setDepartureIndex(OrigSids[findSID].j, () => {
-                            SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 1);
-                            initSidSet = 2;
-                            if ((initSidSet == 2) && (initSidTransSet == 0)) {
-                                initSidTransSet = 1;
-                                mcdu.flightPlanManager.setDepartureEnRouteTransitionIndex(OrigSids[findSID].t, () => {
-                                    initSidTransSet = 2;
-                                    if (initSidTransSet == 2) {
-                                        SimVar.SetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number", 1);
-                                        initSidTransSet = 3;
-                                        mcdu.updateConstraints();
-                                        mcdu.onToRwyChanged();
-                                        CDUPerformancePage.UpdateThrRedAccFromOrigin(mcdu, true, true);
-                                        CDUPerformancePage.UpdateEngOutAccFromOrigin(mcdu);
-                                        mcdu.insertTemporaryFlightPlan(() => {
-                                            let first = 0;
-                                            let countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
-                                            for (let i = 0; i < countWaypoints; i++) {
-                                                wp = mcdu.flightPlanManager.getWaypoint(i);
-                                                if (wp.ident === FixSID) {
-                                                    if (first === 0) {
-                                                        first = 1;
-                                                        continue;
-                                                    } else if (first === 1) {
-                                                        mcdu.flightPlanManager.removeWaypoint(i);
-                                                        countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
-                                                        first = -1;
+        if (OrigSids.length > 0) {
+            if (initRunwaySet == 0) {
+                await SimVar.SetSimVarValue("L:A32NX_SET_RUNWAY_ORIGIN", "Number", 1);
+                initRunwaySet = 1;
+                mcdu.setOriginRunwayIndex(OrigSids[findSID].r, () => {
+                    SimVar.SetSimVarValue("L:A32NX_SET_RUNWAY_ORIGIN", "Number", 2);
+                    initRunwaySet = 2;
+                    if ((initRunwaySet === 2) && (initSidSet === 0)) {
+                        SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 1);
+                        initSidSet = 1;
+                        mcdu.setRunwayIndex(OrigSids[findSID].tr, () => {
+                            mcdu.setDepartureIndex(OrigSids[findSID].j, () => {
+                                SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 2);
+                                initSidSet = 2;
+                                if ((initSidSet == 2) && (initSidTransSet == 0)) {
+                                    SimVar.SetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number", 1);
+                                    initSidTransSet = 1;
+                                    mcdu.flightPlanManager.setDepartureEnRouteTransitionIndex(OrigSids[findSID].t, () => {
+                                        SimVar.SetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number", 2);
+                                        initSidTransSet = 2;
+                                        if (initSidTransSet == 2) {
+                                            SimVar.SetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number", 3);
+                                            initSidTransSet = 3;
+                                            mcdu.updateConstraints();
+                                            mcdu.onToRwyChanged();
+                                            CDUPerformancePage.UpdateThrRedAccFromOrigin(mcdu, true, true);
+                                            CDUPerformancePage.UpdateEngOutAccFromOrigin(mcdu);
+                                            mcdu.insertTemporaryFlightPlan(() => {
+                                                if (add === 1) {
+                                                    let first = 0;
+                                                    let countWaypoints = fpm.getWaypointsCount();
+                                                    for (let i = 0; i < countWaypoints; i++) {
+                                                        wp = fpm.getWaypoint(i);
+                                                        if (wp.ident === FixSID) {
+                                                            if (first === 0) {
+                                                                first = 1;
+                                                                continue;
+                                                            } else if (first === 1) {
+                                                                fpm.removeWaypoint(i);
+                                                                countWaypoints = fpm.getWaypointsCount();
+                                                                first = -1;
+                                                            }
+                                                        } else {
+                                                            first = 0;
+                                                        }
                                                     }
-                                                } else {
-                                                    first = 0;
+                                                    for (let i = 0; i < fpm.getWaypointsCount(); i++) {
+                                                        wp = fpm.getWaypoint(i);
+                                                        if (wp.endsInDiscontinuity) {
+                                                            fpm.clearDiscontinuity(i);
+                                                        }
+                                                    }
+                                                    SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
                                                 }
-                                            }
-                                            for (let i = 0; i < mcdu.flightPlanManager.getWaypointsCount(); i++) {
-                                                wp = mcdu.flightPlanManager.getWaypoint(i);
-                                                if (wp.endsInDiscontinuity) {
-                                                    mcdu.flightPlanManager.clearDiscontinuity(i);
-                                                }
-                                            }
-                                            SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
-                                            CDUFlightPlanPage.ShowPage(mcdu, 0);
-                                        });
-                                    }
-                                }).catch(console.error);
-                            }
+                                                CDUFlightPlanPage.ShowPage(mcdu, 0);
+                                            });
+                                        }
+                                    }).catch(console.error);
+                                }
+                            });
                         });
-                    });
-                }
-            });
-        }
+                    }
+                });
+            }
 
+        }
     }
 };
 
