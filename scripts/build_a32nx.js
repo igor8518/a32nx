@@ -32,6 +32,8 @@ if (packageInfo.edition === 'stable') {
     titlePostfix = 'Experimental';
 } else if (buildInfo?.isPullRequest) {
     titlePostfix = `PR #${buildInfo?.ref}`;
+} else if (packageInfo.edition === 'igor') {
+    titlePostfix = `igor8518`;
 } else {
     titlePostfix = `branch ${buildInfo?.branch}`;
 }
