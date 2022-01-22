@@ -167,6 +167,14 @@ class CDUFlightPlanPage {
                     verticalWaypoint = vnavPredictionsMapByWaypoint.get(fpIndex);
                 }
 
+                // Color
+                let color = "green";
+                if (fpm.isCurrentFlightPlanTemporary()) {
+                    color = "yellow";
+                } else if (fpIndex === fpm.getActiveWaypointIndex()) {
+                    color = "white";
+                }
+
                 // Time
                 let timeCell = "----[s-text]";
                 let timeColor = "white";
@@ -174,15 +182,8 @@ class CDUFlightPlanPage {
                     timeCell = isFlying
                         ? `${FMCMainDisplay.secondsToUTC(verticalWaypoint.secondsFromPresent)}[s-text]`
                         : `${FMCMainDisplay.secondsTohhmm(verticalWaypoint.secondsFromPresent)}[s-text]`;
-                    timeColor = "green";
-                }
 
-                // Color
-                let color = "green";
-                if (fpm.isCurrentFlightPlanTemporary()) {
-                    color = "yellow";
-                } else if (fpIndex === fpm.getActiveWaypointIndex()) {
-                    color = "white";
+                    timeColor = color;
                 }
 
                 // Fix Header
