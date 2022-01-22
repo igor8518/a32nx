@@ -1,19 +1,22 @@
-name: experimental
+name: experimental-vnav
 on:
   push:
     branches:
-      - experimental
+      - experimental-vnav-orig
 
 jobs:
   build:
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'igor8518'
     runs-on: ubuntu-latest
     env:
       A32NX_PRODUCTION_BUILD: 1
       A32NX_INSTRUMENTS_BUILD_WORKERS: 2
-      MASTER_ZIP_NAME: A32NX-experimental.zip
+      MASTER_ZIP_NAME: A32NX-experimental-vnav.zip
       BUILD_DIR_NAME: experimental
+      # https://api.github.com/repos/igor8518/a32nx/releases
+      MASTER_PRE_RELEASE_ID: 57739912
+      MASTER_PRE_RELEASE_TAG: A32NX-experimental-vnav
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -37,7 +40,25 @@ jobs:
 
           mkdir ./${{ env.BUILD_DIR_NAME }}
           zip -r ./${{ env.BUILD_DIR_NAME }}/${{ env.MASTER_ZIP_NAME }} ./flybywire-aircraft-a320-neo/
-      - name: Upload to Bunny CDN
+      - name: Get and delete master pre-release zip asset
+        run: |
+          echo 'checking for first release asset...'
+          assets=$( \
+            curl --location --request GET \
+              --url https://api.github.com/repos/${{ github.repository }}/releases/${{ env.MASTER_PRE_RELEASE_ID }}/assets
+          )
+
+          if [ $(echo $assets | jq '.[0].size') -eq '0' ]; then
+            echo 'no asset to delete'
+          else
+            assetId=$(echo $assets | jq '.[0].id')
+            echo 'deleting asset '$assetId
+            curl --request DELETE \
+              --url https://api.github.com/repos/${{ github.repository }}/releases/assets/$assetId \
+              --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}'
+          fi
+      - name: Upload release binary
+        uses: actions/upload-release-asset@v1.0.2
         env:
           BUNNY_BUCKET_PASSWORD: ${{ secrets.BUNNY_BUCKET_PASSWORD }}
           BUNNY_SECRET_TOKEN: ${{ secrets.BUNNY_SECRET_TOKEN }}
