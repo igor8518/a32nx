@@ -54,6 +54,8 @@ if (edition === 'stable') {
     titlePostfix = 'Experimental';
 } else if (isPullRequest) {
     titlePostfix = `PR #${GIT_BRANCH}`;
+} else if (edition === 'igor') {
+    titlePostfix = `igor8518`;
 } else {
     titlePostfix = `branch ${GIT_BRANCH}`;
 }
@@ -82,7 +84,9 @@ function copyDDSFiles(src_dds) {
 if (edition === 'stable') {
     copyDDSFiles('/textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-stable.dds');
 } else if (GIT_BRANCH === 'master') {
-    copyDDSFiles('/textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-master.dds');
+    copyDDSFiles('/Textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-master.dds');
+} else if (edition === 'igor') {
+    copyDDSFiles('/Textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-green.dds');
 } else {
     copyDDSFiles('/textures/decals 4k/A320NEO_COCKPIT_DECALSTEXT_ALBD.TIF-exp.dds');
 }
