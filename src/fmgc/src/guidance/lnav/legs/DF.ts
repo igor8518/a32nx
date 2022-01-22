@@ -1,4 +1,9 @@
-import { AltitudeConstraint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
+// Copyright (c) 2021-2022 FlyByWire Simulations
+// Copyright (c) 2021-2022 Synaptic Simulations
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import { AltitudeConstraint, getAltitudeConstraintFromWaypoint, getSpeedConstraintFromWaypoint, SpeedConstraint } from '@fmgc/guidance/lnav/legs/index';
 import { Coordinates } from '@fmgc/flightplanning/data/geo';
 import { Guidable } from '@fmgc/guidance/Guidable';
 import { SegmentType } from '@fmgc/flightplanning/FlightPlanSegment';
@@ -26,14 +31,6 @@ export class DFLeg extends XFLeg {
 
     getPathStartPoint(): Coordinates | undefined {
         return this.inboundGuidable?.getPathEndPoint() ?? this.estimateStartPoint();
-    }
-
-    getPathEndPoint(): Coordinates | undefined {
-        if (this.outboundGuidable instanceof FixedRadiusTransition && !this.outboundGuidable.isReverted && this.outboundGuidable.isComputed) {
-            return this.outboundGuidable.getTurningPoints()[0];
-        }
-
-        return this.fix.infos.coordinates;
     }
 
     get predictedPath(): PathVector[] {
