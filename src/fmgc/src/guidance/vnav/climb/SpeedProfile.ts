@@ -25,10 +25,18 @@ export class McduSpeedProfile implements SpeedProfile {
 
     private maxSpeedCache: Map<number, Knots> = new Map();
 
+    /**
+     *
+     * @param parameters
+     * @param aircraftDistanceAlongTrack
+     * @param climbSpeedConstraints - This should be sorted in increasing distance along track
+     * @param descentSpeedConstraints - This should be sorted in increasing distance along track
+     */
     constructor(
         private parameters: ClimbSpeedProfileParameters,
         private aircraftDistanceAlongTrack: NauticalMiles,
-        private maxSpeedConstraints: MaxSpeedConstraint[],
+        private climbSpeedConstraints: MaxSpeedConstraint[],
+        private descentSpeedConstraints: MaxSpeedConstraint[],
     ) { }
 
     private isValidSpeedLimit(): boolean {
@@ -84,15 +92,36 @@ export class McduSpeedProfile implements SpeedProfile {
             return cachedMaxSpeed;
         }
 
+        const maxSpeed = Math.min(this.findMaxClimbSpeedConstraint(distanceAlongTrack), this.findMaxDescentSpeedConstraint(distanceAlongTrack));
+
+        this.maxSpeedCache.set(distanceAlongTrack, maxSpeed);
+
+        return maxSpeed;
+    }
+
+    private findMaxClimbSpeedConstraint(distanceAlongTrack: NauticalMiles): Knots {
         let maxSpeed = Infinity;
 
-        for (const constraint of this.maxSpeedConstraints) {
+        for (const constraint of this.climbSpeedConstraints) {
             if (distanceAlongTrack <= constraint.distanceFromStart && constraint.maxSpeed < maxSpeed) {
                 maxSpeed = constraint.maxSpeed;
             }
         }
 
-        this.maxSpeedCache.set(distanceAlongTrack, maxSpeed);
+        return maxSpeed;
+    }
+
+    private findMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): Knots {
+        let maxSpeed = Infinity;
+
+        for (const constraint of this.descentSpeedConstraints) {
+            // Since the constraint are ordered, there is no need to search further
+            if (distanceAlongTrack < constraint.distanceFromStart) {
+                return maxSpeed;
+            }
+
+            maxSpeed = Math.min(constraint.maxSpeed, maxSpeed);
+        }
 
         return maxSpeed;
     }
@@ -100,7 +129,7 @@ export class McduSpeedProfile implements SpeedProfile {
     private findDistanceAlongTrackOfNextSpeedChange(distanceAlongTrack: NauticalMiles) {
         let distance = Infinity;
 
-        for (const constraint of this.maxSpeedConstraints) {
+        for (const constraint of this.climbSpeedConstraints) {
             if (distanceAlongTrack <= constraint.distanceFromStart && constraint.distanceFromStart < distance) {
                 distance = constraint.distanceFromStart;
             }
