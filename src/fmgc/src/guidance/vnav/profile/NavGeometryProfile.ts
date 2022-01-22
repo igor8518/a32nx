@@ -245,10 +245,6 @@ export class NavGeometryProfile extends BaseGeometryProfile {
 
         const speedLimitCrossing = this.findSpeedLimitCrossing();
         if (!speedLimitCrossing) {
-            if (VnavConfig.DEBUG_PROFILE) {
-                console.warn('[FMS/VNAV] No speed limit found.');
-            }
-
             return [];
         }
 
