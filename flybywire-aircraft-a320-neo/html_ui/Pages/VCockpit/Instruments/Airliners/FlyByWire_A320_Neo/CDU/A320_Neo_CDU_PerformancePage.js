@@ -463,7 +463,7 @@ class CDUPerformancePage {
                 managedSpeedCell = "{small}" + mcdu.managedSpeedTarget.toFixed(0) + "{end}";
             }
         } else {
-            managedSpeedCell = (isSelected ? "*" : "") + mcdu.managedSpeedClimb > mcdu.managedSpeedLimit ? mcdu.managedSpeedLimit.toFixed(0) : mcdu.managedSpeedClimb.toFixed(0);
+            managedSpeedCell = (isSelected ? "*" : "") + mcdu.managedSpeedClimb > mcdu.managedSpeedLimitClimb ? mcdu.managedSpeedLimitClimb.toFixed(0) : mcdu.managedSpeedClimb.toFixed(0);
 
             mcdu.onLeftInput[3] = (value, scratchpadCallback) => {
                 if (mcdu.trySetPreSelectedClimbSpeed(value)) {

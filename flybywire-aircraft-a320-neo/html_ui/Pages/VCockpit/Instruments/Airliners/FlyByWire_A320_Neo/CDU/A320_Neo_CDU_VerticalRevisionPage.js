@@ -14,8 +14,8 @@ class CDUVerticalRevisionPage {
             }
             const transAltLevel = waypoint.constraintType === 2 /* DES */ ? mcdu.flightPlanManager.destinationTransitionLevel : mcdu.flightPlanManager.originTransitionAltitude;
             let climbSpeedLimitCell = "*[][color]cyan";
-            if (isFinite(mcdu.managedSpeedLimit) && isFinite(mcdu.managedSpeedLimitAlt)) {
-                climbSpeedLimitCell = mcdu.managedSpeedLimit + "/" + this.formatFl(mcdu.managedSpeedLimitAlt, transAltLevel) + "[color]magenta";
+            if (isFinite(mcdu.managedSpeedLimitClimb) && isFinite(mcdu.managedSpeedLimitAltClimb)) {
+                climbSpeedLimitCell = mcdu.managedSpeedLimitClimb + "/" + this.formatFl(mcdu.managedSpeedLimitAltClimb, transAltLevel) + "[color]magenta";
             }
 
             let speedConstraint = 0;
@@ -71,7 +71,7 @@ class CDUVerticalRevisionPage {
             mcdu.onRightInput[0] = () => {}; // EXTRA
             mcdu.onLeftInput[1] = (value, scratchpadCallback) => {
                 if (value === FMCMainDisplay.clrValue) {
-                    mcdu.setSpeedLimit(undefined, undefined);
+                    mcdu.setClimbSpeedLimit(undefined, undefined);
                     this.ShowPage(mcdu, waypoint, verticalWaypoint);
 
                     return;
@@ -100,7 +100,7 @@ class CDUVerticalRevisionPage {
                     return;
                 }
 
-                mcdu.setSpeedLimit(speedLimit, speedLimitAlt);
+                mcdu.setClimbSpeedLimit(speedLimit, speedLimitAlt);
                 this.ShowPage(mcdu, waypoint, verticalWaypoint);
             }; // CLB SPD LIM
             mcdu.onRightInput[1] = () => {}; // RTA

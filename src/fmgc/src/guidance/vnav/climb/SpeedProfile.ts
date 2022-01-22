@@ -4,7 +4,7 @@ import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
 interface ClimbSpeedProfileParameters {
     fcuSpeed: Knots | Mach,
     managedClimbSpeed: Knots,
-    speedLimit: SpeedLimit,
+    climbSpeedLimit: SpeedLimit,
     flightPhase: FlightPhase,
     preselectedClbSpeed: Knots,
 }
@@ -32,7 +32,7 @@ export class McduSpeedProfile implements SpeedProfile {
     ) { }
 
     private isValidSpeedLimit(): boolean {
-        const { speed, underAltitude } = this.parameters.speedLimit;
+        const { speed, underAltitude } = this.parameters.climbSpeedLimit;
 
         return Number.isFinite(speed) && Number.isFinite(underAltitude);
     }
@@ -62,7 +62,7 @@ export class McduSpeedProfile implements SpeedProfile {
 
     private getManaged(distanceFromStart: NauticalMiles, altitude: Feet): Knots {
         let { managedClimbSpeed } = this.parameters;
-        const { speed, underAltitude } = this.parameters.speedLimit;
+        const { speed, underAltitude } = this.parameters.climbSpeedLimit;
 
         if (this.isValidSpeedLimit() && altitude < underAltitude) {
             managedClimbSpeed = Math.min(speed, managedClimbSpeed);
@@ -161,7 +161,7 @@ export class NdSpeedProfile implements SpeedProfile {
     ) { }
 
     private isValidSpeedLimit(): boolean {
-        const { speed, underAltitude } = this.parameters.speedLimit;
+        const { speed, underAltitude } = this.parameters.climbSpeedLimit;
 
         return Number.isFinite(speed) && Number.isFinite(underAltitude);
     }
@@ -185,7 +185,7 @@ export class NdSpeedProfile implements SpeedProfile {
 
     private getManaged(distanceFromStart: NauticalMiles, altitude: Feet): Knots {
         let { managedClimbSpeed } = this.parameters;
-        const { speed, underAltitude } = this.parameters.speedLimit;
+        const { speed, underAltitude } = this.parameters.climbSpeedLimit;
 
         if (this.isValidSpeedLimit() && altitude < underAltitude) {
             managedClimbSpeed = Math.min(speed, managedClimbSpeed);
