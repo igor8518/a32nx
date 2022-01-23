@@ -11,7 +11,7 @@ fi
 if [ -z "${GITHUB_EVENT_NAME}" ]; then
     GITHUB_EVENT_NAME="manual"
 fi
-if [ -z "${GITHUB_REF}" ]; then
+if [ -z "${GITHUB_REF##*/}" ]; then
     GITHUB_REF="$(git symbolic-ref --short HEAD)"
 fi
 if [ -z "${GITHUB_SHA}" ]; then
