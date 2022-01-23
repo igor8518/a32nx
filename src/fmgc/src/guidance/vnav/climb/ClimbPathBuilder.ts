@@ -60,7 +60,7 @@ export class ClimbPathBuilder {
 
                     this.addLevelSegmentSteps(profile, speedProfile, constraintDistanceFromStart);
                 }
-            } else if (Math.abs(profile.lastCheckpoint.altitude - constraintAltitude) < 1) {
+            } else if (Math.abs(profile.lastCheckpoint.altitude - constraintAltitude) < 250) {
                 // Continue in level flight to the next constraint
                 this.addLevelSegmentSteps(profile, speedProfile, constraintDistanceFromStart);
             }
