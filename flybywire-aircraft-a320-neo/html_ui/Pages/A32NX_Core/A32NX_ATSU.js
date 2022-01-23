@@ -337,7 +337,7 @@ const AddSID = (RWEnd, fix, mcdu) => {
         shortRwy = rwy;
         const re = /[0-9]+/;
         const rwyDig = rwy.match(re);
-        if (rwyDig < 2) {
+        if (rwyDig < 10) {
 
             rwy = "0" + rwy;
         }
