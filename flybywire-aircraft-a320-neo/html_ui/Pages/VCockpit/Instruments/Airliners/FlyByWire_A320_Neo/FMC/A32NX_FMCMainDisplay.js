@@ -3711,7 +3711,7 @@ class FMCMainDisplay extends BaseAirliners {
     }
 
     updateFuelVars() {
-        this.blockFuel = SimVar.GetSimVarValue("FUEL TOTAL QUANTITY", "gallons") * SimVar.GetSimVarValue("FUEL WEIGHT PER GALLON", "kilograms") / 1000;
+        this.blockFuel = SimVar.GetSimVarValue("L:A32NX_FUEL_TOTAL_DESIRED", "gallons") * SimVar.GetSimVarValue("FUEL WEIGHT PER GALLON", "kilograms") / 1000;
         this.updateZfwVars();
     }
 
