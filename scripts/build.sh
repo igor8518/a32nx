@@ -10,7 +10,7 @@ ORIGINAL_GROUP_ID=$(stat -c '%g' /external)
 if [ "${GITHUB_ACTIONS}" == "true" ]; then
   chown -R root:root /external
 fi
-
+echo $(git symbolic-ref --short HEAD)
 # run build
 npx igniter "$@"
 
