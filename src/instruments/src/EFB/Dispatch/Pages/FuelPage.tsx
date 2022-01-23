@@ -61,6 +61,8 @@ export const FuelPage = () => {
     const [LOutCurrent] = useSimVar('FUEL TANK LEFT AUX QUANTITY', 'Gallons', 1_000);
     const [RInnCurrent] = useSimVar('FUEL TANK RIGHT MAIN QUANTITY', 'Gallons', 1_000);
     const [ROutCurrent] = useSimVar('FUEL TANK RIGHT AUX QUANTITY', 'Gallons', 1_000);
+    const [NewFuel] = useSimVar('L:A32NX_SET_FUEL_DESIRED', 'Number');
+
     const getFuelBarPercent = (curr:number, max: number) => (Math.max(curr, 0) / max) * 100;
 
     const isAirplaneCnD = () => {
@@ -227,6 +229,11 @@ export const FuelPage = () => {
             </SelectGroup>
         </>
     );
+
+    if (NewFuel !== inputValue) {
+        updateDesiredFuel(String(NewFuel));
+        setRefuelStartedByUser(1);
+    }
 
     return (
         <div className="text-white mt-6 h-efb-nav flex flex-col justify-between">
