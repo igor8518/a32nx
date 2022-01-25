@@ -222,6 +222,235 @@ const addLatLonWaypoint = async (mcdu, lat, lon) => {
     }
 };
 
+const AddSTAR = (RWEnd, fix, mcdu) => {
+    const STARs = [];
+    let STARName = "";
+    let APPName = "";
+    let TRANSAPPName = "";
+    let TRANSSTARName = "";
+
+    const fixx = fix;
+    let rwy = "";
+    let shortRwy = "";
+
+    let i, j, j1, r, r2, t, t2, gr = -1;
+    let FindStar = false;
+    let FindAppr = false;
+    let FindTransAppr = false;
+    let FindTransStar = false;
+
+    const destinationAirport = mcdu.flightPlanManager.getDestination();
+    const destinationAirportInfo = destinationAirport.infos;
+
+    const destinationRunways = destinationAirportInfo.oneWayRunways;
+
+    for (let i = 0; i < destinationRunways.length; i++) {
+        rwy = destinationRunways[i].designation;
+        shortRwy = rwy;
+        const re = /[0-9]+/;
+        const rwyDig = rwy.match(re);
+        if (rwyDig < 10) {
+
+            rwy = "0" + rwy;
+        }
+        if (mcdu.simbrief.destinationRwy === rwy) {
+            gr = i;
+            break;
+        }
+    }
+    //Not found rwy in navdata
+    if (gr < 0) {
+        return SIDss;
+    }
+
+    for (let j = 0; j < destinationAirportInfo.approaches.length; j++) {
+        destinationAirportInfo.approaches[j].index = j;
+    }
+
+    for (j = 0; j < destinationAirportInfo.approaches.length; j++) {
+        const approach = destinationAirportInfo.approaches[j];
+        //for (r = 0; r < approach.runwayTransitions.length; r++) {
+        //const runwayTransition = approach.runwayTransitions[r];
+        const runwayTransition = approach.runway;
+        if (shortRwy === runwayTransition) {
+            if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() === fixx) {
+                t = -1;
+                FindAppr = true;
+                break;
+            } else {
+                for (t = 0; t < approach.transitions.length; t++) {
+                    const enRouteTransitionAppr = approach.transitions[t];
+                    if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
+                        FindAppr = true;
+                        FindTransAppr = true;
+                        if (FindAppr) {
+                            APPName = destinationAirportInfo.approaches[j];
+                            if (FindTransAppr) {
+                                TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
+                            }
+                            STARName = APPName;
+
+                            STARs.push({r: gr, t: t, t2: t2, tr: r, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+                            FindAppr = false;
+                            FindTransAppr = false;
+                            //break;
+                        }
+                    }
+                }
+            }
+        }
+        //}
+
+    }
+    if (!FindAppr) {
+        for (i = 0; i < destinationAirportInfo.arrivals.length; i++) {
+            const arrival = destinationAirportInfo.arrivals[i];
+            for (r2 = 0; r2 < arrival.runwayTransitions.length; r2++) {
+                const runwayTransition = arrival.runwayTransitions[r2];
+                if (shortRwy.indexOf(runwayTransition.name.slice(2,runwayTransition.name.length)) !== -1) {
+                    if (runwayTransition.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
+                        t2 = -1;
+                        for (j = 0; j < destinationAirportInfo.approaches.length; j++) {
+                            const approach = destinationAirportInfo.approaches[j];
+                            //for (r = 0; r < approach.runwayTransitions.length; r++) {
+                            //const runwayTransition = approach.runwayTransitions[r];
+                            //const runwayTransition = approach.runway;
+                            if (shortRwy === approach.runway) {
+                                if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() ===
+                                runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
+                                    t = -1;
+                                    FindAppr = true;
+                                    FindStar = true;
+                                    if (FindAppr) {
+                                        STARName = destinationAirportInfo.arrivals[i].name;
+                                        APPName = destinationAirportInfo.approaches[j].name;
+                                        if (FindTransAppr) {
+                                            TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
+                                        }
+                                        STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                        FindAppr = false;
+                                        FindStar = false;
+                                        FindTransAppr = false;
+                                        //break;
+                                    }
+                                } else {
+                                    for (t = 0; t < approach.transitions.length; t++) {
+                                        const enRouteTransitionAppr = approach.transitions[t];
+                                        if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() ==
+                                                runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
+                                            FindAppr = true;
+                                            FindStar = true;
+                                            FindTransAppr = true;
+                                            if (FindAppr) {
+                                                STARName = destinationAirportInfo.arrivals[i].name;
+                                                APPName = destinationAirportInfo.approaches[j].name;
+                                                if (FindTransAppr) {
+                                                    TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
+                                                }
+                                                STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                                FindAppr = false;
+                                                FindStar = false;
+                                                FindTransAppr = false;
+                                                //break;
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                            //}
+
+                        }
+                        //break;
+                    } else {
+                        for (t2 = 0; t2 < arrival.enRouteTransitions.length; t2++) {
+                            const enRouteTransition = approach.enRouteTransitions[t2];
+                            if (enRouteTransition.runwayTransition.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
+                                for (j1 = 0; j1 < destinationAirportInfo.approaches.length; j1++) {
+                                    const approach = destinationAirportInfo.approaches[j1];
+                                    //for (r = 0; r < approach.runwayTransitions.length; r++) {
+                                    //const runwayTransition = approach.runwayTransitions[r];
+                                    //const runwayTransition = approach.runway;
+                                    if (shortRwy === approach.runway) {
+                                        if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() ==
+                                            runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
+                                            t = -1;
+                                            FindAppr = true;
+                                            FindStar = true;
+                                            FindTransStar = true;
+                                            j = j1;
+                                            if (FindAppr) {
+
+                                                STARName = destinationAirportInfo.arrivals[i].name;
+                                                APPName = destinationAirportInfo.approaches[j].name;
+                                                if (FindTransAppr) {
+                                                    TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
+                                                }
+                                                if (FindTransStar) {
+                                                    TRANSSTARName = destinationAirportInfo.arrivals[j].enRouteTransitions[t2].name;
+                                                }
+                                                STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                                FindAppr = false;
+                                                FindStar = false;
+                                                FindTransAppr = false;
+                                                FindTransStar = false;
+                                                //break;
+                                            }
+                                        } else {
+                                            for (t = 0; t < approach.transitions.length; t++) {
+                                                const enRouteTransitionAppr = approach.transitions[t];
+                                                if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() ==
+                                                    runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
+                                                    {
+                                                        FindAppr = true;
+                                                        FindStar = true;
+                                                        FindTransStar = true;
+                                                        FindTransAppr = true;
+                                                        j = j1;
+                                                        if (FindAppr) {
+
+                                                            STARName = destinationAirportInfo.arrivals[i].name;
+                                                            APPName = destinationAirportInfo.approaches[j].name;
+                                                            if (FindTransAppr) {
+                                                                TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
+                                                            }
+                                                            if (FindTransStar) {
+                                                                TRANSSTARName = destinationAirportInfo.arrivals[j].enRouteTransitions[t2].name;
+                                                            }
+                                                            STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                                            FindAppr = false;
+                                                            FindStar = false;
+                                                            FindTransAppr = false;
+                                                            FindTransStar = false;
+                                                            //break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //}
+
+                                }
+                                //break;
+                            }
+                        }
+
+                    }
+                }
+            }
+            if (FindStar) {
+                //break;
+            }
+        }
+    }
+    return STARs;
+};
+
 const AddSID = (RWEnd, fix, mcdu) => {
     const SIDss = [];
     let SIDName = "";
@@ -318,12 +547,22 @@ const uplinkRoute = async (mcdu) => {
     const fpm = mcdu.flightPlanManager;
     const ass = await SimVar.GetSimVarValue("L:A32NX_AUTO_SID_STAR", "Number");
     const add = await SimVar.GetSimVarValue("L:A32NX_AUTO_DELETE_DISCONTINUITY", "Number");
+
     let initRunwaySet = 0;
     let initSidSet = 0;
     let initSidTransSet = 0;
+
+    let initApproachSet = 0;
+    let initStarSet = 0;
+    const initApprTransSet = 0;
+    let initStarTransSet = 0;
+
     let OrigSids = [];
+    let OrigStars = [];
+
     let wp;
     let wps;
+
     const {navlog} = mcdu.simbrief;
 
     const procedures = new Set(navlog.filter(fix => fix.is_sid_star === "1").map(fix => fix.via_airway));
@@ -362,6 +601,10 @@ const uplinkRoute = async (mcdu) => {
             FixSID = fix.ident;
             continue;
         } else {
+            if (procedures.has(nextFix.via_airway)) {
+                SimBriefSTAR = nextFix.via_airway;
+                FixSTAR = fix.ident;
+            }
             if (fix.via_airway === 'DCT' || fix.via_airway.match(/^NAT[A-Z]$/)) {
                 if (fix.type === 'apt' && nextFix === undefined) {
                     break;
@@ -377,18 +620,39 @@ const uplinkRoute = async (mcdu) => {
                 continue;
             }
         }
-        if (procedures.has(nextFix.via_airway)) {
-            SimBriefSTAR = nextFix.via_airway;
-            FixSTAR = fix.ident;
-            continue;
-        }
     }
     if (ass === 1) {
+        const AppTypes = ["ILS", "GLS", "NDB", "VOR", "RNAV"];
         OrigSids = AddSID(mcdu.simbrief.originRwy, FixSID, mcdu);
         let findSID = -1;
         for (let i = 0; i < OrigSids.length; i++) {
             if (OrigSids[i].SIDName === SimBriefSID) {
                 findSID = i;
+            }
+        }
+
+        OrigStars = AddSTAR(mcdu.simbrief.destinationRwy, FixSTAR, mcdu);
+        let findSTAR = -1;
+        for (let n = 0; n < AppTypes.length; n++) {
+            for (let i = 0; i < OrigStars.length; i++) {
+                if (OrigStars[i].STARName === SimBriefSTAR) {
+                    const appindex = OrigStars[i].APPName.indexOf(AppTypes[n]);
+                    if (appindex >= 0) {
+                        findSTAR = i;
+                        break;
+                    }
+                }
+            }
+            if (findSTAR >= 0) {
+                break;
+            }
+        }
+        if (findSTAR < 0) {
+            for (let i = 0; i < OrigStars.length; i++) {
+                if (OrigStars[i].STARName === SimBriefSTAR) {
+                    findSTAR = i;
+                    break;
+                }
             }
         }
 
@@ -411,38 +675,69 @@ const uplinkRoute = async (mcdu) => {
                                         if (initSidTransSet == 2) {
                                             SimVar.SetSimVarValue("L:A32NX_SET_TRANSITION_ORIGIN", "Number", 1);
                                             initSidTransSet = 3;
-                                            mcdu.updateConstraints();
-                                            mcdu.onToRwyChanged();
-                                            CDUPerformancePage.UpdateThrRedAccFromOrigin(mcdu, true, true);
-                                            CDUPerformancePage.UpdateEngOutAccFromOrigin(mcdu);
                                             mcdu.insertTemporaryFlightPlan(() => {
-                                                if (add === 1) {
-                                                    let first = 0;
-                                                    let countWaypoints = fpm.getWaypointsCount();
-                                                    for (let i = 0; i < countWaypoints; i++) {
-                                                        wp = fpm.getWaypoint(i);
-                                                        if (wp.ident === FixSID) {
-                                                            if (first === 0) {
-                                                                first = 1;
-                                                                continue;
-                                                            } else if (first === 1) {
-                                                                fpm.removeWaypoint(i);
-                                                                countWaypoints = fpm.getWaypointsCount();
-                                                                first = -1;
+                                                if (OrigStars.length > 0) {
+                                                    if (initApproachSet == 0) {
+                                                        initApproachSet = 1;
+                                                        mcdu.setApproachIndex (OrigStars[findSTAR].j, () => {
+                                                            SimVar.SetSimVarValue("L:A32NX_SET_APPROACH_DESTINATION", "Number", 1);
+                                                            initApproachSet = 2;
+                                                            if ((initApproachSet === 2) && (initStarSet === 0)) {
+                                                                initStarSet = 1;
+                                                                mcdu.setArrivalProcIndex (OrigStars[findSTAR].i, () => {
+                                                                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 1);
+                                                                    mcdu.setApproachTransitionIndex (OrigStars[findSTAR].t, () => {
+                                                                        SimVar.SetSimVarValue("L:A32NX_SET_APPR_TRANS_DESTINATION", "Number", 1);
+                                                                        initStarSet = 2;
+                                                                        if ((initStarSet == 2) && (initStarTransSet == 0)) {
+                                                                            initStarTransSet = 1;
+                                                                            fpm.setArrivalEnRouteTransitionIndex(OrigStars[findSTAR].t2, () => {
+                                                                                initStarTransSet = 2;
+                                                                                if (initStarTransSet == 2) {
+                                                                                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 1);
+                                                                                    initStarTransSet = 3;
+                                                                                    mcdu.updateConstraints();
+                                                                                    mcdu.onToRwyChanged();
+                                                                                    CDUPerformancePage.UpdateThrRedAccFromOrigin(mcdu, true, true);
+                                                                                    CDUPerformancePage.UpdateEngOutAccFromOrigin(mcdu);
+                                                                                    mcdu.insertTemporaryFlightPlan(() => {
+                                                                                        if (add === 1) {
+                                                                                            let first = 0;
+                                                                                            let countWaypoints = fpm.getWaypointsCount();
+                                                                                            for (let i = 0; i < countWaypoints; i++) {
+                                                                                                wp = fpm.getWaypoint(i);
+                                                                                                if (wp.ident === FixSID) {
+                                                                                                    if (first === 0) {
+                                                                                                        first = 1;
+                                                                                                        continue;
+                                                                                                    } else if (first === 1) {
+                                                                                                        fpm.removeWaypoint(i);
+                                                                                                        countWaypoints = fpm.getWaypointsCount();
+                                                                                                        first = -1;
+                                                                                                    }
+                                                                                                } else {
+                                                                                                    first = 0;
+                                                                                                }
+                                                                                            }
+                                                                                            for (let i = 0; i < fpm.getWaypointsCount(); i++) {
+                                                                                                wp = fpm.getWaypoint(i);
+                                                                                                if (wp.endsInDiscontinuity) {
+                                                                                                    fpm.clearDiscontinuity(i);
+                                                                                                }
+                                                                                            }
+                                                                                            SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
+                                                                                        }
+                                                                                        CDUFlightPlanPage.ShowPage(mcdu, 0);
+                                                                                    });
+                                                                                }
+                                                                            }).catch(console.error);
+                                                                        }
+                                                                    });
+                                                                });
                                                             }
-                                                        } else {
-                                                            first = 0;
-                                                        }
+                                                        });
                                                     }
-                                                    for (let i = 0; i < fpm.getWaypointsCount(); i++) {
-                                                        wp = fpm.getWaypoint(i);
-                                                        if (wp.endsInDiscontinuity) {
-                                                            fpm.clearDiscontinuity(i);
-                                                        }
-                                                    }
-                                                    SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
                                                 }
-                                                CDUFlightPlanPage.ShowPage(mcdu, 0);
                                             });
                                         }
                                     }).catch(console.error);
