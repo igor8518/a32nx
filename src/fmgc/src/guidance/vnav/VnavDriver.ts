@@ -261,7 +261,7 @@ export class VnavDriver implements GuidanceComponent {
 
     getCurrentSpeedConstraint(): Knots {
         if (this.shouldObeySpeedConstraints()) {
-            return this.currentMcduSpeedProfile.getCurrentSpeedConstraint();
+            return this.currentMcduSpeedProfile.getCurrentSpeedTarget();
         }
 
         return Infinity;

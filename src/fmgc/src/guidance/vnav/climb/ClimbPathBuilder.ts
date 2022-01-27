@@ -46,13 +46,42 @@ export class ClimbPathBuilder {
                 break;
             }
 
+            // Code is WIP. Idea is to make ClimbPathBuilder more aware of speed constraints,
+            // so we can properly integrate acceleration segments
+
             if (constraintAltitude > profile.lastCheckpoint.altitude) {
                 // Continue climb
                 if (profile.lastCheckpoint.reason === VerticalCheckpointReason.AltitudeConstraint) {
                     profile.lastCheckpoint.reason = VerticalCheckpointReason.ContinueClimb;
                 }
 
+                // Mark where we are
+                let indexToResetTo = profile.checkpoints.length;
+                // Try going to the next altitude
                 this.buildIteratedClimbSegment(profile, climbStrategy, speedProfile, profile.lastCheckpoint.altitude, constraintAltitude);
+
+                let currentSpeedConstraint = speedProfile.getMaxClimbSpeedConstraint(profile.lastCheckpoint.distanceFromStart);
+                for (let i = 0; i++ < 10 && currentSpeedConstraint; currentSpeedConstraint = speedProfile.getMaxClimbSpeedConstraint(profile.lastCheckpoint.distanceFromStart)) {
+                    // This means we did not pass a constraint during the climb
+                    if (currentSpeedConstraint.distanceFromStart > profile.lastCheckpoint.distanceFromStart) {
+                        break;
+                    }
+
+                    // Reset
+                    profile.checkpoints.splice(indexToResetTo);
+
+                    // Use distance step instead
+                    this.distanceStepFromLastCheckpoint(
+                        profile,
+                        climbStrategy,
+                        currentSpeedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart,
+                        VerticalCheckpointReason.SpeedConstraint,
+                    );
+
+                    // Repeat
+                    indexToResetTo = profile.checkpoints.length;
+                    this.buildIteratedClimbSegment(profile, climbStrategy, speedProfile, profile.lastCheckpoint.altitude, constraintAltitude);
+                }
 
                 // We reach the target altitude before the constraint, so we insert a level segment.
                 if (profile.lastCheckpoint.distanceFromStart < constraintDistanceFromStart) {
@@ -77,11 +106,10 @@ export class ClimbPathBuilder {
     private buildIteratedClimbSegment(profile: BaseGeometryProfile, climbStrategy: ClimbStrategy, speedProfile: SpeedProfile, startingAltitude: Feet, targetAltitude: Feet): void {
         const { managedClimbSpeedMach } = this.computationParametersObserver.get();
 
-        let lastClimbSpeed = 0;
-
         for (let altitude = startingAltitude; altitude < targetAltitude;) {
             const lastCheckpoint = profile.lastCheckpoint;
 
+            const lastClimbSpeed = lastCheckpoint.speed;
             const climbSpeed = speedProfile.getTarget(lastCheckpoint.distanceFromStart, altitude);
             const remainingFuelOnBoard = lastCheckpoint.remainingFuelOnBoard;
 
@@ -100,9 +128,30 @@ export class ClimbPathBuilder {
                 speed,
             });
 
-            lastClimbSpeed = climbSpeed;
             altitude = finalAltitude;
         }
+    }
+
+    private distanceStepFromLastCheckpoint(profile: BaseGeometryProfile, climbStrategy: ClimbStrategy, distance: NauticalMiles, reason: VerticalCheckpointReason) {
+        const { managedClimbSpeedMach } = this.computationParametersObserver.get();
+        const { altitude, speed: initialSpeed, remainingFuelOnBoard, distanceFromStart, secondsFromPresent } = profile.lastCheckpoint;
+
+        const {
+            distanceTraveled,
+            timeElapsed,
+            finalAltitude,
+            fuelBurned,
+            speed,
+        } = climbStrategy.predictToDistance(altitude, distance, initialSpeed, managedClimbSpeedMach, remainingFuelOnBoard);
+
+        profile.checkpoints.push({
+            reason,
+            distanceFromStart: distanceFromStart + distanceTraveled,
+            secondsFromPresent: secondsFromPresent + (timeElapsed * 60),
+            altitude: finalAltitude,
+            remainingFuelOnBoard: remainingFuelOnBoard - fuelBurned,
+            speed,
+        });
     }
 
     private addLevelSegmentSteps(profile: BaseGeometryProfile, speedProfile: SpeedProfile, toDistanceFromStart: NauticalMiles): void {

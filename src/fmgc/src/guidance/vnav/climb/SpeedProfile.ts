@@ -10,9 +10,28 @@ interface ClimbSpeedProfileParameters {
 }
 
 export interface SpeedProfile {
+    /**
+     * This is used for predictions
+     * @param distanceFromStart - The distance at which the target should be queried
+     * @param altitude
+     */
     getTarget(distanceFromStart: NauticalMiles, altitude: Feet): Knots;
-    getCurrentSpeedConstraint(): Knots;
+
+    /**
+     * This is used for guidance.
+     */
+    getCurrentSpeedTarget(): Knots;
     shouldTakeSpeedLimitIntoAccount(): boolean;
+
+    /**
+     * This is used for predictions
+     * @param distanceFromStart
+     */
+    getMaxClimbSpeedConstraint(distanceFromStart: NauticalMiles): MaxSpeedConstraint;
+}
+
+function constraintToSpeed(constraint?: MaxSpeedConstraint): Knots {
+    return constraint?.maxSpeed ?? Infinity;
 }
 
 /**
@@ -79,7 +98,7 @@ export class McduSpeedProfile implements SpeedProfile {
         return Math.min(managedClimbSpeed, this.findMaxSpeedAtDistanceAlongTrack(distanceFromStart));
     }
 
-    getCurrentSpeedConstraint(): Knots {
+    getCurrentSpeedTarget(): Knots {
         return this.findMaxSpeedAtDistanceAlongTrack(this.aircraftDistanceAlongTrack);
     }
 
@@ -92,38 +111,42 @@ export class McduSpeedProfile implements SpeedProfile {
             return cachedMaxSpeed;
         }
 
-        const maxSpeed = Math.min(this.findMaxClimbSpeedConstraint(distanceAlongTrack), this.findMaxDescentSpeedConstraint(distanceAlongTrack));
+        const maxSpeed = Math.min(
+            constraintToSpeed(this.getMaxClimbSpeedConstraint(distanceAlongTrack)),
+            constraintToSpeed(this.findMaxDescentSpeedConstraint(distanceAlongTrack)),
+        );
 
         this.maxSpeedCache.set(distanceAlongTrack, maxSpeed);
 
         return maxSpeed;
     }
 
-    private findMaxClimbSpeedConstraint(distanceAlongTrack: NauticalMiles): Knots {
-        let maxSpeed = Infinity;
+    getMaxClimbSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
+        let activeConstraint: MaxSpeedConstraint = null;
 
         for (const constraint of this.climbSpeedConstraints) {
-            if (distanceAlongTrack < constraint.distanceFromStart && constraint.maxSpeed < maxSpeed) {
-                maxSpeed = constraint.maxSpeed;
+            if (distanceAlongTrack < constraint.distanceFromStart && constraint.maxSpeed < constraintToSpeed(activeConstraint)) {
+                activeConstraint = constraint;
             }
         }
 
-        return maxSpeed;
+        return activeConstraint;
     }
 
-    private findMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): Knots {
-        let maxSpeed = Infinity;
+    private findMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
+        let activeConstraint: MaxSpeedConstraint = null;
 
+        // TODO: I think this is unnecessarily complex, we can probably just return the first constraint that is in front of us.
         for (const constraint of this.descentSpeedConstraints) {
             // Since the constraint are ordered, there is no need to search further
             if (distanceAlongTrack < constraint.distanceFromStart) {
-                return maxSpeed;
+                return activeConstraint;
             }
 
-            maxSpeed = Math.min(constraint.maxSpeed, maxSpeed);
+            activeConstraint = constraint;
         }
 
-        return maxSpeed;
+        return activeConstraint;
     }
 
     private findDistanceAlongTrackOfNextSpeedChange(distanceAlongTrack: NauticalMiles) {
@@ -163,12 +186,16 @@ export class ExpediteSpeedProfile implements SpeedProfile {
         return this.greenDotSpeed;
     }
 
-    getCurrentSpeedConstraint(): Knots {
+    getCurrentSpeedTarget(): Knots {
         return Infinity;
     }
 
     shouldTakeSpeedLimitIntoAccount(): boolean {
         return false;
+    }
+
+    getMaxClimbSpeedConstraint(_distanceFromStart: number): MaxSpeedConstraint {
+        return null;
     }
 }
 
@@ -223,7 +250,7 @@ export class NdSpeedProfile implements SpeedProfile {
         return Math.min(managedClimbSpeed, this.findMaxSpeedAtDistanceAlongTrack(distanceFromStart));
     }
 
-    getCurrentSpeedConstraint(): Knots {
+    getCurrentSpeedTarget(): Knots {
         return this.findMaxSpeedAtDistanceAlongTrack(this.aircraftDistanceAlongTrack);
     }
 
@@ -245,17 +272,22 @@ export class NdSpeedProfile implements SpeedProfile {
             return cachedMaxSpeed;
         }
 
-        let maxSpeed = Infinity;
-
-        for (const constraint of this.maxSpeedConstraints) {
-            if (distanceAlongTrack < constraint.distanceFromStart && constraint.maxSpeed < maxSpeed) {
-                maxSpeed = constraint.maxSpeed;
-            }
-        }
-
+        const maxSpeed = constraintToSpeed(this.getMaxClimbSpeedConstraint(distanceAlongTrack));
         this.maxSpeedCache.set(distanceAlongTrack, maxSpeed);
 
         return maxSpeed;
+    }
+
+    getMaxClimbSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
+        let activeConstraint: MaxSpeedConstraint = null;
+
+        for (const constraint of this.maxSpeedConstraints) {
+            if (distanceAlongTrack < constraint.distanceFromStart && constraint.maxSpeed < constraintToSpeed(activeConstraint)) {
+                activeConstraint = constraint;
+            }
+        }
+
+        return activeConstraint;
     }
 
     showDebugStats() {
