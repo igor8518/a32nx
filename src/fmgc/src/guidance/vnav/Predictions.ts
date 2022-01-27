@@ -382,6 +382,7 @@ export class Predictions {
             distanceTraveled: stepSize,
             fuelBurned,
             finalAltitude: altitude,
+            speed: econCAS,
         };
     }
 
@@ -549,6 +550,7 @@ export class Predictions {
             fuelBurned,
             finalAltitude,
             error,
+            speed: finalCAS,
         };
     }
 
