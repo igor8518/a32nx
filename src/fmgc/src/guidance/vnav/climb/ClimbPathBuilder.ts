@@ -27,10 +27,8 @@ export class ClimbPathBuilder {
         }
 
         if (speedProfile.shouldTakeSpeedLimitIntoAccount()) {
-            this.addSpeedLimitAsCheckpoint(profile, speedProfile);
+            this.addSpeedLimitAsCheckpoint(profile);
         }
-
-        // this.addSpeedConstraintsAsCheckpoints(profile);
     }
 
     private addClimbSteps(
@@ -98,6 +96,57 @@ export class ClimbPathBuilder {
 
         if (profile.lastCheckpoint.reason === VerticalCheckpointReason.AltitudeConstraint) {
             profile.lastCheckpoint.reason = VerticalCheckpointReason.ContinueClimb;
+        }
+
+        const { managedClimbSpeedMach } = this.computationParametersObserver.get();
+
+        for (const speedConstraint of profile.maxClimbSpeedConstraints) {
+            let { distanceFromStart, altitude, speed, remainingFuelOnBoard, secondsFromPresent } = profile.lastCheckpoint;
+
+            const speedTarget = speedProfile.getTarget(distanceFromStart, altitude);
+            if ((speedTarget - speed) > 1) {
+                const {
+                    distanceTraveled,
+                    fuelBurned,
+                    timeElapsed,
+                    speed: finalSpeed,
+                    finalAltitude,
+                } = climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
+
+                distanceFromStart += distanceTraveled;
+                secondsFromPresent += (timeElapsed * 60);
+                altitude = finalAltitude;
+                remainingFuelOnBoard -= fuelBurned;
+                speed = finalSpeed;
+
+                profile.checkpoints.push({
+                    reason: VerticalCheckpointReason.AtmosphericConditions,
+                    distanceFromStart,
+                    secondsFromPresent,
+                    altitude,
+                    remainingFuelOnBoard,
+                    speed,
+                });
+            }
+
+            if (speedConstraint.distanceFromStart > profile.lastCheckpoint.distanceFromStart) {
+                const {
+                    distanceTraveled,
+                    fuelBurned,
+                    timeElapsed,
+                    speed: finalSpeed,
+                    finalAltitude,
+                } = climbStrategy.predictToDistance(altitude, speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart, speed, managedClimbSpeedMach, remainingFuelOnBoard);
+
+                profile.checkpoints.push({
+                    reason: VerticalCheckpointReason.AtmosphericConditions,
+                    distanceFromStart: distanceFromStart + distanceTraveled,
+                    secondsFromPresent: secondsFromPresent + (timeElapsed * 60),
+                    altitude: finalAltitude,
+                    remainingFuelOnBoard: remainingFuelOnBoard - fuelBurned,
+                    speed: finalSpeed,
+                });
+            }
         }
 
         this.buildIteratedClimbSegment(profile, climbStrategy, speedProfile, profile.lastCheckpoint.altitude, finalAltitude);
@@ -310,13 +359,7 @@ export class ClimbPathBuilder {
         );
     }
 
-    private addSpeedConstraintsAsCheckpoints(profile: BaseGeometryProfile): void {
-        for (const { distanceFromStart, maxSpeed } of profile.maxClimbSpeedConstraints) {
-            profile.addInterpolatedCheckpoint(distanceFromStart, { reason: VerticalCheckpointReason.SpeedConstraint, speed: maxSpeed });
-        }
-    }
-
-    addSpeedLimitAsCheckpoint(profile: BaseGeometryProfile, speedProfile: SpeedProfile) {
+    addSpeedLimitAsCheckpoint(profile: BaseGeometryProfile) {
         const { climbSpeedLimit: { underAltitude }, presentPosition: { alt }, cruiseAltitude } = this.computationParametersObserver.get();
 
         if (underAltitude <= alt || underAltitude > cruiseAltitude) {
@@ -325,7 +368,7 @@ export class ClimbPathBuilder {
 
         const distance = profile.interpolateDistanceAtAltitude(underAltitude);
 
-        profile.addInterpolatedCheckpoint(distance, { reason: VerticalCheckpointReason.CrossingSpeedLimit, speed: speedProfile.getTarget(distance, underAltitude - 1) });
+        profile.addInterpolatedCheckpoint(distance, { reason: VerticalCheckpointReason.CrossingSpeedLimit });
     }
 
     private addFcuAltitudeAsCheckpoint(profile: BaseGeometryProfile) {

@@ -132,7 +132,13 @@ export abstract class BaseGeometryProfile {
                         this.checkpoints[i].remainingFuelOnBoard,
                         this.checkpoints[i + 1].remainingFuelOnBoard,
                     ),
-                    speed: this.checkpoints[i + 1].speed,
+                    speed: Common.interpolate(
+                        distanceFromStart,
+                        this.checkpoints[i].distanceFromStart,
+                        this.checkpoints[i + 1].distanceFromStart,
+                        this.checkpoints[i].speed,
+                        this.checkpoints[i + 1].speed,
+                    ),
                 };
             }
         }
@@ -232,7 +238,13 @@ export abstract class BaseGeometryProfile {
                         this.checkpoints[i].remainingFuelOnBoard,
                         this.checkpoints[i + 1].remainingFuelOnBoard,
                     ),
-                    speed: this.checkpoints[i + 1].speed,
+                    speed: Common.interpolate(
+                        distanceFromStart,
+                        this.checkpoints[i].distanceFromStart,
+                        this.checkpoints[i + 1].distanceFromStart,
+                        this.checkpoints[i].speed,
+                        this.checkpoints[i + 1].speed,
+                    ),
                     ...additionalProperties,
                 });
 
