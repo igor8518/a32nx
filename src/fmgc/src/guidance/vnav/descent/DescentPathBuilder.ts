@@ -29,7 +29,7 @@ export class DescentPathBuilder {
             return undefined;
         }
 
-        this.geometricPathBuilder.buildGeometricPath(profile, speedProfile);
+        this.geometricPathBuilder.buildGeometricPath(profile, speedProfile, cruiseAltitude);
 
         const geometricPathStart = profile.findVerticalCheckpoint(VerticalCheckpointReason.GeometricPathStart);
         const tocCheckpoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
@@ -41,15 +41,6 @@ export class DescentPathBuilder {
 
             // TODO: This should not be here ideally
             profile.sortCheckpoints();
-
-            const lastIdlePathCheckpoint = profile.findLastVerticalCheckpoint(VerticalCheckpointReason.IdlePathEnd);
-
-            // Check that the idle path ends before our reference point (at the moment, always DECEL)
-            if (lastIdlePathCheckpoint.distanceFromStart > geometricPathStart.distanceFromStart) {
-                // If so, do not do an idle path for now TODO insert a vertical discontinuity ?
-                console.error('[FMS/VNAV] Idle path construction failed');
-                profile.purgeVerticalCheckpoints(VerticalCheckpointReason.IdlePathAtmosphericConditions);
-            }
 
             return tod;
         }

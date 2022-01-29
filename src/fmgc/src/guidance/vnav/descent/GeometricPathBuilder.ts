@@ -11,13 +11,19 @@ import { Constants } from '@shared/Constants';
 export class GeometricPathBuilder {
     constructor(private observer: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions) { }
 
-    buildGeometricPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile) {
+    buildGeometricPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, finalCruiseAltitude: Feet) {
         const decelPoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.Decel);
         profile.checkpoints.push({ ...decelPoint, reason: VerticalCheckpointReason.GeometricPathEnd });
 
-        const constraintsToUse = profile.descentAltitudeConstraints.slice().reverse().filter((constraint) => constraint.distanceFromStart < profile.lastCheckpoint.distanceFromStart);
+        const constraintsToUse = profile.descentAltitudeConstraints
+            .slice()
+            .reverse()
+            .filter(
+                (constraint) => this.isConstraintBelowCruisingAltitude(constraint, finalCruiseAltitude)
+                    && constraint.distanceFromStart < profile.lastCheckpoint.distanceFromStart,
+            );
 
-        const planner = new GeometricPathPlanner(this.observer, this.atmosphericConditions, speedProfile, constraintsToUse, profile.lastCheckpoint);
+        const planner = new GeometricPathPlanner(this.observer, this.atmosphericConditions, speedProfile, constraintsToUse, profile.lastCheckpoint, finalCruiseAltitude);
 
         for (let i = 0; i < 100 && planner.currentConstraintIndex < constraintsToUse.length; i++) {
             planner.stepAlong();
@@ -26,6 +32,20 @@ export class GeometricPathBuilder {
         const checkpointsToAdd = planner.finalize();
 
         profile.checkpoints.push(...checkpointsToAdd);
+    }
+
+    isConstraintBelowCruisingAltitude(constraint: DescentAltitudeConstraint, finalCruiseAltitude: Feet): boolean {
+        if (constraint.constraint.type === AltitudeConstraintType.at) {
+            return constraint.constraint.altitude1 <= finalCruiseAltitude;
+        } if (constraint.constraint.type === AltitudeConstraintType.atOrAbove) {
+            return constraint.constraint.altitude1 <= finalCruiseAltitude;
+        } if (constraint.constraint.type === AltitudeConstraintType.atOrBelow) {
+            return true;
+        } if (constraint.constraint.type === AltitudeConstraintType.range) {
+            return constraint.constraint.altitude2 <= finalCruiseAltitude;
+        }
+
+        return true;
     }
 }
 
@@ -54,6 +74,7 @@ class GeometricPathPlanner {
         private speedProfile: SpeedProfile,
         private constraints: DescentAltitudeConstraint[],
         private startingPoint: VerticalCheckpoint,
+        private finalCruiseAltitude: Feet,
     ) {
         this.currentCheckpoint = { ...startingPoint };
 
@@ -320,7 +341,7 @@ class GeometricPathPlanner {
      */
     findCumulativeMaxAltitudes(constraints: DescentAltitudeConstraint[]): Feet[] {
         const cumulativeMaxAltitudes = new Array(constraints.length);
-        let maxAltitude = Infinity;
+        let maxAltitude = this.finalCruiseAltitude;
 
         for (const constraint of constraints) {
             if (constraint.constraint.type !== AltitudeConstraintType.atOrAbove) {
