@@ -117,8 +117,8 @@ export class EfisSymbols {
 
         let waypointPredictions = new Map<number, VerticalWaypointPrediction>();
         // Check we are in an AP mode where constraints are not ignored
-        if (this.guidanceController.vnavDriver.shouldObeyAltitudeConstraints() && this.guidanceController.vnavDriver.currentNdGeometryProfile instanceof NavGeometryProfile) {
-            waypointPredictions = this.guidanceController.vnavDriver.currentNdGeometryProfile?.waypointPredictions;
+        if (this.guidanceController.vnavDriver.shouldObeyAltitudeConstraints()) {
+            waypointPredictions = this.guidanceController.vnavDriver.currentNavGeometryProfile?.waypointPredictions;
         }
 
         for (const side of EfisSymbols.sides) {
