@@ -522,7 +522,7 @@ const RealismPage = () => {
                     </div>
 
                     <div className="py-4 flex flex-row justify-between items-center">
-                        <span className="text-lg text-gray-300 mr-1">Automatic delete discontimuity on flightplan SimBrief init</span>
+                        <span className="text-lg text-gray-300 mr-1">Automatically delete discontinuities on SimBrief import</span>
                         <SelectGroup>
                             {autoDeleteDiscontinuityButtons.map((button) => (
                                 <SelectItem
