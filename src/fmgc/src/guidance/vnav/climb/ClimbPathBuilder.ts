@@ -101,51 +101,19 @@ export class ClimbPathBuilder {
         const { managedClimbSpeedMach } = this.computationParametersObserver.get();
 
         for (const speedConstraint of profile.maxClimbSpeedConstraints) {
-            let { distanceFromStart, altitude, speed, remainingFuelOnBoard, secondsFromPresent } = profile.lastCheckpoint;
+            const { distanceFromStart, altitude, speed, remainingFuelOnBoard } = profile.lastCheckpoint;
 
             const speedTarget = speedProfile.getTarget(distanceFromStart, altitude);
             if ((speedTarget - speed) > 1) {
-                const {
-                    distanceTraveled,
-                    fuelBurned,
-                    timeElapsed,
-                    speed: finalSpeed,
-                    finalAltitude,
-                } = climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
+                const accelerationStep = climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
 
-                distanceFromStart += distanceTraveled;
-                secondsFromPresent += (timeElapsed * 60);
-                altitude = finalAltitude;
-                remainingFuelOnBoard -= fuelBurned;
-                speed = finalSpeed;
-
-                profile.checkpoints.push({
-                    reason: VerticalCheckpointReason.AtmosphericConditions,
-                    distanceFromStart,
-                    secondsFromPresent,
-                    altitude,
-                    remainingFuelOnBoard,
-                    speed,
-                });
+                this.addCheckpointFromStep(profile, accelerationStep, VerticalCheckpointReason.AtmosphericConditions);
             }
 
             if (speedConstraint.distanceFromStart > profile.lastCheckpoint.distanceFromStart) {
-                const {
-                    distanceTraveled,
-                    fuelBurned,
-                    timeElapsed,
-                    speed: finalSpeed,
-                    finalAltitude,
-                } = climbStrategy.predictToDistance(altitude, speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart, speed, managedClimbSpeedMach, remainingFuelOnBoard);
-
-                profile.checkpoints.push({
-                    reason: VerticalCheckpointReason.AtmosphericConditions,
-                    distanceFromStart: distanceFromStart + distanceTraveled,
-                    secondsFromPresent: secondsFromPresent + (timeElapsed * 60),
-                    altitude: finalAltitude,
-                    remainingFuelOnBoard: remainingFuelOnBoard - fuelBurned,
-                    speed: finalSpeed,
-                });
+                this.distanceStepFromLastCheckpoint(
+                    profile, climbStrategy, speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart, VerticalCheckpointReason.AtmosphericConditions,
+                );
             }
         }
 
@@ -157,51 +125,27 @@ export class ClimbPathBuilder {
         const { managedClimbSpeedMach } = this.computationParametersObserver.get();
 
         for (let altitude = startingAltitude; altitude < targetAltitude;) {
-            const lastCheckpoint = profile.lastCheckpoint;
+            const { speed, remainingFuelOnBoard, distanceFromStart } = profile.lastCheckpoint;
 
-            const lastClimbSpeed = lastCheckpoint.speed;
-            const climbSpeed = speedProfile.getTarget(lastCheckpoint.distanceFromStart, altitude);
-            const remainingFuelOnBoard = lastCheckpoint.remainingFuelOnBoard;
+            const speedTarget = speedProfile.getTarget(distanceFromStart, altitude);
 
-            const step = Math.abs(climbSpeed - lastClimbSpeed) < 1
-                ? climbStrategy.predictToAltitude(altitude, Math.min(altitude + 1500, targetAltitude), climbSpeed, managedClimbSpeedMach, remainingFuelOnBoard)
-                : climbStrategy.predictToSpeed(altitude, climbSpeed, lastClimbSpeed, managedClimbSpeedMach, remainingFuelOnBoard);
+            const step = Math.abs(speedTarget - speed) < 1
+                ? climbStrategy.predictToAltitude(altitude, Math.min(altitude + 1500, targetAltitude), speedTarget, managedClimbSpeedMach, remainingFuelOnBoard)
+                : climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
 
-            const { distanceTraveled, timeElapsed, fuelBurned, finalAltitude, speed } = step;
+            this.addCheckpointFromStep(profile, step, VerticalCheckpointReason.AtmosphericConditions);
 
-            profile.checkpoints.push({
-                reason: VerticalCheckpointReason.AtmosphericConditions,
-                distanceFromStart: lastCheckpoint.distanceFromStart + distanceTraveled,
-                secondsFromPresent: lastCheckpoint.secondsFromPresent + (timeElapsed * 60),
-                altitude: finalAltitude,
-                remainingFuelOnBoard: remainingFuelOnBoard - fuelBurned,
-                speed,
-            });
-
-            altitude = finalAltitude;
+            altitude = step.finalAltitude;
         }
     }
 
     private distanceStepFromLastCheckpoint(profile: BaseGeometryProfile, climbStrategy: ClimbStrategy, distance: NauticalMiles, reason: VerticalCheckpointReason) {
         const { managedClimbSpeedMach } = this.computationParametersObserver.get();
-        const { altitude, speed: initialSpeed, remainingFuelOnBoard, distanceFromStart, secondsFromPresent } = profile.lastCheckpoint;
+        const { altitude, speed: initialSpeed, remainingFuelOnBoard } = profile.lastCheckpoint;
 
-        const {
-            distanceTraveled,
-            timeElapsed,
-            finalAltitude,
-            fuelBurned,
-            speed,
-        } = climbStrategy.predictToDistance(altitude, distance, initialSpeed, managedClimbSpeedMach, remainingFuelOnBoard);
+        const step = climbStrategy.predictToDistance(altitude, distance, initialSpeed, managedClimbSpeedMach, remainingFuelOnBoard);
 
-        profile.checkpoints.push({
-            reason,
-            distanceFromStart: distanceFromStart + distanceTraveled,
-            secondsFromPresent: secondsFromPresent + (timeElapsed * 60),
-            altitude: finalAltitude,
-            remainingFuelOnBoard: remainingFuelOnBoard - fuelBurned,
-            speed,
-        });
+        this.addCheckpointFromStep(profile, step, reason);
     }
 
     private addLevelSegmentSteps(profile: BaseGeometryProfile, speedProfile: SpeedProfile, toDistanceFromStart: NauticalMiles): void {
@@ -219,12 +163,8 @@ export class ClimbPathBuilder {
             const speedTarget = speedProfile.getTarget(profile.lastCheckpoint.distanceFromStart, altitude);
 
             if (speedTarget > currentSpeed) {
-                const {
-                    distanceTraveled,
-                    timeElapsed,
-                    fuelBurned,
-                    speed,
-                } = this.computeLevelFlightAccelerationStep(altitude, currentSpeed, speedTarget, profile.lastCheckpoint.remainingFuelOnBoard);
+                const step = this.computeLevelFlightAccelerationStep(altitude, currentSpeed, speedTarget, profile.lastCheckpoint.remainingFuelOnBoard);
+                const { distanceTraveled, timeElapsed, fuelBurned, speed } = step;
 
                 // We could not accelerate in time
                 if (profile.lastCheckpoint.distanceFromStart + distanceTraveled > speedConstraint.distanceFromStart) {
@@ -242,45 +182,33 @@ export class ClimbPathBuilder {
                     continue;
                 } else {
                     // End of acceleration
-                    profile.checkpoints.push({
-                        reason: VerticalCheckpointReason.AtmosphericConditions,
-                        distanceFromStart: profile.lastCheckpoint.distanceFromStart + distanceTraveled,
-                        secondsFromPresent: profile.lastCheckpoint.secondsFromPresent + (timeElapsed * 60),
-                        altitude,
-                        remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - fuelBurned,
-                        speed,
-                    });
+                    this.addCheckpointFromStep(profile, step, VerticalCheckpointReason.AtmosphericConditions);
                 }
             }
 
             // Compute step after accelerating to next constraint
-            const { fuelBurned, timeElapsed } = this.computeLevelFlightSegmentPrediction(
+            const levelStepToConstraint = this.computeLevelFlightSegmentPrediction(
                 speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart,
                 altitude,
                 profile.lastCheckpoint.speed,
                 profile.lastCheckpoint.remainingFuelOnBoard,
             );
 
-            profile.checkpoints.push({
-                reason: VerticalCheckpointReason.AltitudeConstraint,
-                distanceFromStart: speedConstraint.distanceFromStart,
-                secondsFromPresent: profile.lastCheckpoint.secondsFromPresent + (timeElapsed * 60),
-                altitude,
-                remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - fuelBurned,
-                speed: profile.lastCheckpoint.speed,
-            });
+            this.addCheckpointFromStep(profile, levelStepToConstraint, VerticalCheckpointReason.AltitudeConstraint);
         }
 
+        // TODO: This exact piece of code appears a couple of lines above, extract to function!
         const currentSpeed = profile.lastCheckpoint.speed;
         const speedTarget = speedProfile.getTarget(profile.lastCheckpoint.distanceFromStart, altitude);
 
         if (speedTarget > currentSpeed) {
+            const accelerationStep = this.computeLevelFlightAccelerationStep(altitude, currentSpeed, speedTarget, profile.lastCheckpoint.remainingFuelOnBoard);
             const {
                 distanceTraveled,
                 timeElapsed,
                 fuelBurned,
                 speed,
-            } = this.computeLevelFlightAccelerationStep(altitude, currentSpeed, speedTarget, profile.lastCheckpoint.remainingFuelOnBoard);
+            } = accelerationStep;
 
             // We could not accelerate in time
             if (profile.lastCheckpoint.distanceFromStart + distanceTraveled > toDistanceFromStart) {
@@ -298,31 +226,17 @@ export class ClimbPathBuilder {
                 return;
             }
             // End of acceleration
-            profile.checkpoints.push({
-                reason: VerticalCheckpointReason.AtmosphericConditions,
-                distanceFromStart: profile.lastCheckpoint.distanceFromStart + distanceTraveled,
-                secondsFromPresent: profile.lastCheckpoint.secondsFromPresent + (timeElapsed * 60),
-                altitude,
-                remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - fuelBurned,
-                speed,
-            });
+            this.addCheckpointFromStep(profile, accelerationStep, VerticalCheckpointReason.AtmosphericConditions);
         }
 
-        const step = this.computeLevelFlightSegmentPrediction(
+        const levelStepToConstraint = this.computeLevelFlightSegmentPrediction(
             toDistanceFromStart - profile.lastCheckpoint.distanceFromStart,
             altitude,
             profile.lastCheckpoint.speed,
             profile.lastCheckpoint.remainingFuelOnBoard,
         );
 
-        profile.checkpoints.push({
-            reason: VerticalCheckpointReason.AltitudeConstraint,
-            distanceFromStart: toDistanceFromStart,
-            secondsFromPresent: profile.lastCheckpoint.secondsFromPresent + (step.timeElapsed * 60),
-            altitude,
-            remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - step.fuelBurned,
-            speed: profile.lastCheckpoint.speed,
-        });
+        this.addCheckpointFromStep(profile, levelStepToConstraint, VerticalCheckpointReason.AltitudeConstraint);
     }
 
     private computeLevelFlightSegmentPrediction(stepSize: Feet, altitude: Feet, initialSpeed: Knots, fuelWeight: number): StepResults {
@@ -394,6 +308,17 @@ export class ClimbPathBuilder {
         ];
 
         return ((armedVerticalMode & ArmedVerticalMode.CLB) === ArmedVerticalMode.CLB) || verticalModesToShowLevelOffArrowFor.includes(verticalMode);
+    }
+
+    private addCheckpointFromStep(profile: BaseGeometryProfile, step: StepResults, reason: VerticalCheckpointReason) {
+        profile.addCheckpointFromLast(({ distanceFromStart, secondsFromPresent, remainingFuelOnBoard }) => ({
+            reason,
+            distanceFromStart: distanceFromStart + step.distanceTraveled,
+            altitude: step.finalAltitude,
+            secondsFromPresent: secondsFromPresent + (step.timeElapsed * 60),
+            speed: step.speed,
+            remainingFuelOnBoard: remainingFuelOnBoard - step.fuelBurned,
+        }));
     }
 }
 
