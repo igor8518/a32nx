@@ -185,7 +185,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
     private hasSpeedChange(distanceFromStart: NauticalMiles, maxSpeed: Knots): boolean {
         for (let i = 0; i < this.checkpoints.length - 1; i++) {
             if (distanceFromStart >= this.checkpoints[i].distanceFromStart && distanceFromStart < this.checkpoints[i + 1].distanceFromStart) {
-                return this.checkpoints[i + 1].speed > maxSpeed;
+                return this.checkpoints[i + 1].speed - maxSpeed > 1;
             }
         }
 
@@ -256,7 +256,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
             }
 
             if (prediction.distanceFromStart < speedLimitDistance && this.waypointPredictions.get(i + 1).distanceFromStart > speedLimitDistance) {
-                if (speedLimitSpeed < this.waypointPredictions.get(i + 1).speed) {
+                if (this.hasSpeedChange(speedLimitDistance, speedLimitSpeed)) {
                     result.push(speedLimitDistance);
                 }
             }
