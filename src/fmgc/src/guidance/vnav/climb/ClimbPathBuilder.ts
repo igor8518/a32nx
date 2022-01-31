@@ -107,6 +107,15 @@ export class ClimbPathBuilder {
             if ((speedTarget - speed) > 1) {
                 const accelerationStep = climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
 
+                // If we shoot through the final altitude trying to accelerate, pretend we didn't accelerate all the way
+                if (accelerationStep.finalAltitude > finalAltitude) {
+                    const scaling = (accelerationStep.finalAltitude - accelerationStep.initialAltitude) === 0
+                        ? (finalAltitude - accelerationStep.initialAltitude) / (accelerationStep.finalAltitude - accelerationStep.initialAltitude)
+                        : 0;
+
+                    this.scaleStep(accelerationStep, scaling);
+                }
+
                 this.addCheckpointFromStep(profile, accelerationStep, VerticalCheckpointReason.AtmosphericConditions);
             }
 
@@ -319,6 +328,15 @@ export class ClimbPathBuilder {
             speed: step.speed,
             remainingFuelOnBoard: remainingFuelOnBoard - step.fuelBurned,
         }));
+    }
+
+    // TODO: Rethink the existence of thsi
+    private scaleStep(step: StepResults, scaling: number) {
+        step.distanceTraveled *= scaling;
+        step.fuelBurned *= scaling;
+        step.timeElapsed *= scaling;
+        step.finalAltitude *= scaling;
+        step.speed *= scaling;
     }
 }
 
