@@ -9,7 +9,7 @@ import { PseudoWaypointFlightPlanInfo } from '@fmgc/guidance/PseudoWaypoint';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { CruisePathBuilder } from '@fmgc/guidance/vnav/cruise/CruisePathBuilder';
 import { CruiseToDescentCoordinator } from '@fmgc/guidance/vnav/CruiseToDescentCoordinator';
-import { ArmedLateralMode, LateralMode, VerticalMode } from '@shared/autopilot';
+import { ArmedLateralMode, ArmedVerticalMode, LateralMode, VerticalMode } from '@shared/autopilot';
 import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { McduSpeedProfile, ExpediteSpeedProfile, NdSpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { SelectedGeometryProfile } from '@fmgc/guidance/vnav/profile/SelectedGeometryProfile';
@@ -191,6 +191,7 @@ export class VnavDriver implements GuidanceComponent {
 
         if (!this.shouldObeyAltitudeConstraints()) {
             this.currentNdGeometryProfile.maxAltitudeConstraints = [];
+            this.currentNdGeometryProfile.descentAltitudeConstraints = [];
         }
 
         if (geometry.legs.size <= 0 || !this.computationParametersObserver.canComputeProfile()) {
@@ -221,8 +222,9 @@ export class VnavDriver implements GuidanceComponent {
     }
 
     shouldObeyAltitudeConstraints(): boolean {
-        const { fcuArmedLateralMode, fcuVerticalMode } = this.computationParametersObserver.get();
+        const { fcuArmedLateralMode, fcuArmedVerticalMode, fcuVerticalMode } = this.computationParametersObserver.get();
 
+        const isClbArmed = (fcuArmedVerticalMode & ArmedVerticalMode.CLB) === ArmedVerticalMode.CLB;
         const isNavArmed = (fcuArmedLateralMode & ArmedLateralMode.NAV) === ArmedLateralMode.NAV;
 
         const verticalModesToApplyAltitudeConstraintsFor = [
@@ -230,9 +232,10 @@ export class VnavDriver implements GuidanceComponent {
             VerticalMode.ALT_CPT,
             VerticalMode.ALT_CST_CPT,
             VerticalMode.ALT_CST,
+            VerticalMode.DES,
         ];
 
-        return isNavArmed || verticalModesToApplyAltitudeConstraintsFor.includes(fcuVerticalMode);
+        return isClbArmed || isNavArmed || verticalModesToApplyAltitudeConstraintsFor.includes(fcuVerticalMode);
     }
 
     computeVerticalProfileForExpediteClimb(): SelectedGeometryProfile | undefined {
