@@ -445,11 +445,11 @@ class CDUPerformancePage {
         let expeditePredToTimeCell = "----";
 
         if (vnavDriver) {
-            [predToDistanceCell, predToTimeCell] = CDUPerformancePage.getTimeAndDistancePredictionsFromGeometryProfile(vnavDriver.currentNavGeometryProfile, fcuAltitude, mcdu.getIsFlying());
+            [predToDistanceCell, predToTimeCell] = CDUPerformancePage.getTimeAndDistancePredictionsFromGeometryProfile(vnavDriver.currentNavGeometryProfile, altitudeToPredict, mcdu.getIsFlying());
 
             if (isPhaseActive) {
                 const expediteProfile = vnavDriver.computeVerticalProfileForExpediteClimb();
-                [expeditePredToDistanceCell, expeditePredToTimeCell] = CDUPerformancePage.getTimeAndDistancePredictionsFromGeometryProfile(expediteProfile, fcuAltitude, mcdu.getIsFlying(), true);
+                [expeditePredToDistanceCell, expeditePredToTimeCell] = CDUPerformancePage.getTimeAndDistancePredictionsFromGeometryProfile(expediteProfile, altitudeToPredict, mcdu.getIsFlying(), true);
             }
         }
 

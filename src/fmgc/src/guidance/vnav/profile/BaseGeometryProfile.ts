@@ -50,12 +50,12 @@ export abstract class BaseGeometryProfile {
     private interpolateFromCheckpoints<T extends number, U extends number>(
         indexValue: T, keySelector: (checkpoint: VerticalCheckpoint) => T, valueSelector: (checkpoint: VerticalCheckpoint) => U,
     ) {
-        if (indexValue < keySelector(this.checkpoints[0])) {
+        if (indexValue <= keySelector(this.checkpoints[0])) {
             return valueSelector(this.checkpoints[0]);
         }
 
         for (let i = 0; i < this.checkpoints.length - 1; i++) {
-            if (indexValue >= keySelector(this.checkpoints[i]) && indexValue < keySelector(this.checkpoints[i + 1])) {
+            if (indexValue > keySelector(this.checkpoints[i]) && indexValue <= keySelector(this.checkpoints[i + 1])) {
                 return Common.interpolate(
                     indexValue,
                     keySelector(this.checkpoints[i]),
@@ -291,7 +291,9 @@ export abstract class BaseGeometryProfile {
     }
 
     computePredictionToFcuAltitude(fcuAltitude: Feet): PerformancePagePrediction | undefined {
-        if (fcuAltitude < this.checkpoints[0].altitude) {
+        const maxAltitude = this.checkpoints.reduce((currentMax, checkpoint) => Math.max(currentMax, checkpoint.altitude), 0);
+
+        if (fcuAltitude < this.checkpoints[0].altitude || fcuAltitude > maxAltitude) {
             return undefined;
         }
 
