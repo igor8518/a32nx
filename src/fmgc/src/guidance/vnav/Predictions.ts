@@ -160,7 +160,9 @@ export class Predictions {
     ): StepResults {
         const weightEstimate = zeroFuelWeight + initialFuelWeight;
 
-        let finalAltitude: Feet;
+        let finalAltitude = initialAltitude;
+        let previousFinalAltitude = finalAltitude;
+
         let pathAngle: number;
         let verticalSpeed: FeetPerMinute;
         let stepTime: Minutes; // Minutes
@@ -168,11 +170,12 @@ export class Predictions {
         let fuelBurned: Pounds;
 
         let midStepWeight = weightEstimate;
-        let previousMidStepWeight = midStepWeight;
         let iterations = 0;
         do {
-            const theta = Common.getTheta(initialAltitude, isaDev, initialAltitude > tropoAltitude);
-            const delta = Common.getDelta(theta, initialAltitude > tropoAltitude, initialAltitude);
+            const midStepAltitude = (initialAltitude + finalAltitude) / 2;
+
+            const theta = Common.getTheta(midStepAltitude, isaDev, midStepAltitude > tropoAltitude);
+            const delta = Common.getDelta(theta, midStepAltitude > tropoAltitude, midStepAltitude);
             let mach = Common.CAStoMach(econCAS, delta);
 
             let eas;
@@ -209,11 +212,11 @@ export class Predictions {
             // const endStepWeight = zeroFuelWeight + (initialFuelWeight - fuelBurned); <- not really needed
 
             // Adjust variables for better accuracy next iteration
-            previousMidStepWeight = midStepWeight;
+            previousFinalAltitude = finalAltitude;
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             finalAltitude = initialAltitude + stepSize;
             iterations++;
-        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) < 100);
+        } while (iterations < 4 && Math.abs(finalAltitude - previousFinalAltitude) < 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -855,12 +858,13 @@ export class Predictions {
         perfFactorPercent: number,
     ): StepResults & { predictedN1: number } {
         let finalAltitude = initialAltitude;
+        let previousFinalAltitude = finalAltitude;
+
         let pathAngle = 0;
         let stepTime = 0;
         let fuelBurned = 0;
         let iterations = 0;
         let midstepWeight = zeroFuelWeight + initialFuelWeight;
-        let previousMidstepWeight = midstepWeight;
         let predictedN1 = 0;
         do {
             const midStepAltitude = (initialAltitude + finalAltitude) / 2;
@@ -884,7 +888,6 @@ export class Predictions {
             // TODO: Use headwind
             pathAngle = Math.atan2(verticalSpeed, tas * 101.269); // radians
             stepTime = 60 * distance / tas;
-            finalAltitude = initialAltitude + verticalSpeed * stepTime;
 
             const drag = FlightModel.getDrag(midstepWeight, mach, delta, false, false, FlapConf.CLEAN);
             const thrust = FlightModel.getThrustFromConstantPathAngle(pathAngle * MathUtils.RADIANS_TO_DEGREES, midstepWeight, drag, 0);
@@ -896,10 +899,11 @@ export class Predictions {
             const correctedFuelFlow = EngineModel.getCorrectedFuelFlow(predictedN1, mach, midStepAltitude) * 2;
             const fuelFlow = EngineModel.getUncorrectedFuelFlow(correctedFuelFlow, delta2, theta2) * (1 + perfFactorPercent / 100); // in lbs/hour
 
+            previousFinalAltitude = finalAltitude;
+            finalAltitude = initialAltitude + verticalSpeed * stepTime;
             fuelBurned = fuelFlow / 60 * stepTime;
-            previousMidstepWeight = midstepWeight;
             midstepWeight -= (fuelBurned / 2);
-        } while (++iterations < 4 && Math.abs(previousMidstepWeight - midstepWeight) < 100);
+        } while (++iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) < 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
