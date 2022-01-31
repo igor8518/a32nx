@@ -115,7 +115,7 @@ export class Predictions {
             previousMidStepWeight = midStepWeight;
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             iterations++;
-        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) < 100);
+        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) > 100);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -216,7 +216,7 @@ export class Predictions {
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             finalAltitude = initialAltitude + stepSize;
             iterations++;
-        } while (iterations < 4 && Math.abs(finalAltitude - previousFinalAltitude) < 10);
+        } while (iterations < 4 && Math.abs(finalAltitude - previousFinalAltitude) > 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -314,7 +314,7 @@ export class Predictions {
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             initialAltitude = finalAltitude - stepSize;
             iterations++;
-        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) < 100);
+        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) > 100);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -543,7 +543,7 @@ export class Predictions {
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             lift = midStepWeight * Math.cos(pathAngleRadians);
             iterations++;
-        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) < 100);
+        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) > 100);
 
         return {
             pathAngle: pathAngleRadians * MathUtils.RADIANS_TO_DEGREES,
@@ -697,7 +697,7 @@ export class Predictions {
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             lift = midStepWeight * Math.cos(fpaRadians);
             iterations++;
-        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) < 100);
+        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) > 100);
 
         return {
             pathAngle: fpaDegrees,
@@ -833,7 +833,7 @@ export class Predictions {
             fuelBurned = fuelFlow / 60 * stepTime;
             previousMidstepWeight = midstepWeight;
             midstepWeight -= (fuelBurned / 2);
-        } while (++iterations < 4 && Math.abs(previousMidstepWeight - midstepWeight) < 100);
+        } while (++iterations < 4 && Math.abs(previousMidstepWeight - midstepWeight) > 100);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -903,7 +903,7 @@ export class Predictions {
             finalAltitude = initialAltitude + verticalSpeed * stepTime;
             fuelBurned = fuelFlow / 60 * stepTime;
             midstepWeight -= (fuelBurned / 2);
-        } while (++iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) < 10);
+        } while (++iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) > 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -991,7 +991,7 @@ export class Predictions {
 
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             iterations++;
-        } while (iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) < 10);
+        } while (iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) > 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
@@ -1080,7 +1080,7 @@ export class Predictions {
 
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             iterations++;
-        } while (iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) < 10);
+        } while (iterations < 4 && Math.abs(previousFinalAltitude - finalAltitude) > 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
