@@ -3,8 +3,9 @@ import { Constants } from '@shared/Constants';
 import { StepCoordinator } from '@fmgc/guidance/vnav/StepCoordinator';
 import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { ClimbStrategy, DescentStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
+import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
 import { Predictions, StepResults } from '../Predictions';
-import { NavGeometryProfile, VerticalCheckpointReason } from '../profile/NavGeometryProfile';
+import { VerticalCheckpointReason } from '../profile/NavGeometryProfile';
 import { AtmosphericConditions } from '../AtmosphericConditions';
 
 export interface CruisePathBuilderResults {
@@ -21,15 +22,19 @@ export class CruisePathBuilder {
         this.atmosphericConditions.update();
     }
 
-    computeCruisePath(profile: NavGeometryProfile, stepClimbStrategy: ClimbStrategy, stepDescentStrategy: DescentStrategy): CruisePathBuilderResults {
+    computeCruisePath(profile: BaseGeometryProfile, stepClimbStrategy: ClimbStrategy, stepDescentStrategy: DescentStrategy): CruisePathBuilderResults {
         const topOfClimb = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfClimb);
+        const presentPosition = profile.findVerticalCheckpoint(VerticalCheckpointReason.PresentPosition);
+
+        const startOfCruise = topOfClimb ?? presentPosition;
+
         const topOfDescent = profile.findVerticalCheckpoint(VerticalCheckpointReason.TopOfDescent);
 
-        if (!topOfClimb?.distanceFromStart || !topOfDescent?.distanceFromStart) {
+        if (!startOfCruise?.distanceFromStart || !topOfDescent?.distanceFromStart) {
             return null;
         }
 
-        if (topOfClimb.distanceFromStart > topOfDescent.distanceFromStart) {
+        if (startOfCruise.distanceFromStart > topOfDescent.distanceFromStart) {
             console.warn('[FMS/VNAV] Cruise segment too short');
             return null;
         }
@@ -37,7 +42,7 @@ export class CruisePathBuilder {
         const { managedCruiseSpeed, managedCruiseSpeedMach } = this.computationParametersObserver.get();
 
         // Steps
-        let { distanceFromStart, altitude, remainingFuelOnBoard, secondsFromPresent } = topOfClimb;
+        let { distanceFromStart, altitude, remainingFuelOnBoard, secondsFromPresent } = startOfCruise;
 
         const steps = this.stepCoordinator.steps;
         for (const step of steps) {
@@ -51,11 +56,11 @@ export class CruisePathBuilder {
 
             const stepDistanceFromStart = step.distanceFromStart;
 
-            if (stepDistanceFromStart < topOfClimb.distanceFromStart || stepDistanceFromStart > topOfDescent.distanceFromStart) {
+            if (stepDistanceFromStart < startOfCruise.distanceFromStart || stepDistanceFromStart > topOfDescent.distanceFromStart) {
                 if (VnavConfig.DEBUG_PROFILE) {
                     console.warn(
                         `[FMS/VNAV] Cruise step is not within cruise segment \
-                        (${stepDistanceFromStart.toFixed(2)} NM, T/C: ${topOfClimb.distanceFromStart.toFixed(2)} NM, T/D: ${topOfDescent.distanceFromStart.toFixed(2)} NM)`,
+                        (${stepDistanceFromStart.toFixed(2)} NM, T/C: ${startOfCruise.distanceFromStart.toFixed(2)} NM, T/D: ${topOfDescent.distanceFromStart.toFixed(2)} NM)`,
                     );
                 }
 
@@ -94,7 +99,7 @@ export class CruisePathBuilder {
             });
         }
 
-        const { fuelBurned, timeElapsed, distanceTraveled } = this.computeCruiseSegment(topOfDescent.distanceFromStart - distanceFromStart, topOfClimb.remainingFuelOnBoard);
+        const { fuelBurned, timeElapsed, distanceTraveled } = this.computeCruiseSegment(topOfDescent.distanceFromStart - distanceFromStart, startOfCruise.remainingFuelOnBoard);
         distanceFromStart += distanceTraveled;
         remainingFuelOnBoard -= fuelBurned;
         secondsFromPresent += timeElapsed * 60;

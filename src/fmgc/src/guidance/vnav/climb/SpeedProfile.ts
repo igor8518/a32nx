@@ -214,6 +214,7 @@ export class NdSpeedProfile implements SpeedProfile {
         private parameters: ClimbSpeedProfileParameters,
         private aircraftDistanceAlongTrack: NauticalMiles,
         private maxSpeedConstraints: MaxSpeedConstraint[],
+        private descentSpeedConstraints: MaxSpeedConstraint[],
     ) { }
 
     private isValidSpeedLimit(): boolean {
@@ -272,7 +273,10 @@ export class NdSpeedProfile implements SpeedProfile {
             return cachedMaxSpeed;
         }
 
-        const maxSpeed = constraintToSpeed(this.getMaxClimbSpeedConstraint(distanceAlongTrack));
+        const maxSpeed = Math.min(
+            constraintToSpeed(this.getMaxClimbSpeedConstraint(distanceAlongTrack)),
+            constraintToSpeed(this.findMaxDescentSpeedConstraint(distanceAlongTrack)),
+        );
         this.maxSpeedCache.set(distanceAlongTrack, maxSpeed);
 
         return maxSpeed;
@@ -285,6 +289,22 @@ export class NdSpeedProfile implements SpeedProfile {
             if (distanceAlongTrack < constraint.distanceFromStart && constraint.maxSpeed < constraintToSpeed(activeConstraint)) {
                 activeConstraint = constraint;
             }
+        }
+
+        return activeConstraint;
+    }
+
+    private findMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
+        let activeConstraint: MaxSpeedConstraint = null;
+
+        // TODO: I think this is unnecessarily complex, we can probably just return the first constraint that is in front of us.
+        for (const constraint of this.descentSpeedConstraints) {
+            // Since the constraint are ordered, there is no need to search further
+            if (distanceAlongTrack < constraint.distanceFromStart) {
+                return activeConstraint;
+            }
+
+            activeConstraint = constraint;
         }
 
         return activeConstraint;

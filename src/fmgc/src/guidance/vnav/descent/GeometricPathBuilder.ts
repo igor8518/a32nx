@@ -12,9 +12,6 @@ export class GeometricPathBuilder {
     constructor(private observer: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions) { }
 
     buildGeometricPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, finalCruiseAltitude: Feet) {
-        const decelPoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.Decel);
-        profile.checkpoints.push({ ...decelPoint, reason: VerticalCheckpointReason.GeometricPathEnd });
-
         const constraintsToUse = profile.descentAltitudeConstraints
             .slice()
             .reverse()
@@ -29,7 +26,7 @@ export class GeometricPathBuilder {
             planner.stepAlong();
         }
 
-        const checkpointsToAdd = planner.finalize();
+        const checkpointsToAdd = planner.finalize(profile);
 
         profile.checkpoints.push(...checkpointsToAdd);
     }
@@ -305,8 +302,10 @@ class GeometricPathPlanner {
         this.currentCheckpoint = this.updateCheckpointFromStep(this.currentCheckpoint, step);
     }
 
-    finalize(): VerticalCheckpoint[] {
-        const checkpoints: VerticalCheckpoint[] = [];
+    finalize(profile: BaseGeometryProfile): VerticalCheckpoint[] {
+        const decelPoint = profile.findVerticalCheckpoint(VerticalCheckpointReason.Decel);
+        const checkpoints: VerticalCheckpoint[] = [{ ...decelPoint, reason: VerticalCheckpointReason.GeometricPathEnd }];
+
         let newCheckpoint = this.startingPoint;
 
         for (const step of this.steps) {

@@ -51,9 +51,7 @@ export class VnavDriver implements GuidanceComponent {
 
     currentMcduSpeedProfile: McduSpeedProfile;
 
-    timeMarkers = new Map<Seconds, PseudoWaypointFlightPlanInfo | undefined>([
-        [10_000, undefined],
-    ])
+    timeMarkers = new Map<Seconds, PseudoWaypointFlightPlanInfo | undefined>()
 
     stepCoordinator: StepCoordinator;
 
@@ -141,7 +139,7 @@ export class VnavDriver implements GuidanceComponent {
         const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
         const descentStrategy = new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, -1000);
 
-        const { cruiseAltitude, fuelOnBoard, presentPosition } = this.computationParametersObserver.get();
+        const { cruiseAltitude, fuelOnBoard, presentPosition, flightPhase } = this.computationParametersObserver.get();
 
         if (geometry.legs.size > 0 && this.computationParametersObserver.canComputeProfile()) {
             const isOnGround = SimVar.GetSimVarValue('SIM ON GROUND', 'Bool');
@@ -151,10 +149,16 @@ export class VnavDriver implements GuidanceComponent {
                 this.currentNavGeometryProfile.addPresentPositionCheckpoint(presentPosition, fuelOnBoard * Constants.TONS_TO_POUNDS);
             }
 
-            this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, climbStrategy, this.currentMcduSpeedProfile, cruiseAltitude);
+            if (flightPhase < FlightPhase.FLIGHT_PHASE_CRUISE) {
+                this.climbPathBuilder.computeClimbPath(this.currentNavGeometryProfile, climbStrategy, this.currentMcduSpeedProfile, cruiseAltitude);
+            }
 
-            if (this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
-                this.cruiseToDescentCoordinator.coordinate(this.currentNavGeometryProfile, this.currentMcduSpeedProfile, climbStrategy, descentStrategy);
+            if (flightPhase < FlightPhase.FLIGHT_PHASE_DESCENT) {
+                if (this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
+                    this.cruiseToDescentCoordinator.buildCruiseAndDescentPath(this.currentNavGeometryProfile, this.currentMcduSpeedProfile, climbStrategy, descentStrategy);
+                }
+            } else {
+                this.cruiseToDescentCoordinator.buildDescentPathOnly(this.currentNavGeometryProfile, this.currentMcduSpeedProfile);
             }
 
             this.currentNavGeometryProfile.finalizeProfile();
@@ -176,7 +180,7 @@ export class VnavDriver implements GuidanceComponent {
     }
 
     private computeVerticalProfileForNd(geometry: Geometry) {
-        const { fcuAltitude, fcuVerticalMode, presentPosition, fuelOnBoard, fcuVerticalSpeed } = this.computationParametersObserver.get();
+        const { fcuAltitude, fcuVerticalMode, presentPosition, fuelOnBoard, fcuVerticalSpeed, flightPhase } = this.computationParametersObserver.get();
 
         this.currentNdGeometryProfile = this.isInManagedNav()
             ? new NavGeometryProfile(geometry, this.flightPlanManager, this.guidanceController.activeLegIndex)
@@ -202,11 +206,31 @@ export class VnavDriver implements GuidanceComponent {
             ? new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, fcuVerticalSpeed)
             : new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
 
+        const stepDescentStrategy = new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, -1000);
+
         const speedProfile = this.shouldObeySpeedConstraints()
             ? this.currentMcduSpeedProfile
-            : new NdSpeedProfile(this.computationParametersObserver.get(), this.currentNdGeometryProfile.distanceToPresentPosition, this.currentNdGeometryProfile.maxClimbSpeedConstraints);
+            : new NdSpeedProfile(
+                this.computationParametersObserver.get(),
+                this.currentNdGeometryProfile.distanceToPresentPosition,
+                this.currentNdGeometryProfile.maxClimbSpeedConstraints,
+                this.currentNdGeometryProfile.descentSpeedConstraints,
+            );
 
-        this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile, climbStrategy, speedProfile, fcuAltitude);
+        if (flightPhase < FlightPhase.FLIGHT_PHASE_CRUISE) {
+            this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile,
+                climbStrategy, speedProfile, fcuAltitude);
+        }
+
+        // To please TypeScript, we explicitly check that currentNdGeometryProfile is a NavGeometryProfile even if this is guaranteed by the check before
+        if (this.isInManagedNav() && this.currentNdGeometryProfile instanceof NavGeometryProfile && this.decelPathBuilder.canCompute(geometry, this.currentNavGeometryProfile.waypointCount)) {
+            if (flightPhase < FlightPhase.FLIGHT_PHASE_DESCENT) {
+                this.cruiseToDescentCoordinator.buildCruiseAndDescentPath(this.currentNdGeometryProfile, speedProfile, climbStrategy, stepDescentStrategy);
+            } else {
+                this.cruiseToDescentCoordinator.buildDescentPathOnly(this.currentNdGeometryProfile, this.currentMcduSpeedProfile);
+            }
+        }
+
         this.currentNdGeometryProfile.finalizeProfile();
 
         if (VnavConfig.DEBUG_PROFILE) {

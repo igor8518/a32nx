@@ -1,4 +1,4 @@
-import { NavGeometryProfile, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
+import { VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { Predictions, StepResults } from '@fmgc/guidance/vnav/Predictions';
@@ -22,7 +22,7 @@ export class DescentPathBuilder {
         this.atmosphericConditions.update();
     }
 
-    computeDescentPath(profile: NavGeometryProfile, speedProfile: SpeedProfile, cruiseAltitude: Feet): VerticalCheckpoint {
+    computeDescentPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, cruiseAltitude: Feet): VerticalCheckpoint {
         const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);
 
         if (!decelCheckpoint) {
