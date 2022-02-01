@@ -235,36 +235,18 @@ export class NavGeometryProfile extends BaseGeometryProfile {
         return predictions;
     }
 
-    // TODO: Make this not iterate over map
     override findDistancesToSpeedChanges(): NauticalMiles[] {
-        const result: NauticalMiles[] = [];
+        const result = [];
 
-        if (VnavConfig.DEBUG_PROFILE) {
-            console.log(this.waypointPredictions);
-        }
+        for (let i = 0; i < this.checkpoints.length - 1; i++) {
+            const checkpoint = this.checkpoints[i];
 
-        const speedLimitCrossing = this.findSpeedLimitCrossing();
-        if (!speedLimitCrossing) {
-            return [];
-        }
-
-        const [speedLimitDistance, speedLimitSpeed] = speedLimitCrossing;
-
-        for (const [i, prediction] of this.waypointPredictions) {
-            if (!this.waypointPredictions.has(i + 1)) {
+            if ([VerticalCheckpointReason.AccelerationAltitude, VerticalCheckpointReason.PresentPosition].includes(checkpoint.reason)) {
                 continue;
             }
 
-            if (prediction.distanceFromStart < speedLimitDistance && this.waypointPredictions.get(i + 1).distanceFromStart > speedLimitDistance) {
-                if (this.hasSpeedChange(speedLimitDistance, speedLimitSpeed)) {
-                    result.push(speedLimitDistance);
-                }
-            }
-
-            if (prediction.speedConstraint && prediction.speedConstraint.speed > 100) {
-                if (this.hasSpeedChange(prediction.distanceFromStart, prediction.speedConstraint.speed)) {
-                    result.push(prediction.distanceFromStart);
-                }
+            if (this.checkpoints[i + 1].speed - checkpoint.speed > 5) {
+                result.push(checkpoint.distanceFromStart);
             }
         }
 
