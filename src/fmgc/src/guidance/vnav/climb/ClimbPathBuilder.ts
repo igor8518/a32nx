@@ -103,6 +103,10 @@ export class ClimbPathBuilder {
         for (const speedConstraint of profile.maxClimbSpeedConstraints) {
             const { distanceFromStart, altitude, speed, remainingFuelOnBoard } = profile.lastCheckpoint;
 
+            if (distanceFromStart < speedConstraint.distanceFromStart) {
+                continue;
+            }
+
             const speedTarget = speedProfile.getTarget(distanceFromStart, altitude);
             if ((speedTarget - speed) > 1) {
                 const accelerationStep = climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
