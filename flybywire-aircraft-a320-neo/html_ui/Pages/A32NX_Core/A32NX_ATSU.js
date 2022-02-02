@@ -233,7 +233,7 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
     let rwy = "";
     let shortRwy = "";
 
-    let i, j, j1, r, r2, t, t2, gr = -1;
+    let i = -1, j = -1, j1 = -1, r2 = -1, t = -1, t2 = -1, gr = -1;
     let FindStar = false;
     let FindAppr = false;
     let FindTransAppr = false;
@@ -269,10 +269,6 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
 
     for (j = 0; j < destinationAirportInfo.approaches.length; j++) {
         const approach = destinationAirportInfo.approaches[j];
-        //Test needed
-        //for (r = 0; r < approach.runwayTransitions.length; r++) {
-        //const runwayTransition = approach.runwayTransitions[r];
-        //////////////
         const runwayTransition = approach.runway;
         if (shortRwy === runwayTransition) {
             if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() === fixx) {
@@ -286,7 +282,7 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
                         FindAppr = true;
                         FindTransAppr = true;
                         if (FindAppr) {
-                            APPName = destinationAirportInfo.approaches[j];
+                            APPName = destinationAirportInfo.approaches[j].name;
                             if (FindTransAppr) {
                                 TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
                             }
@@ -300,132 +296,118 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
                 }
             }
         }
-        //}
-
     }
-    if (!FindAppr) {
-        for (i = 0; i < destinationAirportInfo.arrivals.length; i++) {
-            const arrival = destinationAirportInfo.arrivals[i];
-            for (r2 = 0; r2 < arrival.runwayTransitions.length; r2++) {
-                const runwayTransition = arrival.runwayTransitions[r2];
-                if (shortRwy.indexOf(runwayTransition.name.slice(2,runwayTransition.name.length)) !== -1) {
-                    if (runwayTransition.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
-                        t2 = -1;
-                        for (j = 0; j < destinationAirportInfo.approaches.length; j++) {
-                            const approach = destinationAirportInfo.approaches[j];
-                            //Test needed
-                            //for (r = 0; r < approach.runwayTransitions.length; r++) {
-                            //const runwayTransition = approach.runwayTransitions[r];
-                            //const runwayTransition = approach.runway;
-                            //////////////
-                            if (shortRwy === approach.runway) {
-                                if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() ===
+
+    for (i = 0; i < destinationAirportInfo.arrivals.length; i++) {
+        const arrival = destinationAirportInfo.arrivals[i];
+        for (r2 = 0; r2 < arrival.runwayTransitions.length; r2++) {
+            const runwayTransition = arrival.runwayTransitions[r2];
+            if (shortRwy.indexOf(runwayTransition.name.slice(2,runwayTransition.name.length)) !== -1) {
+                if (runwayTransition.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
+                    t2 = -1;
+                    for (j = 0; j < destinationAirportInfo.approaches.length; j++) {
+                        const approach = destinationAirportInfo.approaches[j];
+                        if (shortRwy === approach.runway) {
+                            if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() ===
                                 runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
-                                    t = -1;
-                                    FindAppr = true;
-                                    FindStar = true;
-                                    if (FindAppr) {
-                                        STARName = destinationAirportInfo.arrivals[i].name;
-                                        APPName = destinationAirportInfo.approaches[j].name;
-                                        if (FindTransAppr) {
-                                            TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
-                                        }
-                                        STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
-
-                                        FindAppr = false;
-                                        FindStar = false;
-                                        FindTransAppr = false;
+                                t = -1;
+                                FindAppr = true;
+                                FindStar = true;
+                                if (FindAppr) {
+                                    STARName = destinationAirportInfo.arrivals[i].name;
+                                    APPName = destinationAirportInfo.approaches[j].name;
+                                    if (FindTransAppr) {
+                                        TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
                                     }
-                                } else {
-                                    for (t = 0; t < approach.transitions.length; t++) {
-                                        const enRouteTransitionAppr = approach.transitions[t];
-                                        if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() ==
+                                    STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                    FindAppr = false;
+                                    FindStar = false;
+                                    FindTransAppr = false;
+                                }
+                            } else {
+                                for (t = 0; t < approach.transitions.length; t++) {
+                                    const enRouteTransitionAppr = approach.transitions[t];
+                                    if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() ==
                                                 runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
-                                            FindAppr = true;
-                                            FindStar = true;
-                                            FindTransAppr = true;
-                                            if (FindAppr) {
-                                                STARName = destinationAirportInfo.arrivals[i].name;
-                                                APPName = destinationAirportInfo.approaches[j].name;
-                                                if (FindTransAppr) {
-                                                    TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
-                                                }
-                                                STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
-
-                                                FindAppr = false;
-                                                FindStar = false;
-                                                FindTransAppr = false;
+                                        FindAppr = true;
+                                        FindStar = true;
+                                        FindTransAppr = true;
+                                        if (FindAppr) {
+                                            STARName = destinationAirportInfo.arrivals[i].name;
+                                            APPName = destinationAirportInfo.approaches[j].name;
+                                            if (FindTransAppr) {
+                                                TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
                                             }
+                                            STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                            FindAppr = false;
+                                            FindStar = false;
+                                            FindTransAppr = false;
                                         }
                                     }
-
                                 }
                             }
                         }
-                    } else {
-                        for (t2 = 0; t2 < arrival.enRouteTransitions.length; t2++) {
-                            const enRouteTransition = approach.enRouteTransitions[t2];
-                            if (enRouteTransition.runwayTransition.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
-                                for (j1 = 0; j1 < destinationAirportInfo.approaches.length; j1++) {
-                                    const approach = destinationAirportInfo.approaches[j1];
-                                    //Test needed
-                                    //for (r = 0; r < approach.runwayTransitions.length; r++) {
-                                    //const runwayTransition = approach.runwayTransitions[r];
-                                    //const runwayTransition = approach.runway;
-                                    //////////////
-                                    if (shortRwy === approach.runway) {
-                                        if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() ==
+                    }
+                } else {
+                    for (t2 = 0; t2 < arrival.enRouteTransitions.length; t2++) {
+                        const enRouteTransition = arrival.enRouteTransitions[t2];
+                        if (enRouteTransition.legs[0].fixIcao.substr(7, 12).trim() === fixx) {
+                            for (j1 = 0; j1 < destinationAirportInfo.approaches.length; j1++) {
+                                const approach = destinationAirportInfo.approaches[j1];
+                                if (shortRwy === approach.runway) {
+                                    if (approach.finalLegs[0].fixIcao.substr(7, 12).trim() ==
                                             runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
-                                            t = -1;
-                                            FindAppr = true;
-                                            FindStar = true;
-                                            FindTransStar = true;
-                                            j = j1;
-                                            if (FindAppr) {
+                                        t = -1;
+                                        FindAppr = true;
+                                        FindStar = true;
+                                        FindTransStar = true;
+                                        j = j1;
+                                        if (FindAppr) {
 
-                                                STARName = destinationAirportInfo.arrivals[i].name;
-                                                APPName = destinationAirportInfo.approaches[j].name;
-                                                if (FindTransAppr) {
-                                                    TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
-                                                }
-                                                if (FindTransStar) {
-                                                    TRANSSTARName = destinationAirportInfo.arrivals[j].enRouteTransitions[t2].name;
-                                                }
-                                                STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
-
-                                                FindAppr = false;
-                                                FindStar = false;
-                                                FindTransAppr = false;
-                                                FindTransStar = false;
+                                            STARName = destinationAirportInfo.arrivals[i].name;
+                                            APPName = destinationAirportInfo.approaches[j].name;
+                                            if (FindTransAppr) {
+                                                TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
                                             }
-                                        } else {
-                                            for (t = 0; t < approach.transitions.length; t++) {
-                                                const enRouteTransitionAppr = approach.transitions[t];
-                                                if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() ==
+                                            if (FindTransStar) {
+                                                TRANSSTARName = destinationAirportInfo.arrivals[j].enRouteTransitions[t2].name;
+                                            }
+                                            STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                            FindAppr = false;
+                                            FindStar = false;
+                                            FindTransAppr = false;
+                                            FindTransStar = false;
+                                        }
+                                    } else {
+                                        for (t = 0; t < approach.transitions.length; t++) {
+                                            const enRouteTransitionAppr = approach.transitions[t];
+                                            if (enRouteTransitionAppr.legs[0].fixIcao.substr(7, 12).trim() ==
                                                     runwayTransition.legs[runwayTransition.legs.length - 1].fixIcao.substr(7, 12).trim()) {
-                                                    {
-                                                        FindAppr = true;
-                                                        FindStar = true;
-                                                        FindTransStar = true;
-                                                        FindTransAppr = true;
-                                                        j = j1;
-                                                        if (FindAppr) {
+                                                {
+                                                    FindAppr = true;
+                                                    FindStar = true;
+                                                    FindTransStar = true;
+                                                    FindTransAppr = true;
+                                                    j = j1;
+                                                    if (FindAppr) {
 
-                                                            STARName = destinationAirportInfo.arrivals[i].name;
-                                                            APPName = destinationAirportInfo.approaches[j].name;
-                                                            if (FindTransAppr) {
-                                                                TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
-                                                            }
-                                                            if (FindTransStar) {
-                                                                TRANSSTARName = destinationAirportInfo.arrivals[j].enRouteTransitions[t2].name;
-                                                            }
-                                                            STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
-
-                                                            FindAppr = false;
-                                                            FindStar = false;
-                                                            FindTransAppr = false;
-                                                            FindTransStar = false;
+                                                        STARName = destinationAirportInfo.arrivals[i].name;
+                                                        APPName = destinationAirportInfo.approaches[j].name;
+                                                        if (FindTransAppr) {
+                                                            TRANSAPPName = destinationAirportInfo.approaches[j].transitions[t].name;
                                                         }
+                                                        if (FindTransStar) {
+                                                            TRANSSTARName = destinationAirportInfo.arrivals[i].enRouteTransitions[t2].name;
+                                                        }
+                                                        STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+
+                                                        FindAppr = false;
+                                                        FindStar = false;
+                                                        FindTransAppr = false;
+                                                        FindTransStar = false;
                                                     }
                                                 }
                                             }
@@ -434,7 +416,6 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
                                 }
                             }
                         }
-
                     }
                 }
             }
@@ -789,14 +770,14 @@ const uplinkRoute = async (mcdu) => {
                 initStarTransSet = 1;
                 SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 1);
 
-                await mcdu.flightPlanManager.setArrivalEnRouteTransitionIndex(OrigStars[findSTAR].t2, async () => {
-                    await mcdu.flightPlanManager.setArrivalProcIndex(OrigStars[findSTAR].i, async () => {
-                        initStarSet = 2;
-                        SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 2);
-                    }).catch(console.error);
-                    initStarTransSet = 2;
-                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 2);
+                //await mcdu.flightPlanManager.setArrivalEnRouteTransitionIndex(OrigStars[findSTAR].t2, async () => {
+                await mcdu.flightPlanManager.setArrivalProcIndex(OrigStars[findSTAR].i, async () => {
+                    initStarSet = 2;
+                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 2);
                 }).catch(console.error);
+                //initStarTransSet = 2;
+                //SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 2);
+                //}).catch(console.error);
             }
 
             if (initApproachSet == 2) {
@@ -815,6 +796,22 @@ const uplinkRoute = async (mcdu) => {
                 }).catch(console.error);
             }
 
+            if (initStarSet == 2) {
+                initStarSet = 1;
+                SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 1);
+                initStarTransSet = 1;
+                SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 1);
+
+                await mcdu.flightPlanManager.setArrivalEnRouteTransitionIndex(OrigStars[findSTAR].t2, async () => {
+                    await mcdu.flightPlanManager.setArrivalProcIndex(OrigStars[findSTAR].i, async () => {
+                        initStarSet = 2;
+                        SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 2);
+                    }).catch(console.error);
+                    initStarTransSet = 2;
+                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 2);
+                }).catch(console.error);
+            }
+
             if (initStarSet != 2) {
                 initStarSet = 1;
                 SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 1);
@@ -826,7 +823,7 @@ const uplinkRoute = async (mcdu) => {
 
             if (initStarSet == 2 && initApproachSet == 2) {
                 initStarTransSet = 3;
-                SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 1);
+                SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 3);
 
                 mcdu.updateConstraints();
                 mcdu.onToRwyChanged();
