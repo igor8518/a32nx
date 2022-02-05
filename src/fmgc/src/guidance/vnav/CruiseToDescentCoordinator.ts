@@ -14,6 +14,11 @@ export class CruiseToDescentCoordinator {
 
     }
 
+    resetEstimations() {
+        this.lastEstimatedFuelAtDestination = 2300;
+        this.lastEstimatedTimeAtDestination = 0;
+    }
+
     buildCruiseAndDescentPath(profile: NavGeometryProfile, speedProfile: SpeedProfile, stepClimbStrategy: ClimbStrategy, stepDescentStrategy: DescentStrategy) {
         // - Start with initial guess for fuel on board at destination
         // - Compute descent profile to get distance to T/D and burnt fuel during descent
@@ -32,6 +37,10 @@ export class CruiseToDescentCoordinator {
         let iterationCount = 0;
         let todFuelError = Infinity;
         let todTimeError = Infinity;
+
+        if (Number.isNaN(this.lastEstimatedFuelAtDestination) || Number.isNaN(this.lastEstimatedTimeAtDestination)) {
+            this.resetEstimations();
+        }
 
         while (iterationCount++ < 4 && (Math.abs(todFuelError) > 100 || Math.abs(todTimeError) > 1)) {
             // Reset checkpoints
