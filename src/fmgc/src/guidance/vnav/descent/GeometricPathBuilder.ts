@@ -103,7 +103,7 @@ class GeometricPathPlanner {
             const endsUpTooHighForUpcomingConstraint = this.currentCheckpoint.altitude > this.maxAltitudeConstraints[this.currentConstraintIndex - 1];
             if (endsUpTooHighForUpcomingConstraint) {
                 this.resetToIndex(this.currentConstraintIndex - 1);
-                this.prepareGeometricStep(this.maxAltitudeConstraints[this.currentConstraintIndex - 1]);
+                this.prepareGeometricStep(this.maxAltitudeConstraints[this.currentConstraintIndex]);
 
                 return;
             }
