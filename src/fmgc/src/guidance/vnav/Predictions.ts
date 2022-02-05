@@ -433,7 +433,7 @@ export class Predictions {
         // let initialEas;
         // let finalEas;
 
-        // let usingMachAtStart;
+        // let usingMachAtStart: boolean;
         // If above crossover altitude, use mach
         if (actualInitialMach > initialMach) {
             actualInitialMach = initialMach;
@@ -496,13 +496,7 @@ export class Predictions {
                 error = VnavStepError.AVAILABLE_GRADIENT_INSUFFICIENT;
             }
 
-            const acceleration = FlightModel.accelerationForGradient(
-                availableGradient,
-                pathAngleRadians,
-                9.81,
-            );
-
-            // TODO what do we do with this
+            // TODO: Put this back in
             // const accelFactorMode = usingMachAtStart ? AccelFactorMode.CONSTANT_MACH : AccelFactorMode.CONSTANT_CAS;
             // const accelFactor = Common.getAccelerationFactor(averageMach,
             //     initialAltitude,
@@ -510,11 +504,11 @@ export class Predictions {
             //     initialAltitude > tropoAltitude,
             //     accelFactorMode);
 
-            // pathAngle = FlightModel.fpaForGradient(
-            //     availableGradient,
-            //     FlightModel.requiredAccelRateMS2,
-            //     accelFactor,
-            // );
+            const acceleration = FlightModel.accelerationForGradient(
+                availableGradient,
+                pathAngleRadians,
+                10,
+            );
 
             const accelerationKNS = (FlightModel.requiredAccelRateKNS * acceleration) / FlightModel.requiredAccelRateMS2;
 
@@ -947,43 +941,63 @@ export class Predictions {
 
         do {
             const midStepAltitude = (initialAltitude + finalAltitude) / 2;
+            const isAboveTropo = midStepAltitude > tropoAltitude;
 
-            const theta = Common.getTheta(midStepAltitude, isaDev, midStepAltitude > tropoAltitude);
-            const delta = Common.getDelta(theta, midStepAltitude > tropoAltitude, midStepAltitude);
-            let mach = Common.CAStoMach(initialCAS, delta);
+            const theta = Common.getTheta(midStepAltitude, isaDev, isAboveTropo);
+            const delta = Common.getDelta(theta, isAboveTropo, midStepAltitude);
 
-            let eas;
-            let tas;
+            let initialMach = Common.CAStoMach(initialCAS, delta);
+            let finalMach = Common.CAStoMach(finalCAS, delta);
+
+            let initialEas: Knots;
+            let initialTas: Knots;
             let usingMach = false;
             // If above crossover altitude, use econMach
-            if (mach > econMach) {
-                mach = econMach;
-                eas = Common.machToEAS(mach, delta);
-                tas = Common.machToTAS(mach, theta);
+            if (initialMach > econMach) {
+                initialMach = econMach;
+                initialEas = Common.machToEAS(initialMach, delta);
+                initialTas = Common.machToTAS(initialMach, theta);
                 usingMach = true;
             } else {
-                eas = Common.CAStoEAS(initialCAS, delta);
-                tas = Common.CAStoTAS(initialCAS, theta, delta);
+                initialEas = Common.CAStoEAS(initialCAS, delta);
+                initialTas = Common.CAStoTAS(initialCAS, theta, delta);
             }
 
+            let finalEas: Knots;
+            let finalTas: Knots;
+            if (finalMach > econMach) {
+                finalMach = econMach;
+                finalEas = Common.machToEAS(finalMach, delta);
+                finalTas = Common.machToTAS(finalMach, theta);
+            } else {
+                finalEas = Common.CAStoEAS(finalCAS, delta);
+                finalTas = Common.CAStoTAS(finalCAS, theta, delta);
+            }
+
+            const midwayTas = (initialTas + finalTas) / 2;
+            const midwayMach = (initialMach + finalMach) / 2;
+
             // Engine model calculations
-            const theta2 = Common.getTheta2(theta, mach);
-            const delta2 = Common.getDelta2(delta, mach);
+            const theta2 = Common.getTheta2(theta, midwayMach);
+            const delta2 = Common.getDelta2(delta, midwayMach);
             const correctedN1 = EngineModel.getCorrectedN1(commandedN1, theta2);
-            const correctedThrust = EngineModel.tableInterpolation(EngineModel.table1506, correctedN1, mach) * 2 * EngineModel.maxThrust;
-            const correctedFuelFlow = EngineModel.getCorrectedFuelFlow(correctedN1, mach, midStepAltitude) * 2;
+            const correctedThrust = EngineModel.tableInterpolation(EngineModel.table1506, correctedN1, midwayMach) * 2 * EngineModel.maxThrust;
+            const correctedFuelFlow = EngineModel.getCorrectedFuelFlow(correctedN1, midwayMach, midStepAltitude) * 2;
             const thrust = EngineModel.getUncorrectedThrust(correctedThrust, delta2); // in lbf
             const fuelFlow = Math.max(0, EngineModel.getUncorrectedFuelFlow(correctedFuelFlow, delta2, theta2) * (1 + perfFactorPercent / 100)); // in lbs/hour
 
-            const drag = FlightModel.getDrag(midStepWeight, mach, delta, speedbrakesExtended, false, flapsConfig);
+            const drag = FlightModel.getDrag(midStepWeight, midwayMach, delta, speedbrakesExtended, false, flapsConfig);
 
             const availableGradient = FlightModel.getAvailableGradient(thrust, drag, midStepWeight);
-            pathAngle = Math.atan2(verticalSpeed, tas * 101.269); // radians
-            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, Constants.G); // m/s^2
+            pathAngle = Math.atan2(verticalSpeed, midwayTas * 101.269); // radians
+
+            const accelFactorMode = usingMach ? AccelFactorMode.CONSTANT_MACH : AccelFactorMode.CONSTANT_CAS;
+            const accelerationFactor = Common.getAccelerationFactor(midwayMach, midStepAltitude, isaDev, isAboveTropo, accelFactorMode);
+            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, accelerationFactor); // m/s^2
 
             const knotsToMetersPerSecond = 0.514444;
             stepTime = (finalCAS - initialCAS) * knotsToMetersPerSecond / 60 / acceleration; // in minutes
-            distanceTraveled = (tas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
+            distanceTraveled = (midwayTas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
             fuelBurned = (fuelFlow / 60) * stepTime;
 
             // Adjust variables for better accuracy next iteration
@@ -1035,44 +1049,65 @@ export class Predictions {
 
         do {
             const midStepAltitude = (initialAltitude + finalAltitude) / 2;
+            const isAboveTropo = midStepAltitude > tropoAltitude;
 
-            const theta = Common.getTheta(midStepAltitude, isaDev, midStepAltitude > tropoAltitude);
-            const delta = Common.getDelta(theta, midStepAltitude > tropoAltitude, midStepAltitude);
-            let mach = Common.CAStoMach(initialCAS, delta);
+            const theta = Common.getTheta(midStepAltitude, isaDev, isAboveTropo);
+            const delta = Common.getDelta(theta, isAboveTropo, midStepAltitude);
 
-            let eas;
-            let tas;
+            let initialMach = Common.CAStoMach(initialCAS, delta);
+            let finalMach = Common.CAStoMach(finalCAS, delta);
+
+            let initialEas: Knots;
+            let initialTas: Knots;
             let usingMach = false;
             // If above crossover altitude, use econMach
-            if (mach > econMach) {
-                mach = econMach;
-                eas = Common.machToEAS(mach, delta);
-                tas = Common.machToTAS(mach, theta);
+            if (initialMach > econMach) {
+                initialMach = econMach;
+                initialEas = Common.machToEAS(initialMach, delta);
+                initialTas = Common.machToTAS(initialMach, theta);
                 usingMach = true;
             } else {
-                eas = Common.CAStoEAS(initialCAS, delta);
-                tas = Common.CAStoTAS(initialCAS, theta, delta);
+                initialEas = Common.CAStoEAS(initialCAS, delta);
+                initialTas = Common.CAStoTAS(initialCAS, theta, delta);
             }
 
+            let finalEas: Knots;
+            let finalTas: Knots;
+            // If above crossover altitude, use econMach
+            if (finalMach > econMach) {
+                finalMach = econMach;
+                finalEas = Common.machToEAS(finalMach, delta);
+                finalTas = Common.machToTAS(finalMach, theta);
+            } else {
+                finalEas = Common.CAStoEAS(finalCAS, delta);
+                finalTas = Common.CAStoTAS(finalCAS, theta, delta);
+            }
+
+            const midwayMach = (initialMach + finalMach) / 2;
+            const midwayTas = (initialTas + finalTas) / 2;
+
             // Engine model calculations
-            const theta2 = Common.getTheta2(theta, mach);
-            const delta2 = Common.getDelta2(delta, mach);
+            const theta2 = Common.getTheta2(theta, midwayMach);
+            const delta2 = Common.getDelta2(delta, midwayMach);
             const correctedN1 = EngineModel.getCorrectedN1(commandedN1, theta2);
-            const correctedThrust = EngineModel.tableInterpolation(EngineModel.table1506, correctedN1, mach) * 2 * EngineModel.maxThrust;
-            const correctedFuelFlow = EngineModel.getCorrectedFuelFlow(correctedN1, mach, midStepAltitude) * 2;
+            const correctedThrust = EngineModel.tableInterpolation(EngineModel.table1506, correctedN1, midwayMach) * 2 * EngineModel.maxThrust;
+            const correctedFuelFlow = EngineModel.getCorrectedFuelFlow(correctedN1, midwayMach, midStepAltitude) * 2;
             const thrust = EngineModel.getUncorrectedThrust(correctedThrust, delta2); // in lbf
             const fuelFlow = Math.max(0, EngineModel.getUncorrectedFuelFlow(correctedFuelFlow, delta2, theta2) * (1 + perfFactorPercent / 100)); // in lbs/hour
 
-            const drag = FlightModel.getDrag(midStepWeight, mach, delta, speedbrakesExtended, false, flapsConfig);
+            const drag = FlightModel.getDrag(midStepWeight, midwayMach, delta, speedbrakesExtended, false, flapsConfig);
 
             const availableGradient = FlightModel.getAvailableGradient(thrust, drag, midStepWeight);
             pathAngle = FlightModel.getSpeedChangePathAngle(thrust, midStepWeight, drag); // radians
-            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, Constants.G); // m/s^2
+            const accelFactorMode = usingMach ? AccelFactorMode.CONSTANT_MACH : AccelFactorMode.CONSTANT_CAS;
+            const accelerationFactor = Common.getAccelerationFactor(midwayMach, midStepAltitude, isaDev, isAboveTropo, accelFactorMode);
 
-            verticalSpeed = 101.268 * tas * Math.sin(pathAngle); // in feet per minute
+            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, accelerationFactor); // m/s^2
+
+            verticalSpeed = 101.268 * midwayTas * Math.sin(pathAngle); // in feet per minute
             const knotsToMetersPerSecond = 0.514444;
             stepTime = (finalCAS - initialCAS) * knotsToMetersPerSecond / 60 / acceleration; // in minutes
-            distanceTraveled = (tas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
+            distanceTraveled = (midwayTas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
             fuelBurned = (fuelFlow / 60) * stepTime;
 
             // Adjust variables for better accuracy next iteration
