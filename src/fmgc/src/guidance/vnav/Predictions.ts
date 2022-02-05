@@ -993,10 +993,9 @@ export class Predictions {
 
             const accelFactorMode = usingMach ? AccelFactorMode.CONSTANT_MACH : AccelFactorMode.CONSTANT_CAS;
             const accelerationFactor = Common.getAccelerationFactor(midwayMach, midStepAltitude, isaDev, isAboveTropo, accelFactorMode);
-            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, accelerationFactor); // m/s^2
+            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, accelerationFactor) * FlightModel.gravityConstKNS;
 
-            const knotsToMetersPerSecond = 0.514444;
-            stepTime = (finalCAS - initialCAS) * knotsToMetersPerSecond / 60 / acceleration; // in minutes
+            stepTime = (finalCAS - initialCAS) / 60 / acceleration; // in minutes
             distanceTraveled = (midwayTas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
             fuelBurned = (fuelFlow / 60) * stepTime;
 
@@ -1101,12 +1100,10 @@ export class Predictions {
             pathAngle = FlightModel.getSpeedChangePathAngle(thrust, midStepWeight, drag); // radians
             const accelFactorMode = usingMach ? AccelFactorMode.CONSTANT_MACH : AccelFactorMode.CONSTANT_CAS;
             const accelerationFactor = Common.getAccelerationFactor(midwayMach, midStepAltitude, isaDev, isAboveTropo, accelFactorMode);
-
-            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, accelerationFactor); // m/s^2
+            const acceleration = FlightModel.accelerationForGradient(availableGradient, pathAngle, accelerationFactor) * FlightModel.gravityConstKNS;
 
             verticalSpeed = 101.268 * midwayTas * Math.sin(pathAngle); // in feet per minute
-            const knotsToMetersPerSecond = 0.514444;
-            stepTime = (finalCAS - initialCAS) * knotsToMetersPerSecond / 60 / acceleration; // in minutes
+            stepTime = (finalCAS - initialCAS) / 60 / acceleration; // in minutes
             distanceTraveled = (midwayTas - headwindAtMidStepAlt) * (stepTime / 60); // in nautical miles
             fuelBurned = (fuelFlow / 60) * stepTime;
 
