@@ -146,10 +146,13 @@
 1. [MISC] Handling "ATC MSG" button - @svengcz (Sven Czarnian)
 1. [DCDU] Increase DCDU size and use new DCDU font - @svengcz (Sven Czarnian)
 1. [AP] Fix: adjustment of vertical speed limitation in SPD/MACH law - @IbrahimK42 (IbrahimK42)
+1. [HYD] Ailerons hydraulic control (only visual and hydraulics) - @Crocket63
 1. [MISC] Animation speed/behaviors for button, switches and knobs - @bouveng (Johan Bouveng)
 1. [AP] Added Autoland capability for special terrain profiles, i.e. KSEA 16R - @aguther (Andreas Guther)
 1. [ATHR] Adjustment of ATHR SPD/MACH gains - @IbrahimK42 (IbrahimK42)
 1. [ATHR] Fix ATHR Alt Soft Mode - @IbrahimK42 (IbrahimK42)
+1. [HYD] Elevator hydraulic control (only visual and hydraulics) - @Crocket63
+1. [HYD] Aileron hydraulic control (only visual and hydraulics) - @Crocket63
 1. [HYD] Simplified max step loop updater - @Crocket63
 1. [MISC] Fix for bleed/hyd system failure in some conditions - @Crocket63
 1. [ECAM] Add pack abnormally off warnings - @tracernz (Mike)
