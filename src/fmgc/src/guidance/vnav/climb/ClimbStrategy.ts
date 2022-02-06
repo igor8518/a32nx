@@ -4,6 +4,7 @@ import { EngineModel } from '../EngineModel';
 import { FlapConf } from '../common';
 import { Predictions, StepResults } from '../Predictions';
 import { AtmosphericConditions } from '../AtmosphericConditions';
+import { DescentStrategy } from '@fmgc/guidance/vnav/descent/DescentStrategy';
 
 export interface ClimbStrategy {
     /**
@@ -20,21 +21,6 @@ export interface ClimbStrategy {
     predictToDistance(initialAltitude: number, distance: NauticalMiles, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
 
     predictToSpeed(initialAltitude: number, finalSpeed: Knots, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
-}
-
-export interface DescentStrategy {
-    /**
-     * Computes predictions for a single segment using the atmospheric conditions in the middle.
-     * @param initialAltitude Altitude at the start of climb
-     * @param finalAltitude Altitude to terminate the climb
-     * @param speed
-     * @param mach
-     * @param fuelOnBoard Remainging fuel on board at the start of the climb
-     * @returns `StepResults`
-     */
-    predictToAltitude(initialAltitude: number, finalAltitude: number, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
-
-    predictToDistance(initialAltitude: number, distance: NauticalMiles, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
 }
 
 export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {

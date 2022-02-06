@@ -1,28 +1,31 @@
 import { VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
 import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
-import { Predictions, StepResults } from '@fmgc/guidance/vnav/Predictions';
-import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
-import { Constants } from '@shared/Constants';
 import { GeometricPathBuilder } from '@fmgc/guidance/vnav/descent/GeometricPathBuilder';
+import { DescentStrategy, IdleDescentStrategy } from '@fmgc/guidance/vnav/descent/DescentStrategy';
+import { StepResults } from '@fmgc/guidance/vnav/Predictions';
 
 export class DescentPathBuilder {
     private geometricPathBuilder: GeometricPathBuilder;
+
+    private idleDescentStrategy: DescentStrategy;
 
     constructor(
         private computationParametersObserver: VerticalProfileComputationParametersObserver,
         private atmosphericConditions: AtmosphericConditions,
     ) {
         this.geometricPathBuilder = new GeometricPathBuilder(computationParametersObserver, atmosphericConditions);
+
+        this.idleDescentStrategy = new IdleDescentStrategy(computationParametersObserver, atmosphericConditions);
     }
 
     update() {
         this.atmosphericConditions.update();
     }
 
-    computeDescentPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, cruiseAltitude: Feet): VerticalCheckpoint {
+    computeManagedDescentPath(profile: BaseGeometryProfile, speedProfile: SpeedProfile, cruiseAltitude: Feet): VerticalCheckpoint {
         const decelCheckpoint = profile.checkpoints.find((checkpoint) => checkpoint.reason === VerticalCheckpointReason.Decel);
 
         if (!decelCheckpoint) {
@@ -53,25 +56,16 @@ export class DescentPathBuilder {
         // Assume the last checkpoint is the start of the geometric path
         profile.addCheckpointFromLast((lastCheckpoint) => ({ ...lastCheckpoint, reason: VerticalCheckpointReason.IdlePathEnd }));
 
+        const { managedDescentSpeedMach } = this.computationParametersObserver.get();
+
         for (let altitude = profile.lastCheckpoint.altitude; altitude < topOfDescentAltitude; altitude = Math.min(altitude + 1500, topOfDescentAltitude)) {
-            const lastCheckpoint = profile.lastCheckpoint;
+            const { distanceFromStart, remainingFuelOnBoard } = profile.lastCheckpoint;
 
             const startingAltitudeForSegment = Math.min(altitude + 1500, topOfDescentAltitude);
-            const speed = speedProfile.getTarget(lastCheckpoint.distanceFromStart, startingAltitudeForSegment);
+            const speed = speedProfile.getTarget(distanceFromStart, startingAltitudeForSegment);
 
-            // TODO: Use fuel at start of segment
-            const remainingFuelOnBoard = lastCheckpoint.remainingFuelOnBoard;
-
-            const { distanceTraveled, fuelBurned, timeElapsed } = this.computeIdlePathSegmentPrediction(startingAltitudeForSegment, altitude, speed, remainingFuelOnBoard);
-
-            profile.checkpoints.push({
-                reason: VerticalCheckpointReason.IdlePathAtmosphericConditions,
-                distanceFromStart: lastCheckpoint.distanceFromStart - distanceTraveled,
-                secondsFromPresent: lastCheckpoint.secondsFromPresent - (timeElapsed * 60),
-                altitude: startingAltitudeForSegment,
-                remainingFuelOnBoard: remainingFuelOnBoard + fuelBurned,
-                speed,
-            });
+            const step = this.idleDescentStrategy.predictToAltitude(startingAltitudeForSegment, altitude, speed, managedDescentSpeedMach, remainingFuelOnBoard);
+            this.addCheckpointFromStep(profile, step, VerticalCheckpointReason.IdlePathAtmosphericConditions)
         }
 
         if (profile.lastCheckpoint.reason === VerticalCheckpointReason.IdlePathAtmosphericConditions) {
@@ -81,27 +75,14 @@ export class DescentPathBuilder {
         }
     }
 
-    private computeIdlePathSegmentPrediction(startingAltitude: Feet, targetAltitude: Feet, climbSpeed: Knots, remainingFuelOnBoard: number): StepResults {
-        const { zeroFuelWeight, perfFactor, tropoPause, managedDescentSpeedMach } = this.computationParametersObserver.get();
-
-        const midwayAltitudeClimb = (startingAltitude + targetAltitude) / 2;
-
-        const predictedN1 = 26 + ((targetAltitude / midwayAltitudeClimb) * (30 - 26));
-
-        return Predictions.altitudeStep(
-            startingAltitude,
-            targetAltitude - startingAltitude,
-            climbSpeed,
-            managedDescentSpeedMach,
-            predictedN1,
-            zeroFuelWeight * Constants.TONS_TO_POUNDS,
-            remainingFuelOnBoard,
-            0,
-            this.atmosphericConditions.isaDeviation,
-            tropoPause,
-            false,
-            FlapConf.CLEAN,
-            perfFactor,
-        );
+    private addCheckpointFromStep(profile: BaseGeometryProfile, step: StepResults, reason: VerticalCheckpointReason) {
+        profile.addCheckpointFromLast(({ distanceFromStart, secondsFromPresent, remainingFuelOnBoard }) => ({
+            reason,
+            distanceFromStart: distanceFromStart + step.distanceTraveled,
+            altitude: step.finalAltitude,
+            secondsFromPresent: secondsFromPresent + (step.timeElapsed * 60),
+            speed: step.speed,
+            remainingFuelOnBoard: remainingFuelOnBoard - step.fuelBurned,
+        }));
     }
 }
