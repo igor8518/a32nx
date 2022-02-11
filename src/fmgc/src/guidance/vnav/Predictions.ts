@@ -115,7 +115,7 @@ export class Predictions {
             previousMidStepWeight = midStepWeight;
             midStepWeight = zeroFuelWeight + (initialFuelWeight - (fuelBurned / 2));
             iterations++;
-        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) > 100);
+        } while (iterations < 4 && Math.abs(previousMidStepWeight - midStepWeight) > 10);
 
         return {
             pathAngle: pathAngle * MathUtils.RADIANS_TO_DEGREES,
