@@ -14,8 +14,6 @@ import { AtsuTimestamp } from './messages/AtsuTimestamp';
 export class AtsuManager {
     private datalink = new Datalink(this);
 
-    private fltNo: string = '';
-
     private messageCounter = 0;
 
     public aoc = new AocSystem(this.datalink);
@@ -30,29 +28,20 @@ export class AtsuManager {
         this.mcdu = mcdu;
     }
 
-    public async connectToNetworks(flightNo: string): Promise<AtsuStatusCodes> {
+    public static async connectToNetworks(): Promise<AtsuStatusCodes> {
+        const flightNo = SimVar.GetSimVarValue('ATC FLIGHT NUMBER', 'string');
         if (flightNo.length === 0) {
             return AtsuStatusCodes.Ok;
         }
 
-        let retvalAoc = await AocSystem.connect(flightNo);
+        let retvalAoc = await AocSystem.connect();
         if (retvalAoc === AtsuStatusCodes.Ok || retvalAoc === AtsuStatusCodes.TelexDisabled) {
             retvalAoc = AtsuStatusCodes.Ok;
         }
 
-        let retvalAtc = AtsuStatusCodes.Ok;
-        if (retvalAoc === AtsuStatusCodes.Ok) {
-            retvalAtc = await this.atc.connect(flightNo);
-            if (retvalAtc === AtsuStatusCodes.Ok || retvalAtc === AtsuStatusCodes.NoHoppieConnection) {
-                retvalAtc = AtsuStatusCodes.Ok;
-            } else {
-                AocSystem.disconnect();
-            }
-        }
-
-        if (retvalAoc === AtsuStatusCodes.Ok && retvalAtc === AtsuStatusCodes.Ok) {
-            console.log(`ATSU: Callsign switch from ${this.fltNo} to ${flightNo}`);
-            this.fltNo = flightNo;
+        let retvalAtc = await AtcSystem.connect();
+        if (retvalAtc === AtsuStatusCodes.Ok || retvalAtc === AtsuStatusCodes.NoHoppieConnection) {
+            retvalAtc = AtsuStatusCodes.Ok;
         }
 
         if (retvalAoc !== AtsuStatusCodes.Ok) {
@@ -61,30 +50,21 @@ export class AtsuManager {
         return retvalAtc;
     }
 
-    public async disconnectFromNetworks(): Promise<AtsuStatusCodes> {
+    public static async disconnectFromNetworks(): Promise<AtsuStatusCodes> {
         let retvalAoc = await AocSystem.disconnect();
         if (retvalAoc === AtsuStatusCodes.Ok || retvalAoc === AtsuStatusCodes.NoTelexConnection) {
             retvalAoc = AtsuStatusCodes.Ok;
         }
 
-        let retvalAtc = await this.atc.disconnect();
+        let retvalAtc = await AtcSystem.disconnect();
         if (retvalAtc === AtsuStatusCodes.Ok || retvalAtc === AtsuStatusCodes.NoHoppieConnection) {
             retvalAtc = AtsuStatusCodes.Ok;
-        }
-
-        if (retvalAoc === AtsuStatusCodes.Ok && retvalAtc === AtsuStatusCodes.Ok) {
-            console.log('ATSU: Reset of callsign');
-            this.fltNo = '';
         }
 
         if (retvalAoc !== AtsuStatusCodes.Ok) {
             return retvalAoc;
         }
         return retvalAtc;
-    }
-
-    public flightNumber(): string {
-        return this.fltNo;
     }
 
     public async sendMessage(message: AtsuMessage): Promise<AtsuStatusCodes> {

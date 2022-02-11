@@ -170,6 +170,7 @@ class FMCMainDisplay extends BaseAirliners {
         this.climbTransitionGroundAltitude = undefined;
         this.altDestination = undefined;
         this.flightNumber = undefined;
+        SimVar.SetSimVarValue("ATC FLIGHT NUMBER", "string", "", "FMC");
         this.cruiseTemperature = undefined;
         this.taxiFuelWeight = undefined;
         this.blockFuel = undefined;
@@ -501,6 +502,7 @@ class FMCMainDisplay extends BaseAirliners {
         this.climbTransitionGroundAltitude = null;
         this.altDestination = undefined;
         this.flightNumber = undefined;
+        SimVar.SetSimVarValue("ATC FLIGHT NUMBER", "string", "", "FMC");
         this.cruiseTemperature = undefined;
         this.taxiFuelWeight = 0.2;
         this.blockFuel = undefined;
@@ -2038,16 +2040,15 @@ class FMCMainDisplay extends BaseAirliners {
         }
 
         SimVar.SetSimVarValue("ATC FLIGHT NUMBER", "string", flightNo, "FMC").then(() => {
-            this.atsuManager.connectToNetworks(flightNo)
+            Atsu.AtsuManager.connectToNetworks()
                 .then((code) => {
                     if (code !== Atsu.AtsuStatusCodes.Ok) {
-                        SimVar.SetSimVarValue("L:A32NX_MCDU_FLT_NO_SET", "boolean", 0);
+                        SimVar.SetSimVarValue("ATC FLIGHT NUMBER", "string", "", "FMC");
                         this.addNewAtsuMessage(code);
                         this.flightNo = "";
                         return callback(false);
                     }
 
-                    SimVar.SetSimVarValue("L:A32NX_MCDU_FLT_NO_SET", "boolean", 1);
                     this.flightNumber = flightNo;
                     return callback(true);
                 });

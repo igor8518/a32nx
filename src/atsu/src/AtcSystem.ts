@@ -15,8 +15,6 @@ export class AtcSystem {
 
     private listener = RegisterViewListener('JS_LISTENER_SIMVARS');
 
-    private cdplcResetRequired = false;
-
     private currentAtc = '';
 
     private nextAtc = '';
@@ -43,32 +41,23 @@ export class AtcSystem {
         SimVar.SetSimVarValue('L:A32NX_DCDU_MSG_SEND_UID', 'number', -1);
         SimVar.SetSimVarValue('L:A32NX_DCDU_MSG_PRINT_UID', 'number', -1);
 
-        setInterval(() => {
-            const cpdlcOnline = SimVar.GetSimVarValue('L:A32NX_HOPPIE_ACTIVE', 'number') === 1;
-
-            if (this.cdplcResetRequired && !cpdlcOnline) {
+        setInterval(async () => {
+            if (SimVar.GetSimVarValue('L:A32NX_HOPPIE_ACTIVE', 'number') !== 1) {
                 if (this.currentAtc !== '') {
-                    this.logoff();
+                    await this.logoff();
                 }
-                if (this.nextAtc !== '') {
+                return;
+            }
+
+            this.handleDcduMessageSync();
+            this.handlePilotNotifications();
+
+            // check if we have to timeout the logon request
+            if (this.logonInProgress()) {
+                const currentTime = SimVar.GetGlobalVarValue('ZULU TIME', 'seconds');
+                const delta = currentTime - this.notificationTime;
+                if (delta >= 300) {
                     this.resetLogon();
-                }
-
-                this.listener.triggerToAllSubscribers('A32NX_DCDU_RESET');
-                this.cdplcResetRequired = false;
-            } else if (cpdlcOnline) {
-                this.cdplcResetRequired = true;
-
-                this.handleDcduMessageSync();
-                this.handlePilotNotifications();
-
-                // check if we have to timeout the logon request
-                if (this.logonInProgress()) {
-                    const currentTime = SimVar.GetGlobalVarValue('ZULU TIME', 'seconds');
-                    const delta = currentTime - this.notificationTime;
-                    if (delta >= 300) {
-                        this.resetLogon();
-                    }
                 }
             }
         }, 100);
@@ -147,15 +136,13 @@ export class AtcSystem {
         this.unreadMessagesLastCycle = unreadMessages;
     }
 
-    public async connect(flightNo: string): Promise<AtsuStatusCodes> {
-        if (this.currentAtc !== '') {
-            return this.logoff().then(() => HoppieConnector.connect(flightNo));
-        }
-        return HoppieConnector.connect(flightNo);
+    public static async connect(): Promise<AtsuStatusCodes> {
+        const flightNo = SimVar.GetSimVarValue('ATC FLIGHT NUMBER', 'string');
+        return HoppieConnector.isCallsignInUse(flightNo);
     }
 
-    public async disconnect(): Promise<AtsuStatusCodes> {
-        return HoppieConnector.disconnect();
+    public static async disconnect(): Promise<AtsuStatusCodes> {
+        return AtsuStatusCodes.Ok;
     }
 
     public currentStation(): string {
