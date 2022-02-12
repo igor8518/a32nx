@@ -1027,7 +1027,7 @@ export class TcasComputer implements TcasComponent {
             }
         });
 
-        this.sendListener.triggerToAllSubscribers('A32NX_TCAS_TRAFFIC', stringify(this.sendAirTraffic));
+        this.sendListener.triggerToAllSubscribers('A32NX_TCAS_TRAFFIC', this.sendAirTraffic);
     }
 
     update(_deltaTime: number): void {
@@ -1043,7 +1043,7 @@ export class TcasComputer implements TcasComponent {
         if (this.tcasMode.getVar() === TcasMode.STBY) {
             if (this.sendAirTraffic.length !== 0) {
                 this.sendAirTraffic.length = 0;
-                this.sendListener.triggerToAllSubscribers('A32NX_TCAS_TRAFFIC', stringify(this.sendAirTraffic));
+                this.sendListener.triggerToAllSubscribers('A32NX_TCAS_TRAFFIC', this.sendAirTraffic);
             }
             return;
         }
