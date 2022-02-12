@@ -4537,6 +4537,18 @@ class FMCMainDisplay extends BaseAirliners {
     getManagedDescentSpeedMach() {
         return this.managedSpeedDescendMach;
     }
+    getApproachSpeed() {
+        return this.approachSpeeds && this.approachSpeeds.valid ? this.approachSpeeds.vapp : 0;
+    }
+    getFlapRetractionSpeed() {
+        return this.approachSpeeds && this.approachSpeeds.valid ? this.approachSpeeds.f : 0;
+    }
+    getSlatRetractionSpeed() {
+        return this.approachSpeeds && this.approachSpeeds.valid ? this.approachSpeeds.s : 0;
+    }
+    getCleanSpeed() {
+        return this.approachSpeeds && this.approachSpeeds.valid ? this.approachSpeeds.gd : 0;
+    }
 }
 
 FMCMainDisplay.clrValue = "\xa0\xa0\xa0\xa0\xa0CLR";

@@ -41,6 +41,10 @@ export interface Fmgc {
     getTakeoffFlapsSetting(): FlapConf | undefined
     getManagedDescentSpeed(): Knots,
     getManagedDescentSpeedMach(): Mach,
+    getApproachSpeed(): Knots,
+    getFlapRetractionSpeed(): Knots,
+    getSlatRetractionSpeed(): Knots,
+    getCleanSpeed(): Knots,
 }
 
 export class GuidanceController {

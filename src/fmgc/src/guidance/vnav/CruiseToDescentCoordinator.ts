@@ -46,7 +46,7 @@ export class CruiseToDescentCoordinator {
         while (iterationCount++ < 4 && (Math.abs(todFuelError) > 100 || Math.abs(todTimeError) > 1)) {
             // Reset checkpoints
             profile.checkpoints.splice(startOfCruiseIndex + 1, profile.checkpoints.length - startOfCruiseIndex - 1);
-            this.decelPathBuilder.computeDecelPath(profile, this.lastEstimatedFuelAtDestination, this.lastEstimatedTimeAtDestination);
+            this.decelPathBuilder.computeDecelPath(profile, speedProfile, this.lastEstimatedFuelAtDestination, this.lastEstimatedTimeAtDestination);
 
             // Geometric and idle
             const todCheckpoint = this.descentPathBuilder.computeManagedDescentPath(profile, speedProfile, this.cruisePathBuilder.getFinalCruiseAltitude());

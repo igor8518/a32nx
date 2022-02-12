@@ -38,6 +38,11 @@ export interface VerticalProfileComputationParameters {
 
     managedDescentSpeed: Knots,
     managedDescentSpeedMach: Mach,
+
+    approachSpeed: Knots,
+    flapRetractionSpeed: Knots,
+    slatRetractionSpeed: Knots,
+    cleanSpeed: Knots,
 }
 
 export class VerticalProfileComputationParametersObserver {
@@ -82,6 +87,11 @@ export class VerticalProfileComputationParametersObserver {
 
             managedDescentSpeed: this.fmgc.getManagedDescentSpeed(),
             managedDescentSpeedMach: this.fmgc.getManagedDescentSpeedMach(),
+
+            approachSpeed: this.fmgc.getApproachSpeed(),
+            flapRetractionSpeed: this.fmgc.getFlapRetractionSpeed(),
+            slatRetractionSpeed: this.fmgc.getSlatRetractionSpeed(),
+            cleanSpeed: this.fmgc.getCleanSpeed(),
         };
     }
 
@@ -98,6 +108,11 @@ export class VerticalProfileComputationParametersObserver {
     }
 
     canComputeProfile(): boolean {
-        return this.parameters.flightPhase > FmgcFlightPhase.Takeoff || this.parameters.v2Speed > 0;
+        const areApproachSpeedsValid = this.parameters.cleanSpeed > 100
+            && this.parameters.slatRetractionSpeed > 100
+            && this.parameters.flapRetractionSpeed > 100
+            && this.parameters.approachSpeed > 100;
+
+        return (this.parameters.flightPhase > FmgcFlightPhase.Takeoff || this.parameters.v2Speed > 0) && areApproachSpeedsValid;
     }
 }

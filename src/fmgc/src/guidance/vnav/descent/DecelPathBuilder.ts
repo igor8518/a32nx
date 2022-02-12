@@ -7,6 +7,10 @@ import { Predictions, StepResults, VnavStepError } from '@fmgc/guidance/vnav/Pre
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
+import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
+import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
+import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
+import { Constants } from '@shared/Constants';
 
 const ALTITUDE_ADJUSTMENT_FACTOR = 1.4;
 
@@ -31,7 +35,9 @@ export interface DecelPathCharacteristics {
 }
 
 export class DecelPathBuilder {
-    computeDecelPath(profile: NavGeometryProfile, estimatedFuelOnBoardAtDestination: number, estimatedSecondsFromPresentAtDestination: number) {
+    constructor(private observer: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions) { }
+
+    computeDecelPath(profile: NavGeometryProfile, speedProfile: SpeedProfile, estimatedFuelOnBoardAtDestination: number, estimatedSecondsFromPresentAtDestination: number) {
         // TO GET FPA:
         // If approach exists, use approach alt constraints to get FPA and glidepath
         // If no approach but arrival, use arrival alt constraints, if any
@@ -43,12 +49,9 @@ export class DecelPathBuilder {
         //      - TODO: make sure alt constraints are obeyed during this speed change DECEL segment?
         // The point at the beginning of the speedChangeStep is DECEL
 
-        const TEMP_TROPO = 36_000;
         const DES = 250;
-        const O = 203;
-        const S = 184;
-        const F = 143;
-        const Vapp = 135;
+
+        const { approachSpeed, flapRetractionSpeed, slatRetractionSpeed, cleanSpeed, zeroFuelWeight, managedDescentSpeedMach } = this.observer.get();
 
         if (!this.canCompute(profile.geometry, profile.waypointCount)) {
             return;
@@ -58,12 +61,12 @@ export class DecelPathBuilder {
             1_000,
             50,
             3.14,
-            Vapp,
-            999,
-            107_000,
+            approachSpeed,
+            managedDescentSpeedMach,
+            zeroFuelWeight * Constants.TONS_TO_POUNDS,
             estimatedFuelOnBoardAtDestination,
             0,
-            TEMP_TROPO,
+            this.atmosphericConditions.isaDeviation,
             true,
             FlapConf.CONF_FULL,
         );
@@ -75,7 +78,7 @@ export class DecelPathBuilder {
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Landing,
             distanceFromStart: profile.getDistanceFromStart(distanceFromEnd),
-            speed: 135, // FIXME
+            speed: approachSpeed, // FIXME
             altitude: vappSegment.finalAltitude,
             remainingFuelOnBoard: fuelWeight,
             secondsFromPresent: timeElapsed,
@@ -85,20 +88,22 @@ export class DecelPathBuilder {
             ApproachPathSegmentType.CONSTANT_SLOPE,
             -3,
             1_000,
-            F,
-            135,
+            flapRetractionSpeed,
+            approachSpeed,
             fuelWeight,
             FlapConf.CONF_FULL,
             true,
-            TEMP_TROPO,
+            this.atmosphericConditions.isaDeviation,
         );
+
         fuelWeight += cFullTo3Segment.fuelBurned;
         distanceFromEnd += cFullTo3Segment.distanceTraveled;
         timeElapsed -= cFullTo3Segment.timeElapsed;
+
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.FlapsFull,
             distanceFromStart: profile.getDistanceFromStart(distanceFromEnd),
-            speed: F,
+            speed: flapRetractionSpeed,
             altitude: cFullTo3Segment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
             secondsFromPresent: timeElapsed,
@@ -108,20 +113,22 @@ export class DecelPathBuilder {
             ApproachPathSegmentType.CONSTANT_SLOPE,
             -3,
             cFullTo3Segment.initialAltitude,
-            F + (S - F) / 2,
-            F,
+            (flapRetractionSpeed + slatRetractionSpeed) / 2,
+            flapRetractionSpeed,
             fuelWeight,
             FlapConf.CONF_3,
             true,
-            TEMP_TROPO,
+            this.atmosphericConditions.isaDeviation,
         );
+
         fuelWeight += c3to2Segment.fuelBurned;
         distanceFromEnd += c3to2Segment.distanceTraveled;
         timeElapsed -= c3to2Segment.timeElapsed;
+
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Flaps3,
             distanceFromStart: profile.getDistanceFromStart(distanceFromEnd),
-            speed: F + (S - F) / 2,
+            speed: (flapRetractionSpeed + slatRetractionSpeed) / 2,
             altitude: c3to2Segment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
             secondsFromPresent: timeElapsed,
@@ -131,20 +138,22 @@ export class DecelPathBuilder {
             ApproachPathSegmentType.CONSTANT_SLOPE,
             -3,
             c3to2Segment.initialAltitude,
-            S,
-            F + (S - F) / 2,
+            slatRetractionSpeed,
+            (flapRetractionSpeed + slatRetractionSpeed) / 2,
             fuelWeight,
             FlapConf.CONF_2,
             false,
-            TEMP_TROPO,
+            this.atmosphericConditions.isaDeviation,
         );
+
         fuelWeight += c2to1Segment.fuelBurned;
         distanceFromEnd += c2to1Segment.distanceTraveled;
         timeElapsed -= c2to1Segment.timeElapsed;
+
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Flaps2,
             distanceFromStart: profile.getDistanceFromStart(distanceFromEnd),
-            speed: S,
+            speed: slatRetractionSpeed,
             altitude: c2to1Segment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
             secondsFromPresent: timeElapsed,
@@ -154,20 +163,22 @@ export class DecelPathBuilder {
             ApproachPathSegmentType.CONSTANT_SLOPE,
             -2.5,
             c2to1Segment.initialAltitude,
-            O,
-            S,
+            cleanSpeed,
+            slatRetractionSpeed,
             fuelWeight,
             FlapConf.CONF_1,
             false,
-            TEMP_TROPO,
+            this.atmosphericConditions.isaDeviation,
         );
+
         fuelWeight += c1toCleanSegment.fuelBurned;
         distanceFromEnd += c1toCleanSegment.distanceTraveled;
         timeElapsed -= c1toCleanSegment.timeElapsed;
+
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Flaps1,
             distanceFromStart: profile.getDistanceFromStart(distanceFromEnd),
-            speed: O,
+            speed: cleanSpeed,
             altitude: c1toCleanSegment.initialAltitude,
             remainingFuelOnBoard: fuelWeight,
             secondsFromPresent: timeElapsed,
@@ -177,12 +188,12 @@ export class DecelPathBuilder {
             ApproachPathSegmentType.CONSTANT_SLOPE,
             -2.5,
             c1toCleanSegment.initialAltitude,
-            DES,
-            O,
+            speedProfile.getTarget(profile.getDistanceFromStart(distanceFromEnd), c1toCleanSegment.initialAltitude),
+            cleanSpeed,
             fuelWeight,
             FlapConf.CLEAN,
             false,
-            TEMP_TROPO,
+            this.atmosphericConditions.isaDeviation,
         );
 
         // TODO for TOO_LOW_DECELERATION do CONSTANT_DECELERATION, not LEVEL_DECELERATION
@@ -197,12 +208,12 @@ export class DecelPathBuilder {
                 ApproachPathSegmentType.LEVEL_DECELERATION,
                 undefined,
                 c1toCleanSegment.initialAltitude,
-                DES,
-                O,
+                speedProfile.getTarget(profile.getDistanceFromStart(distanceFromEnd), c1toCleanSegment.initialAltitude),
+                cleanSpeed,
                 fuelWeight,
                 FlapConf.CLEAN,
                 false,
-                TEMP_TROPO,
+                this.atmosphericConditions.isaDeviation,
             );
             // } else {
             //     throw new Error('[VNAV/computeDecelPath] Computation of cleanToDesSpeedSegment for CDA is not yet implemented');
@@ -212,6 +223,7 @@ export class DecelPathBuilder {
         fuelWeight += cleanToDesSpeedSegment.fuelBurned;
         distanceFromEnd += cleanToDesSpeedSegment.distanceTraveled;
         timeElapsed -= cleanToDesSpeedSegment.timeElapsed;
+
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Decel,
             distanceFromStart: profile.getDistanceFromStart(distanceFromEnd),

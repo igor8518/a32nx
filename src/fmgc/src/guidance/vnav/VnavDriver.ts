@@ -78,7 +78,7 @@ export class VnavDriver implements GuidanceComponent {
         this.cruisePathBuilder = new CruisePathBuilder(computationParametersObserver, this.atmosphericConditions, this.stepCoordinator);
         this.tacticalDescentPathBuilder = new TacticalDescentPathBuilder(this.computationParametersObserver);
         this.managedDescentPathBuilder = new DescentPathBuilder(computationParametersObserver, this.atmosphericConditions);
-        this.decelPathBuilder = new DecelPathBuilder();
+        this.decelPathBuilder = new DecelPathBuilder(computationParametersObserver, this.atmosphericConditions);
         this.cruiseToDescentCoordinator = new CruiseToDescentCoordinator(this.cruisePathBuilder, this.managedDescentPathBuilder, this.decelPathBuilder);
 
         this.constraintReader = new ConstraintReader(this.flightPlanManager);
