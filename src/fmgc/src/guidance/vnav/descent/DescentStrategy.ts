@@ -64,7 +64,7 @@ export class IdleDescentStrategy implements DescentStrategy {
         const { zeroFuelWeight, perfFactor, tropoPause } = this.observer.get();
 
         const midwayAltitude = (initialAltitude + finalAltitude) / 2;
-        const predictedN1 = 26 + ((midwayAltitude / 36000) * (30 - 26));
+        const predictedN1 = 30;
 
         return Predictions.altitudeStep(
             initialAltitude,
@@ -87,7 +87,7 @@ export class IdleDescentStrategy implements DescentStrategy {
         const { zeroFuelWeight, perfFactor, tropoPause } = this.observer.get();
 
         // TODO: Fix this
-        const predictedN1 = 26 + ((initialAltitude / 36000) * (30 - 26));
+        const predictedN1 = 30;
 
         return Predictions.distanceStep(
             initialAltitude,
@@ -109,7 +109,7 @@ export class IdleDescentStrategy implements DescentStrategy {
     predictToDistanceBackwards(finalAltitude: number, distance: number, speed: number, mach: number, fuelOnBoard: number): StepResults {
         const { zeroFuelWeight, perfFactor, tropoPause } = this.observer.get();
 
-        const predictedN1 = 26 + ((finalAltitude / 36000) * (30 - 26));
+        const predictedN1 = 30;
 
         return Predictions.reverseDistanceStep(
             finalAltitude,
@@ -129,13 +129,13 @@ export class IdleDescentStrategy implements DescentStrategy {
     }
 
     predictToSpeed(initialAltitude: number, speed: Knots, finalSpeed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
-        throw new Error("[FMS/VNAV] predictToSpeed not implemented for IdleDescentStrategy")
+        throw new Error('[FMS/VNAV] predictToSpeed not implemented for IdleDescentStrategy');
     }
 
     predictToSpeedBackwards(finalAltitude: number, finalSpeed: Knots, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
         const { zeroFuelWeight, perfFactor, tropoPause } = this.observer.get();
 
-        const predictedN1 = 26 + ((finalAltitude / 36000) * (30 - 26));
+        const predictedN1 = 30;
 
         return Predictions.reverseAltitudeStepWithSpeedChange(
             finalAltitude,

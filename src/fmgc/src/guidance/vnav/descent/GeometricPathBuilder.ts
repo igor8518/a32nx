@@ -331,7 +331,7 @@ class GeometricPathPlanner {
     }
 
     private predictN1(altitude: Feet): number {
-        return 25;
+        return 30;
     }
 
     /**
