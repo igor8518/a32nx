@@ -142,7 +142,7 @@ export class ClimbPathBuilder {
 
             const speedTarget = speedProfile.getTarget(distanceFromStart, altitude);
 
-            const step = Math.abs(speedTarget - speed) < 1
+            const step = speedTarget - speed < 1
                 ? climbStrategy.predictToAltitude(altitude, Math.min(altitude + 1500, targetAltitude), speedTarget, managedClimbSpeedMach, remainingFuelOnBoard)
                 : climbStrategy.predictToSpeed(altitude, speedTarget, speed, managedClimbSpeedMach, remainingFuelOnBoard);
 
