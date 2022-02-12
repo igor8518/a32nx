@@ -164,7 +164,7 @@ export class VnavDriver implements GuidanceComponent {
             this.climbPathBuilder.computeClimbPath(profile, managedClimbStrategy, this.currentMcduSpeedProfile, cruiseAltitude);
         }
 
-        if (profile instanceof NavGeometryProfile) {
+        if (profile instanceof NavGeometryProfile && this.cruiseToDescentCoordinator.canCompute(profile)) {
             this.cruiseToDescentCoordinator.buildCruiseAndDescentPath(profile, this.currentMcduSpeedProfile, managedClimbStrategy, stepDescentStrategy);
         }
     }

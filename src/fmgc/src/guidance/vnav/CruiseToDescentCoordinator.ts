@@ -68,4 +68,8 @@ export class CruiseToDescentCoordinator {
             this.lastEstimatedTimeAtDestination += todTimeError;
         }
     }
+
+    canCompute(profile: NavGeometryProfile) {
+        return this.decelPathBuilder?.canCompute(profile.geometry, profile.waypointCount);
+    }
 }
