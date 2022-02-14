@@ -36,7 +36,7 @@ class CDUProgressPage {
                 break;
             }
             case FmgcFlightPhases.DESCENT: {
-                const vDev = mcdu.guidanceController.vnavDriver.getVerticalDeviation();
+                const vDev = SimVar.GetSimVarValue("L:A32NX_PFD_LINEAR_DEVIATION", "Feet");
                 let vDevFormattedNumber = "{small}-----{end}";
 
                 if (vDev && isFinite(vDev)) {

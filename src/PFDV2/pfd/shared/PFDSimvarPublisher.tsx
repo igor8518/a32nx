@@ -92,6 +92,9 @@ export interface PFDSimvars {
     engTwoRunning: boolean;
     expediteMode: boolean;
     setHoldSpeed: boolean;
+    linearDeviationActive: boolean;
+    linearDeviation: number;
+    verticalProfileLatched: boolean;
   }
 
 export enum PFDVars {
@@ -185,7 +188,9 @@ export enum PFDVars {
     engTwoRunning = 'GENERAL ENG COMBUSTION:2',
     expediteMode = 'L:A32NX_FMA_EXPEDITE_MODE',
     setHoldSpeed = 'L:A32NX_PFD_MSG_SET_HOLD_SPEED',
-
+    linearDeviationActive = 'L:A32NX_PFD_LINEAR_DEVIATION_ACTIVE',
+    linearDeviation = 'L:A32NX_PFD_LINEAR_DEVIATION',
+    verticalProfileLatched = 'L:A32NX_PFD_VERTICAL_PROFILE_LATCHED',
   }
 
 /** A publisher to poll and publish nav/com simvars. */
@@ -296,6 +301,9 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['expediteMode', { name: PFDVars.expediteMode, type: SimVarValueType.Bool }],
         ['setHoldSpeed', { name: PFDVars.setHoldSpeed, type: SimVarValueType.Bool }],
 
+        ['linearDeviationActive', { name: PFDVars.linearDeviationActive, type: SimVarValueType.Bool }],
+        ['linearDeviation', { name: PFDVars.linearDeviation, type: SimVarValueType.Feet }],
+        ['verticalProfileLatched', { name: PFDVars.verticalProfileLatched, type: SimVarValueType.Bool }],
     ])
 
     /**

@@ -23,6 +23,7 @@ import { ConstraintReader } from '@fmgc/guidance/vnav/ConstraintReader';
 import { FmgcFlightPhase } from '@shared/flightphase';
 import { TacticalDescentPathBuilder } from '@fmgc/guidance/vnav/descent/TacticalDescentPathBuilder';
 import { IdleDescentStrategy } from '@fmgc/guidance/vnav/descent/DescentStrategy';
+import { DescentGuidance } from '@fmgc/guidance/vnav/descent/DescentGuidance';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile, VerticalCheckpointReason } from './profile/NavGeometryProfile';
@@ -63,6 +64,8 @@ export class VnavDriver implements GuidanceComponent {
 
     private constraintReader: ConstraintReader;
 
+    private descentGuidance: DescentGuidance;
+
     constructor(
         private readonly guidanceController: GuidanceController,
         private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
@@ -82,6 +85,8 @@ export class VnavDriver implements GuidanceComponent {
         this.cruiseToDescentCoordinator = new CruiseToDescentCoordinator(this.cruisePathBuilder, this.managedDescentPathBuilder, this.decelPathBuilder);
 
         this.constraintReader = new ConstraintReader(this.flightPlanManager);
+
+        this.descentGuidance = new DescentGuidance(computationParametersObserver);
     }
 
     init(): void {
@@ -97,6 +102,7 @@ export class VnavDriver implements GuidanceComponent {
         this.computeVerticalProfileForNd(geometry);
 
         this.stepCoordinator.updateGeometryProfile(this.currentNavGeometryProfile);
+        this.descentGuidance.updateProfile(this.currentNavGeometryProfile);
 
         this.version++;
     }
@@ -119,12 +125,14 @@ export class VnavDriver implements GuidanceComponent {
             this.computeVerticalProfileForNd(this.guidanceController.activeGeometry);
 
             this.stepCoordinator.updateGeometryProfile(this.currentNavGeometryProfile);
+            this.descentGuidance.updateProfile(this.currentNavGeometryProfile);
 
             this.version++;
         }
 
         this.updateTimeMarkers();
         this.atmosphericConditions.update();
+        this.descentGuidance.update();
     }
 
     private updateTimeMarkers() {
@@ -334,21 +342,5 @@ export class VnavDriver implements GuidanceComponent {
         const { fcuLateralMode, fcuArmedLateralMode } = this.computationParametersObserver.get();
 
         return fcuLateralMode === LateralMode.NAV || isArmed(fcuArmedLateralMode, ArmedLateralMode.NAV);
-    }
-
-    getVerticalDeviation(): Feet | null {
-        const ppos = this.currentNavGeometryProfile.findVerticalCheckpoint(VerticalCheckpointReason.PresentPosition);
-        if (!ppos) {
-            return null;
-        }
-
-        // TODO: We should not have to remove PPOS and put it back in to get a good interpolation.
-        this.currentNavGeometryProfile.checkpoints = this.currentNavGeometryProfile.checkpoints.filter(({ reason }) => reason !== VerticalCheckpointReason.PresentPosition);
-
-        const altitudeWeShouldBeAt = this.currentNavGeometryProfile.interpolateAltitudeAtDistance(ppos.distanceFromStart);
-        const vDev = ppos.altitude - altitudeWeShouldBeAt;
-
-        this.currentNavGeometryProfile.addCheckpointAtDistanceFromStart(ppos.distanceFromStart, ppos);
-        return vDev;
     }
 }

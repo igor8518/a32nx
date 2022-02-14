@@ -1200,6 +1200,18 @@
     - Bool
     - Indicates if the SET HOLD SPEED message is shown on the PFD
 
+- A32NX_PFD_LINEAR_DEVIATION_ACTIVE
+    - Bool
+    - Indicates if the linear deviation is shown on the PFD
+
+- A32NX_PFD_LINEAR_DEVIATION
+    - Feet
+    - Indicates the current linear deviation shown on the PFD
+
+- A32NX_PFD_VERTICAL_PROFILE_LATCHED
+    - Boolean
+    - Indicates whether to show the latch symbol on the PFD with the deviation indicator
+
 - A32NX_ISIS_LS_ACTIVE
 	- Bool
 	- Indicates whether LS scales are shown on the ISIS

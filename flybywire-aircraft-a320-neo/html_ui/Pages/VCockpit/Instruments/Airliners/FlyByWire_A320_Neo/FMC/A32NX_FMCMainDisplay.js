@@ -4492,7 +4492,7 @@ class FMCMainDisplay extends BaseAirliners {
     }
 
     getFlightPhase() {
-        return this.currentFlightPhase;
+        return this.flightPhaseManager.phase;
     }
     getClimbSpeedLimit() {
         return {
