@@ -47,6 +47,8 @@ export class FMA extends DisplayComponent<{ bus: EventBus }> {
 
     private speedPreselVal = 0;
 
+    private setHoldSpeed = false;
+
     private firstBorderRef = FSComponent.createRef<SVGPathElement>();
 
     private secondBorderRef = FSComponent.createRef<SVGPathElement>();
@@ -68,7 +70,7 @@ export class FMA extends DisplayComponent<{ bus: EventBus }> {
         this.isAttExcessiveSub.set(isAttExcessive);
         const sharedModeActive = this.activeLateralMode === 32 || this.activeLateralMode === 33
         || this.activeLateralMode === 34 || (this.activeLateralMode === 20 && this.activeVerticalMode === 24);
-        const BC3Message = getBC3Message(isAttExcessive, this.armedVerticalModeSub.get())[0] !== null;
+        const BC3Message = getBC3Message(isAttExcessive, this.armedVerticalModeSub.get(), this.setHoldSpeed)[0] !== null;
 
         const engineMessage = this.athrModeMessage;
         const AB3Message = (this.machPreselVal !== -1
@@ -128,6 +130,11 @@ export class FMA extends DisplayComponent<{ bus: EventBus }> {
 
         sub.on('machPreselVal').whenChanged().handle((m) => {
             this.machPreselVal = m;
+            this.handleFMABorders();
+        });
+
+        sub.on('setHoldSpeed').whenChanged().handle((shs) => {
+            this.setHoldSpeed = shs;
             this.handleFMABorders();
         });
     }
@@ -191,7 +198,7 @@ class Row3 extends DisplayComponent<{ bus:EventBus, hiddenClassSub: Subscribable
                     <AB3Cell bus={this.props.bus} />
                     <D3Cell bus={this.props.bus} />
                 </g>
-                <BC3Cell isAttExcessive={this.props.isAttExcessiveSub} verticalArmedMode={this.props.verticalArmedModeSub} />
+                <BC3Cell isAttExcessive={this.props.isAttExcessiveSub} bus={this.props.bus} />
                 <E3Cell bus={this.props.bus} />
             </g>
         );
@@ -919,7 +926,7 @@ class BC1Cell extends ShowForSecondsComponent<{bus:EventBus, visibility: Subscri
     }
 }
 
-const getBC3Message = (isAttExcessive: boolean, armedVerticalMode: number) => {
+const getBC3Message = (isAttExcessive: boolean, armedVerticalMode: number, setHoldSpeed: boolean) => {
     const armedVerticalBitmask = armedVerticalMode;
     const TCASArmed = (armedVerticalBitmask >> 6) & 1;
 
@@ -968,7 +975,7 @@ const getBC3Message = (isAttExcessive: boolean, armedVerticalMode: number) => {
     } else if (false) {
         text = 'TURN AREA EXCEEDANCE';
         className = 'White';
-    } else if (false) {
+    } else if (setHoldSpeed) {
         text = 'SET HOLD SPEED';
         className = 'White';
     } else if (false) {
@@ -984,7 +991,7 @@ const getBC3Message = (isAttExcessive: boolean, armedVerticalMode: number) => {
     return [text, className];
 };
 
-class BC3Cell extends DisplayComponent<{ isAttExcessive: Subscribable<boolean>, verticalArmedMode: Subscribable<number> }> {
+class BC3Cell extends DisplayComponent<{ isAttExcessive: Subscribable<boolean>, bus: EventBus }> {
     private bc3Cell = FSComponent.createRef<SVGTextElement>();
 
     private classNameSub = Subject.create('');
@@ -993,8 +1000,10 @@ class BC3Cell extends DisplayComponent<{ isAttExcessive: Subscribable<boolean>, 
 
     private armedVerticalMode = 0;
 
+    private setHoldSpeed = false;
+
     private fillBC3Cell() {
-        const [text, className] = getBC3Message(this.isAttExcessive, this.armedVerticalMode);
+        const [text, className] = getBC3Message(this.isAttExcessive, this.armedVerticalMode, this.setHoldSpeed);
         this.classNameSub.set(`FontMedium MiddleAlign ${className}`);
         if (text !== null) {
             this.bc3Cell.instance.innerHTML = text;
@@ -1004,13 +1013,20 @@ class BC3Cell extends DisplayComponent<{ isAttExcessive: Subscribable<boolean>, 
     onAfterRender(node: VNode): void {
         super.onAfterRender(node);
 
+        const sub = this.props.bus.getSubscriber<PFDSimvars>();
+
         this.props.isAttExcessive.sub((e) => {
             this.isAttExcessive = e;
             this.fillBC3Cell();
         });
 
-        this.props.verticalArmedMode.sub((v) => {
+        sub.on('fmaVerticalArmed').whenChanged().handle((v) => {
             this.armedVerticalMode = v;
+            this.fillBC3Cell();
+        });
+
+        sub.on('setHoldSpeed').whenChanged().handle((shs) => {
+            this.setHoldSpeed = shs;
             this.fillBC3Cell();
         });
     }

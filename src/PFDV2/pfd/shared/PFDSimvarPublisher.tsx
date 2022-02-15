@@ -91,6 +91,7 @@ export interface PFDSimvars {
     engOneRunning: boolean;
     engTwoRunning: boolean;
     expediteMode: boolean;
+    setHoldSpeed: boolean;
   }
 
 export enum PFDVars {
@@ -183,6 +184,7 @@ export enum PFDVars {
     engOneRunning = 'GENERAL ENG COMBUSTION:1',
     engTwoRunning = 'GENERAL ENG COMBUSTION:2',
     expediteMode = 'L:A32NX_FMA_EXPEDITE_MODE',
+    setHoldSpeed = 'L:A32NX_PFD_MSG_SET_HOLD_SPEED',
 
   }
 
@@ -292,6 +294,7 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['engOneRunning', { name: PFDVars.engOneRunning, type: SimVarValueType.Bool }],
         ['engTwoRunning', { name: PFDVars.engTwoRunning, type: SimVarValueType.Bool }],
         ['expediteMode', { name: PFDVars.expediteMode, type: SimVarValueType.Bool }],
+        ['setHoldSpeed', { name: PFDVars.setHoldSpeed, type: SimVarValueType.Bool }],
 
     ])
 

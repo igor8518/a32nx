@@ -31,9 +31,11 @@ export class DisplayUnit extends DisplayComponent<DisplayUnitProps> {
 
     private timeOut: number = 0;
 
-    private readonly selfTestRef = FSComponent.createRef<SVGElement>();
+    private selfTestRef = FSComponent.createRef<SVGElement>();
 
-    private readonly pfdRef = FSComponent.createRef<HTMLDivElement>();
+    private pfdRef = FSComponent.createRef<HTMLDivElement>();
+
+    private backLightBleedRef = FSComponent.createRef<HTMLDivElement>();
 
     constructor(props: DisplayUnitProps) {
         super(props);
@@ -75,14 +77,17 @@ export class DisplayUnit extends DisplayComponent<DisplayUnitProps> {
 
         this.state.sub((v) => {
             if (v === DisplayUnitState.Selftest) {
-                this.selfTestRef.instance.setAttribute('visibility', 'visible');
-                this.pfdRef.instance.setAttribute('style', 'display:none');
+                this.selfTestRef.instance.style.display = 'block';
+                this.pfdRef.instance.style.display = 'none';
+                this.backLightBleedRef.instance.style.display = 'block';
             } else if (v === DisplayUnitState.On) {
-                this.selfTestRef.instance.setAttribute('visibility', 'hidden');
-                this.pfdRef.instance.setAttribute('style', 'display:block');
+                this.selfTestRef.instance.style.display = 'none';
+                this.pfdRef.instance.style.display = 'block';
+                this.backLightBleedRef.instance.style.display = 'block';
             } else {
-                this.selfTestRef.instance.setAttribute('visibility', 'hidden');
-                this.pfdRef.instance.setAttribute('style', 'display:none');
+                this.selfTestRef.instance.style.display = 'none';
+                this.pfdRef.instance.style.display = 'none';
+                this.backLightBleedRef.instance.style.display = 'none';
             }
         }, true);
     }
@@ -119,7 +124,7 @@ export class DisplayUnit extends DisplayComponent<DisplayUnitProps> {
         return (
 
             <>
-                <div class="BacklightBleed" />
+                <div ref={this.backLightBleedRef} class="BacklightBleed" />
 
                 <svg ref={this.selfTestRef} class="SelfTest" viewBox="0 0 600 600">
                     <rect class="SelfTestBackground" x="0" y="0" width="100%" height="100%" />
