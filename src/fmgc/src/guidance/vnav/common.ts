@@ -125,6 +125,12 @@ export class Common {
         return Math.sqrt(term3);
     }
 
+    static machToCas(mach: number, delta: number): number {
+        const term1 = (0.2 * mach ** 2 + 1) ** 3.5;
+        const term2 = (delta * term1 + 1) ** (1 / 3.5) - 1;
+        return 1479.1 * Math.sqrt(term2);
+    }
+
     static TAStoCAS(tas: number, theta: number, delta: number): number {
         const term1 = 1 + (1 / theta) * (tas / 1479.1) ** 2;
         const term2 = delta * ((term1 ** 3.5) - 1) + 1;
