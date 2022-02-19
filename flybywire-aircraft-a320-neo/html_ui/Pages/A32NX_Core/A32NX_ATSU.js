@@ -658,7 +658,7 @@ const uplinkRoute = async (mcdu) => {
                     }).catch(console.error);
                 }
             }
-
+            let departureRunwayIndex = -1;
             if (initRunwaySet == 2) {
                 const currentRunway = mcdu.flightPlanManager.getOriginRunway();
                 initSidSet = 1;
@@ -667,7 +667,7 @@ const uplinkRoute = async (mcdu) => {
                     if (currentRunway) {
                         SimVar.SetSimVarValue("L:A32NX_DEPARTURE_ELEVATION", "feet", A32NX_Util.meterToFeet(currentRunway.elevation));
                         const departure = mcdu.flightPlanManager.getDeparture();
-                        const departureRunwayIndex = await departure.runwayTransitions.findIndex(async t => {
+                        departureRunwayIndex = await departure.runwayTransitions.findIndex(async t => {
                             if (t.name.indexOf(currentRunway.designation) !== -1) {
                                 initSidSet = 2;
                                 SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 2);
@@ -676,13 +676,14 @@ const uplinkRoute = async (mcdu) => {
                                 SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", -1);
                             }
                         });
-                        if (departureRunwayIndex >= -1) {
-                            await mcdu.flightPlanManager.setDepartureRunwayIndex(departureRunwayIndex, async () => {
-                                initSidSet = 2;
-                                SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 2);
-                            }).catch(console.error);
-                        }
                     }
+                    initSidSet = 2;
+                    SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 2);
+                }).catch(console.error);
+            }
+
+            if (departureRunwayIndex >= -1) {
+                await mcdu.flightPlanManager.setDepartureRunwayIndex(departureRunwayIndex, async () => {
                     initSidSet = 2;
                     SimVar.SetSimVarValue("L:A32NX_SET_SID_ORIGIN", "Number", 2);
                 }).catch(console.error);
@@ -784,13 +785,15 @@ const uplinkRoute = async (mcdu) => {
                 SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 1);
                 const arrivalIndex = mcdu.flightPlanManager.getArrivalProcIndex();
                 await mcdu.flightPlanManager.setApproachTransitionIndex(OrigStars[findSTAR].t, async () => {
+                    initApprTransSet = 2;
+                    SimVar.SetSimVarValue("L:A32NX_SET_APPR_TRANS_DESTINATION", "Number", 2);
+                }).catch(console.error);
+                if (initApprTransSet === 2) {
                     await mcdu.flightPlanManager.setArrivalProcIndex(arrivalIndex, async () => {
                         initStarSet = 2;
                         SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 2);
                     }).catch(console.error);
-                    initApprTransSet = 2;
-                    SimVar.SetSimVarValue("L:A32NX_SET_APPR_TRANS_DESTINATION", "Number", 2);
-                }).catch(console.error);
+                }
             }
 
             if (initStarSet == 2) {
@@ -798,15 +801,16 @@ const uplinkRoute = async (mcdu) => {
                 SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 1);
                 initStarTransSet = 1;
                 SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 1);
-
                 await mcdu.flightPlanManager.setArrivalEnRouteTransitionIndex(OrigStars[findSTAR].t2, async () => {
+                    initStarTransSet = 2;
+                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 2);
+                }).catch(console.error);
+                if (initStarTransSet === 2) {
                     await mcdu.flightPlanManager.setArrivalProcIndex(OrigStars[findSTAR].i, async () => {
                         initStarSet = 2;
                         SimVar.SetSimVarValue("L:A32NX_SET_STAR_DESTINATION", "Number", 2);
                     }).catch(console.error);
-                    initStarTransSet = 2;
-                    SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 2);
-                }).catch(console.error);
+                }
             }
 
             if (initStarSet != 2) {
