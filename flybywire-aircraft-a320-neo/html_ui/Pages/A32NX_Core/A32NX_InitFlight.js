@@ -176,11 +176,11 @@ class A32NX_InitFlight {
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET FLAPS");
                         A32NX_InitFlight.MCDU.trySetFlapsTHS("2/UP" + String(0));
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET V1");
-                        A32NX_InitFlight.MCDU.trySetV1Speed((A32NX_InitFlight.MCDU._getV1Speed() + 10).toString());
+                        A32NX_InitFlight.MCDU.trySetV1Speed((A32NX_InitFlight.MCDU._getV1Speed()).toString());
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET VR");
-                        A32NX_InitFlight.MCDU.trySetVRSpeed((A32NX_InitFlight.MCDU._getVRSpeed() + 10).toString());
+                        A32NX_InitFlight.MCDU.trySetVRSpeed((A32NX_InitFlight.MCDU._getVRSpeed()).toString());
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET V2");
-                        A32NX_InitFlight.MCDU.trySetV2Speed((A32NX_InitFlight.MCDU._getV2Speed() + 10).toString());
+                        A32NX_InitFlight.MCDU.trySetV2Speed((A32NX_InitFlight.MCDU._getV2Speed()).toString());
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET FLEX");
                         A32NX_InitFlight.MCDU.setPerfTOFlexTemp(69);
                         A32NX_InitFlight.MCDU.scratchpad.setText("DONE");
