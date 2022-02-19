@@ -37,6 +37,12 @@ export interface SpeedProfile {
      * @param distanceFromStart
      */
     getMaxClimbSpeedConstraint(distanceFromStart: NauticalMiles): MaxSpeedConstraint;
+
+    /**
+     * This is used for predictions
+     * @param distanceFromStart
+     */
+    getMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint;
 }
 
 function constraintToSpeed(constraint?: MaxSpeedConstraint): Knots {
@@ -122,7 +128,7 @@ export class McduSpeedProfile implements SpeedProfile {
 
         const maxSpeed = Math.min(
             constraintToSpeed(this.getMaxClimbSpeedConstraint(distanceAlongTrack)),
-            constraintToSpeed(this.findMaxDescentSpeedConstraint(distanceAlongTrack)),
+            constraintToSpeed(this.getMaxDescentSpeedConstraint(distanceAlongTrack)),
         );
 
         this.maxSpeedCache.set(distanceAlongTrack, maxSpeed);
@@ -142,7 +148,7 @@ export class McduSpeedProfile implements SpeedProfile {
         return activeConstraint;
     }
 
-    private findMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
+    getMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
         let activeConstraint: MaxSpeedConstraint = null;
 
         // TODO: I think this is unnecessarily complex, we can probably just return the first constraint that is in front of us.
@@ -219,6 +225,10 @@ export class ExpediteSpeedProfile implements SpeedProfile {
     }
 
     getMaxClimbSpeedConstraint(_distanceFromStart: number): MaxSpeedConstraint {
+        return null;
+    }
+
+    getMaxDescentSpeedConstraint(_distanceFromStart: number): MaxSpeedConstraint {
         return null;
     }
 }
@@ -313,6 +323,22 @@ export class NdSpeedProfile implements SpeedProfile {
             if (distanceAlongTrack < constraint.distanceFromStart && constraint.maxSpeed < constraintToSpeed(activeConstraint)) {
                 activeConstraint = constraint;
             }
+        }
+
+        return activeConstraint;
+    }
+
+    getMaxDescentSpeedConstraint(distanceAlongTrack: NauticalMiles): MaxSpeedConstraint {
+        let activeConstraint: MaxSpeedConstraint = null;
+
+        // TODO: I think this is unnecessarily complex, we can probably just return the first constraint that is in front of us.
+        for (const constraint of this.descentSpeedConstraints) {
+            // Since the constraint are ordered, there is no need to search further
+            if (distanceAlongTrack < constraint.distanceFromStart) {
+                return activeConstraint;
+            }
+
+            activeConstraint = constraint;
         }
 
         return activeConstraint;

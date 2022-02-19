@@ -354,6 +354,8 @@ export class PseudoWaypoints implements GuidanceComponent {
 
             if (pwp) {
                 [efisSymbolLla, distanceFromLegTermination, alongLegIndex] = pwp;
+            } else {
+                console.warn('[FMS/VNAV] Could not find place checkpoint:', checkpoint.reason);
             }
         }
 
@@ -392,7 +394,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 mcduHeader: '(SPD)',
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: false,
             };
@@ -418,7 +422,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: false,
             };
@@ -434,7 +440,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: true,
             };
@@ -450,7 +458,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: true,
             };
@@ -466,7 +476,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: true,
             };
@@ -515,7 +527,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: true,
             };
@@ -530,7 +544,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: true,
             };
@@ -545,7 +561,9 @@ export class PseudoWaypoints implements GuidanceComponent {
                 displayedOnMcdu: true,
                 flightPlanInfo: {
                     ...checkpoint,
-                    distanceFromLastFix: PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination),
+                    distanceFromLastFix: Number.isFinite(alongLegIndex)
+                        ? PseudoWaypoints.computePseudoWaypointDistanceFromFix(geometry.legs.get(alongLegIndex), distanceFromLegTermination)
+                        : 0,
                 },
                 displayedOnNd: true,
             };

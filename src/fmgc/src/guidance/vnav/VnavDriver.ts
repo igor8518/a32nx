@@ -25,6 +25,7 @@ import { TacticalDescentPathBuilder } from '@fmgc/guidance/vnav/descent/Tactical
 import { IdleDescentStrategy } from '@fmgc/guidance/vnav/descent/DescentStrategy';
 import { DescentGuidance } from '@fmgc/guidance/vnav/descent/DescentGuidance';
 import { ProfileInterceptCalculator } from '@fmgc/guidance/vnav/descent/ProfileInterceptCalculator';
+import { ApproachPathBuilder } from '@fmgc/guidance/vnav/descent/ApproachPathBuilder';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile, VerticalCheckpointReason } from './profile/NavGeometryProfile';
@@ -46,6 +47,8 @@ export class VnavDriver implements GuidanceComponent {
     managedDescentPathBuilder: DescentPathBuilder;
 
     decelPathBuilder: DecelPathBuilder;
+
+    approachPathBuilder: ApproachPathBuilder;
 
     cruiseToDescentCoordinator: CruiseToDescentCoordinator;
 
@@ -82,8 +85,10 @@ export class VnavDriver implements GuidanceComponent {
         this.cruisePathBuilder = new CruisePathBuilder(computationParametersObserver, this.atmosphericConditions, this.stepCoordinator);
         this.tacticalDescentPathBuilder = new TacticalDescentPathBuilder(this.computationParametersObserver);
         this.managedDescentPathBuilder = new DescentPathBuilder(computationParametersObserver, this.atmosphericConditions);
+        // TODO: Remove decelPathBuilder
         this.decelPathBuilder = new DecelPathBuilder(computationParametersObserver, this.atmosphericConditions);
-        this.cruiseToDescentCoordinator = new CruiseToDescentCoordinator(this.cruisePathBuilder, this.managedDescentPathBuilder, this.decelPathBuilder);
+        this.approachPathBuilder = new ApproachPathBuilder(computationParametersObserver, this.atmosphericConditions);
+        this.cruiseToDescentCoordinator = new CruiseToDescentCoordinator(this.cruisePathBuilder, this.managedDescentPathBuilder, this.approachPathBuilder);
 
         this.constraintReader = new ConstraintReader(this.flightPlanManager);
 
@@ -166,7 +171,7 @@ export class VnavDriver implements GuidanceComponent {
             this.computationParametersObserver.get(),
             this.currentNavGeometryProfile.distanceToPresentPosition,
             this.currentNavGeometryProfile.maxClimbSpeedConstraints,
-            this.currentNavGeometryProfile.descentSpeedConstraints,
+            [...this.currentNavGeometryProfile.descentSpeedConstraints, ...this.currentNavGeometryProfile.approachSpeedConstraints],
         );
 
         if (fromFlightPhase < FmgcFlightPhase.Cruise) {

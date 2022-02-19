@@ -109,12 +109,20 @@ export class NavGeometryProfile extends BaseGeometryProfile {
         return this.constraintReader.descentAltitudeConstraints;
     }
 
+    override get approachAltitudeConstraints(): DescentAltitudeConstraint[] {
+        return this.constraintReader.approachAltitudeConstraints;
+    }
+
     override get maxClimbSpeedConstraints(): MaxSpeedConstraint[] {
         return this.constraintReader.climbSpeedConstraints;
     }
 
     override get descentSpeedConstraints(): MaxSpeedConstraint[] {
         return this.constraintReader.descentSpeedConstraints;
+    }
+
+    override get approachSpeedConstraints(): MaxSpeedConstraint[] {
+        return this.constraintReader.approachSpeedConstraints;
     }
 
     override get distanceToPresentPosition(): number {

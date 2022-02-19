@@ -3,7 +3,7 @@ import { FlightPlanManager } from '@fmgc/wtsdk';
 import { Leg } from '@fmgc/guidance/lnav/legs/Leg';
 import { ApproachPathAngleConstraint, DescentAltitudeConstraint, MaxAltitudeConstraint, MaxSpeedConstraint } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { Geometry } from '@fmgc/guidance/Geometry';
-import { AltitudeConstraintType, PathAngleConstraint, SpeedConstraintType } from '@fmgc/guidance/lnav/legs';
+import { AltitudeConstraintType, SpeedConstraintType } from '@fmgc/guidance/lnav/legs';
 import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 
 type UncategorizedAltitudeConstraint = DescentAltitudeConstraint;

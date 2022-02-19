@@ -1,17 +1,16 @@
 import { CruisePathBuilder } from '@fmgc/guidance/vnav/cruise/CruisePathBuilder';
 import { DescentPathBuilder } from '@fmgc/guidance/vnav/descent/DescentPathBuilder';
-import { DecelPathBuilder } from '@fmgc/guidance/vnav/descent/DecelPathBuilder';
 import { NavGeometryProfile, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
-import { SpeedProfile } from '@fmgc/guidance/vnav/climb/SpeedProfile';
 import { ClimbStrategy } from '@fmgc/guidance/vnav/climb/ClimbStrategy';
 import { DescentStrategy } from '@fmgc/guidance/vnav/descent/DescentStrategy';
+import { ApproachPathBuilder } from '@fmgc/guidance/vnav/descent/ApproachPathBuilder';
 
 export class CruiseToDescentCoordinator {
     private lastEstimatedFuelAtDestination: Pounds = 2300;
 
     private lastEstimatedTimeAtDestination: Seconds = 0;
 
-    constructor(private cruisePathBuilder: CruisePathBuilder, private descentPathBuilder: DescentPathBuilder, private decelPathBuilder: DecelPathBuilder) {
+    constructor(private cruisePathBuilder: CruisePathBuilder, private descentPathBuilder: DescentPathBuilder, private approachPathBuilder: ApproachPathBuilder) {
 
     }
 
@@ -46,7 +45,7 @@ export class CruiseToDescentCoordinator {
         while (iterationCount++ < 4 && (Math.abs(todFuelError) > 100 || Math.abs(todTimeError) > 1)) {
             // Reset checkpoints
             profile.checkpoints.splice(startOfCruiseIndex + 1, profile.checkpoints.length - startOfCruiseIndex - 1);
-            this.decelPathBuilder.computeDecelPath(profile, speedProfile, this.lastEstimatedFuelAtDestination, this.lastEstimatedTimeAtDestination);
+            this.approachPathBuilder.computeApproachPath(profile, speedProfile, this.lastEstimatedFuelAtDestination, this.lastEstimatedTimeAtDestination);
 
             // Geometric and idle
             const todCheckpoint = this.descentPathBuilder.computeManagedDescentPath(profile, speedProfile, this.cruisePathBuilder.getFinalCruiseAltitude());
@@ -70,6 +69,6 @@ export class CruiseToDescentCoordinator {
     }
 
     canCompute(profile: NavGeometryProfile) {
-        return this.decelPathBuilder?.canCompute(profile.geometry, profile.waypointCount);
+        return this.approachPathBuilder?.canCompute(profile);
     }
 }
