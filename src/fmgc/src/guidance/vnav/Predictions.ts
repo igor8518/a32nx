@@ -175,7 +175,7 @@ export class Predictions {
             const midStepAltitude = (initialAltitude + finalAltitude) / 2;
 
             const theta = Common.getTheta(midStepAltitude, isaDev, midStepAltitude > tropoAltitude);
-            const delta = Common.getDelta(theta, midStepAltitude > tropoAltitude, midStepAltitude);
+            const delta = Common.getDelta(midStepAltitude, midStepAltitude > tropoAltitude);
             let mach = Common.CAStoMach(econCAS, delta);
 
             let eas;
@@ -273,7 +273,7 @@ export class Predictions {
         let iterations = 0;
         do {
             const theta = Common.getTheta(initialAltitude, isaDev, initialAltitude > tropoAltitude);
-            const delta = Common.getDelta(theta, initialAltitude > tropoAltitude, initialAltitude);
+            const delta = Common.getDelta(initialAltitude, initialAltitude > tropoAltitude);
             let mach = Common.CAStoMach(econCAS, delta);
 
             let eas;
@@ -789,7 +789,7 @@ export class Predictions {
         const midStepAltitude = (initialAltitude + finalAltitude) / 2;
 
         const theta = Common.getTheta(midStepAltitude, isaDev);
-        const delta = Common.getDelta(theta);
+        const delta = Common.getDelta(midStepAltitude);
 
         let mach = Common.CAStoMach(econCAS, delta);
         const delta2 = Common.getDelta2(delta, mach);
@@ -865,7 +865,7 @@ export class Predictions {
             const midStepAltitude = (initialAltitude + finalAltitude) / 2;
 
             const theta = Common.getTheta(midStepAltitude, isaDev);
-            const delta = Common.getDelta(theta);
+            const delta = Common.getDelta(midStepAltitude);
 
             let mach = Common.CAStoMach(econCAS, delta);
             const delta2 = Common.getDelta2(delta, mach);
@@ -944,7 +944,7 @@ export class Predictions {
             const isAboveTropo = midStepAltitude > tropoAltitude;
 
             const theta = Common.getTheta(midStepAltitude, isaDev, isAboveTropo);
-            const delta = Common.getDelta(theta, isAboveTropo, midStepAltitude);
+            const delta = Common.getDelta(midStepAltitude, isAboveTropo);
 
             let initialMach = Common.CAStoMach(initialCAS, delta);
             let finalMach = Common.CAStoMach(finalCAS, delta);
@@ -1051,7 +1051,7 @@ export class Predictions {
             const isAboveTropo = midStepAltitude > tropoAltitude;
 
             const theta = Common.getTheta(midStepAltitude, isaDev, isAboveTropo);
-            const delta = Common.getDelta(theta, isAboveTropo, midStepAltitude);
+            const delta = Common.getDelta(midStepAltitude, isAboveTropo);
 
             let initialMach = Common.CAStoMach(initialCAS, delta);
             let finalMach = Common.CAStoMach(finalCAS, delta);
@@ -1159,7 +1159,7 @@ export class Predictions {
             const isAboveTropo = midStepAltitude > tropoAltitude;
 
             const theta = Common.getTheta(midStepAltitude, isaDev, isAboveTropo);
-            const delta = Common.getDelta(theta, isAboveTropo, midStepAltitude);
+            const delta = Common.getDelta(midStepAltitude, isAboveTropo);
 
             let initialMach = Common.CAStoMach(initialCAS, delta);
             let finalMach = Common.CAStoMach(finalCAS, delta);

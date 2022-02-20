@@ -31,12 +31,9 @@ import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile, VerticalCheckpointReason } from './profile/NavGeometryProfile';
 import { ClimbPathBuilder } from './climb/ClimbPathBuilder';
-import { ClimbProfileBuilderResult } from './climb/ClimbProfileBuilderResult';
 
 export class VnavDriver implements GuidanceComponent {
-    atmosphericConditions: AtmosphericConditions = new AtmosphericConditions();
-
-    currentClimbProfile: ClimbProfileBuilderResult;
+    atmosphericConditions: AtmosphericConditions
 
     version: number = 0;
 
@@ -85,7 +82,7 @@ export class VnavDriver implements GuidanceComponent {
         private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
         private readonly flightPlanManager: FlightPlanManager,
     ) {
-        this.atmosphericConditions = new AtmosphericConditions();
+        this.atmosphericConditions = new AtmosphericConditions(computationParametersObserver.get().tropoPause);
 
         this.currentMcduSpeedProfile = new McduSpeedProfile(this.computationParametersObserver.get(), 0, [], []);
 

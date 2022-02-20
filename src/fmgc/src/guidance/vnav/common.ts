@@ -81,7 +81,7 @@ export class Common {
     }
 
     /**
-     * Get pressure ratio for a particular theta
+     * Get pressure ratio for a particular altitude
      * @param alt pressure altitude
      * @param aboveTropo whether the aircraft is above the tropopause
      * @returns pressure ratio
