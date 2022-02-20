@@ -288,7 +288,7 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
                             }
                             STARName = APPName;
 
-                            STARs.push({r: gr, t: t, t2: t2, tr: r, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
+                            STARs.push({r: gr, t: t, t2: t2, tr: r2, i: i, j: destinationAirportInfo.approaches[j].index, STARName: STARName, APPName: APPName, TRANSSTARName: TRANSSTARName, TRANSAPPName: TRANSAPPName, RWName: RWEnd});
                             FindAppr = false;
                             FindTransAppr = false;
                         }
@@ -521,14 +521,14 @@ const uplinkRoute = async (mcdu) => {
     const ass = await SimVar.GetSimVarValue("L:A32NX_AUTO_SID_STAR", "Number");
     const add = await SimVar.GetSimVarValue("L:A32NX_AUTO_DELETE_DISCONTINUITY", "Number");
 
-    let initRunwaySet = 0;
-    let initSidSet = 0;
-    let initSidTransSet = 0;
+    const initRunwaySet = 0;
+    const initSidSet = 0;
+    const initSidTransSet = 0;
 
-    let initApproachSet = 0;
-    let initStarSet = 0;
-    let initApprTransSet = 0;
-    let initStarTransSet = 0;
+    const initApproachSet = 0;
+    const initStarSet = 0;
+    const initApprTransSet = 0;
+    const initStarTransSet = 0;
 
     let OrigSids = [];
     let OrigStars = [];
@@ -631,9 +631,199 @@ const uplinkRoute = async (mcdu) => {
                 }
             }
         }
-
-        // SID
+        mcdu.flightPlanManager.pauseSync();
         if (OrigSids.length > 0) {
+            // SID
+            await mcdu.ensureCurrentFlightPlanIsTemporary(async () => {
+                SimVar.SetSimVarValue("L:A32NX_SET_SID", "Number", 1);
+            });
+            // set departure
+            //  rwy index
+            await mcdu.flightPlanManager.setDepartureRunwayIndex(OrigSids[findSID].tr)
+                .then(() => console.log(`[FP LOAD] Setting Departure Runway ${OrigSids[findSID].tr} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Departure Runway ${OrigSids[findSID].tr} ... FAILED`);
+                    console.error(e);
+                });
+            // proc index
+            await mcdu.flightPlanManager.setDepartureProcIndex(OrigSids[findSID].j)
+                .then(() => console.log(`[FP LOAD] Setting Departure Procedure  ${OrigSids[findSID].j} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Departure Procedure ${OrigSids[findSID].j} ... FAILED`);
+                    console.error(e);
+                });
+            // origin runway
+            if (OrigSids[findSID].tr !== -1) {
+                await mcdu.flightPlanManager.setOriginRunwayIndex(OrigSids[findSID].tr)
+                    .then(() => console.log(`[FP LOAD] Setting Origin  ${OrigSids[findSID].tr} ... SUCCESS`))
+                    .catch((e) => {
+                        console.error(`[FP LOAD] Setting Origin ${OrigSids[findSID].tr} ... FAILED`);
+                        console.error(e);
+                    });
+            } else if (OrigSids[findSID].tr !== -1 && OrigSids[findSID].j !== -1) {
+                await mcdu.flightPlanManager.setOriginRunwayIndexFromDeparture()
+                    .then(() => console.log(`[FP LOAD] Setting Origin using ${OrigSids[findSID].j}/${OrigSids[findSID].tr}... SUCCESS`))
+                    .catch((e) => {
+                        console.error(`[FP LOAD] Setting Origin using ${OrigSids[findSID].j}/${OrigSids[findSID].tr} ... FAILED`);
+                        console.error(e);
+                    });
+            }
+            //  enroutetrans index
+            await mcdu.flightPlanManager.setDepartureEnRouteTransitionIndex(OrigSids[findSID].t)
+                .then(() => console.log(`[FP LOAD] Setting Departure En Route Transition ${OrigSids[findSID].t} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Departure En Route Transition ${OrigSids[findSID].t} ... FAILED`);
+                    console.error(e);
+                });
+            if (mcdu.flightPlanManager.getCurrentFlightPlanIndex() === 1) {
+                await mcdu.flightPlanManager.copyCurrentFlightPlanInto(0, () => {
+                    mcdu.flightPlanManager.setCurrentFlightPlanIndex(0, () => {
+                        SimVar.SetSimVarValue("L:FMC_FLIGHT_PLAN_IS_TEMPORARY", "number", 0);
+                        SimVar.SetSimVarValue("L:MAP_SHOW_TEMPORARY_FLIGHT_PLAN", "number", 0);
+                        if (mcdu.tempFpPendingAutoTune) {
+                            mcdu.clearAutotunedIls();
+                            mcdu.tempFpPendingAutoTune = false;
+                        }
+                        if (add === 1) {
+                            let first = 0;
+                            let countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
+                            for (let i = 0; i < countWaypoints; i++) {
+                                wp = mcdu.flightPlanManager.getWaypoint(i);
+                                if (wp.ident === FixSID) {
+                                    if (first === 0) {
+                                        first = 1;
+                                        continue;
+                                    } else if (first === 1) {
+                                        mcdu.flightPlanManager.removeWaypoint(i);
+                                        countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
+                                        first = -1;
+                                    }
+                                } else {
+                                    first = 0;
+                                }
+                            }
+                            for (let i = 0; i < mcdu.flightPlanManager.getWaypointsCount(); i++) {
+                                wp = mcdu.flightPlanManager.getWaypoint(i);
+                                if (wp.endsInDiscontinuity) {
+                                    mcdu.flightPlanManager.clearDiscontinuity(i);
+                                }
+                            }
+                            SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
+                        }
+                        CDUFlightPlanPage.ShowPage(mcdu, 0);
+                    });
+                }).catch(console.error);
+            }
+        }
+        if (OrigStars.length > 0) {
+            // STAR
+            await mcdu.ensureCurrentFlightPlanIsTemporary(async () => {
+                SimVar.SetSimVarValue("L:A32NX_SET_STAR", "Number", 1);
+            });
+            // set approach
+            //  rwy index
+            await mcdu.flightPlanManager.setArrivalRunwayIndex(OrigStars[findSTAR].r)
+                .then(() => console.log(`[FP LOAD] Setting Arrival Runway ${OrigStars[findSTAR].r} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Arrival Runway ${OrigStars[findSTAR].r} ... FAILED`);
+                    console.error(e);
+                });
+            //  approach index
+            await mcdu.flightPlanManager.setApproachIndex(OrigStars[findSTAR].j)
+                .then(() => console.log(`[FP LOAD] Setting Approach ${OrigStars[findSTAR].j} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Approach ${OrigStars[findSTAR].j} ... FAILED`);
+                    console.error(e);
+                });
+            //  approachtrans index
+            await mcdu.flightPlanManager.setApproachTransitionIndex(OrigStars[findSTAR].t)
+                .then(() => console.log(`[FP LOAD] Setting Approach Transition ${OrigStars[findSTAR].t} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Approach Transition ${OrigStars[findSTAR].t} ... FAILED`);
+                    console.error(e);
+                });
+
+            // set arrival
+            //  arrivalproc index
+            await mcdu.flightPlanManager.setArrivalProcIndex(OrigStars[findSTAR].i)
+                .then(() => console.log(`[FP LOAD] Setting Arrival Procedure ${OrigStars[findSTAR].i} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Arrival Procedure ${OrigStars[findSTAR].i} ... FAILED`);
+                    console.error(e);
+                });
+            //  arrivaltrans index
+            await mcdu.flightPlanManager.setArrivalEnRouteTransitionIndex(OrigStars[findSTAR].t2)
+                .then(() => console.log(`[FP LOAD] Setting En Route Transition ${OrigStars[findSTAR].t2} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting En Route Transition ${OrigStars[findSTAR].t2} ... FAILED`);
+                    console.error(e);
+                });
+
+            await mcdu.flightPlanManager.setDestinationRunwayIndexFromApproach()
+                .then(() => console.log(`[FP LOAD] Setting Destination Runway using ${OrigStars[findSTAR].j} ... SUCCESS`))
+                .catch((e) => {
+                    console.error(`[FP LOAD] Setting Destination Runway using ${OrigStars[findSTAR].j} ... FAILED`);
+                    console.error(e);
+                });
+
+            SimVar.SetSimVarValue("L:A32NX_SET_STAR_TRANS_DESTINATION", "Number", 3);
+
+            mcdu.updateConstraints();
+            mcdu.onToRwyChanged();
+            CDUPerformancePage.UpdateThrRedAccFromOrigin(mcdu, true, true);
+            CDUPerformancePage.UpdateEngOutAccFromOrigin(mcdu);
+            if (mcdu.flightPlanManager.getCurrentFlightPlanIndex() === 1) {
+                await mcdu.flightPlanManager.copyCurrentFlightPlanInto(0, () => {
+                    mcdu.flightPlanManager.setCurrentFlightPlanIndex(0, () => {
+                        SimVar.SetSimVarValue("L:FMC_FLIGHT_PLAN_IS_TEMPORARY", "number", 0);
+                        SimVar.SetSimVarValue("L:MAP_SHOW_TEMPORARY_FLIGHT_PLAN", "number", 0);
+                        if (mcdu.tempFpPendingAutoTune) {
+                            mcdu.clearAutotunedIls();
+                            mcdu.tempFpPendingAutoTune = false;
+                        }
+                        if (add === 1) {
+                            let first = 0;
+                            let countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
+                            for (let i = 0; i < countWaypoints; i++) {
+                                wp = mcdu.flightPlanManager.getWaypoint(i);
+                                if (wp.ident === FixSID) {
+                                    if (first === 0) {
+                                        first = 1;
+                                        continue;
+                                    } else if (first === 1) {
+                                        mcdu.flightPlanManager.removeWaypoint(i);
+                                        countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
+                                        first = -1;
+                                    }
+                                } else if (wp.ident === "MANUAL") {
+                                    mcdu.flightPlanManager.removeWaypoint(i);
+                                    countWaypoints = mcdu.flightPlanManager.getWaypointsCount();
+                                    first = 0;
+                                } else {
+                                    first = 0;
+                                }
+                            }
+                            for (let i = 0; i < mcdu.flightPlanManager.getWaypointsCount(); i++) {
+                                wp = mcdu.flightPlanManager.getWaypoint(i);
+                                if (wp.endsInDiscontinuity) {
+                                    mcdu.flightPlanManager.clearDiscontinuity(i);
+                                }
+                            }
+                            SimVar.SetSimVarValue("L:A32NX_SET_CLEAR_DISCONTINUITY", "Number", 1);
+                        }
+                        CDUFlightPlanPage.ShowPage(mcdu, 0);
+                    });
+                }).catch(console.error);
+            }
+        }
+        mcdu.flightPlanManager.resumeSync();
+
+        // Potential CTD source?
+        Coherent.call('SET_ACTIVE_WAYPOINT_INDEX', 0)
+            .catch((e) => console.error('[FP LOAD] Error when setting Active WP'));
+        Coherent.call('RECOMPUTE_ACTIVE_WAYPOINT_INDEX')
+            .catch((e) => console.error('[FP LOAD] Error when recomputing Active WP'));
+        /*if (OrigSids.length > 0) {
 
             await mcdu.ensureCurrentFlightPlanIsTemporary(async () => {
                 initRunwaySet = 1;
@@ -740,10 +930,10 @@ const uplinkRoute = async (mcdu) => {
                     }).catch(console.error);
                 }
             }
-        }
+        }*/
 
         // STAR
-        if (OrigStars.length > 0) {
+        /*if (OrigStars.length > 0) {
             await mcdu.ensureCurrentFlightPlanIsTemporary(async () => {
                 initApproachSet = 1;
                 SimVar.SetSimVarValue("L:A32NX_SET_APPROACH_DESTINATION", "Number", 1);
@@ -877,7 +1067,7 @@ const uplinkRoute = async (mcdu) => {
                     }).catch(console.error);
                 }
             }
-        }
+        }*/
     }
 };
 
