@@ -127,6 +127,13 @@ export class ClimbPathBuilder {
                 this.distanceStepFromLastCheckpoint(
                     profile, climbStrategy, speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart, VerticalCheckpointReason.AtmosphericConditions,
                 );
+
+                // This occurs if we somehow overshot the target altitude
+                if (profile.lastCheckpoint.altitude > finalAltitude) {
+                    profile.checkpoints.splice(profile.checkpoints.length - 1);
+
+                    this.buildIteratedClimbSegment(profile, climbStrategy, speedProfile, profile.lastCheckpoint.altitude, finalAltitude);
+                }
             }
         }
 
