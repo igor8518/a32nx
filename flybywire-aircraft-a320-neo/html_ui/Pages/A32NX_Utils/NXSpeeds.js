@@ -503,9 +503,9 @@ class NXSpeedsApp {
         const cm = _correctMass(m);
         this.vls = vls[isConf3 ? 3 : 4][cm](m, 1) + 5;
         this.vapp = this.vls + NXSpeedsUtils.addWindComponent(wind / 3);
-        this.f = f[cm](m);
-        this.s = s[cm](m);
-        this.gd = _computeGD(m);
+        this.f = f[cm](m) + 5;
+        this.s = s[cm](m) + 5;
+        this.gd = _computeGD(m) + 5;
         this.valid = true;
     }
 }
