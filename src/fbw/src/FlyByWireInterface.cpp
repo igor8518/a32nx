@@ -802,16 +802,25 @@ bool FlyByWireInterface::updateAutopilotStateMachine(double sampleTime) {
     autopilotStateMachineInput.in.data.nav_valid = (simData.nav_valid != 0);
     autopilotStateMachineInput.in.data.nav_loc_deg = simData.nav_loc_deg;
     autopilotStateMachineInput.in.data.nav_gs_deg = simData.nav_gs_deg;
-    autopilotStateMachineInput.in.data.nav_dme_valid = idRadioReceiverUsageEnabled->get() ? 0 : (simData.nav_dme_valid != 0);
-    autopilotStateMachineInput.in.data.nav_dme_nmi = simData.nav_dme_nmi;
-    autopilotStateMachineInput.in.data.nav_loc_valid = (simData.nav_loc_valid != 0);
+    if (idRadioReceiverUsageEnabled->get()) {
+      autopilotStateMachineInput.in.data.nav_dme_valid = 0;  // this forces the usage of the calculated dme
+      autopilotStateMachineInput.in.data.nav_dme_nmi = idRadioReceiverLocalizerDistance->get();
+      autopilotStateMachineInput.in.data.nav_loc_valid = idRadioReceiverLocalizerValid->get() != 0;
+      autopilotStateMachineInput.in.data.nav_loc_error_deg = idRadioReceiverLocalizerDeviation->get();
+      autopilotStateMachineInput.in.data.nav_gs_valid = idRadioReceiverGlideSlopeValid->get() != 0;
+      autopilotStateMachineInput.in.data.nav_gs_error_deg = idRadioReceiverGlideSlopeDeviation->get();
+    } else {
+      autopilotStateMachineInput.in.data.nav_dme_valid = (simData.nav_dme_valid != 0);
+      autopilotStateMachineInput.in.data.nav_dme_nmi = simData.nav_dme_nmi;
+      autopilotStateMachineInput.in.data.nav_loc_valid = (simData.nav_loc_valid != 0);
+      autopilotStateMachineInput.in.data.nav_loc_error_deg = simData.nav_loc_error_deg;
+      autopilotStateMachineInput.in.data.nav_gs_valid = (simData.nav_gs_valid != 0);
+      autopilotStateMachineInput.in.data.nav_gs_error_deg = simData.nav_gs_error_deg;
+    }
     autopilotStateMachineInput.in.data.nav_loc_magvar_deg = simData.nav_loc_magvar_deg;
-    autopilotStateMachineInput.in.data.nav_loc_error_deg = simData.nav_loc_error_deg;
     autopilotStateMachineInput.in.data.nav_loc_position.lat = simData.nav_loc_pos.Latitude;
     autopilotStateMachineInput.in.data.nav_loc_position.lon = simData.nav_loc_pos.Longitude;
     autopilotStateMachineInput.in.data.nav_loc_position.alt = simData.nav_loc_pos.Altitude;
-    autopilotStateMachineInput.in.data.nav_gs_valid = (simData.nav_gs_valid != 0);
-    autopilotStateMachineInput.in.data.nav_gs_error_deg = simData.nav_gs_error_deg;
     autopilotStateMachineInput.in.data.nav_gs_position.lat = simData.nav_gs_pos.Latitude;
     autopilotStateMachineInput.in.data.nav_gs_position.lon = simData.nav_gs_pos.Longitude;
     autopilotStateMachineInput.in.data.nav_gs_position.alt = simData.nav_gs_pos.Altitude;
@@ -1145,11 +1154,11 @@ bool FlyByWireInterface::updateAutopilotLaws(double sampleTime) {
     autopilotLawsInput.in.data.nav_gs_deg = simData.nav_gs_deg;
     if (idRadioReceiverUsageEnabled->get()) {
       autopilotLawsInput.in.data.nav_dme_valid = 0;  // this forces the usage of the calculated dme
-      autopilotLawsInput.in.data.nav_dme_nmi = autopilotStateMachine.getExternalOutputs().out.data.nav_dme_nmi;
-      autopilotLawsInput.in.data.nav_loc_valid = autopilotStateMachine.getExternalOutputs().out.data.nav_e_loc_valid;
-      autopilotLawsInput.in.data.nav_loc_error_deg = autopilotStateMachine.getExternalOutputs().out.data.nav_e_loc_error_deg;
-      autopilotLawsInput.in.data.nav_gs_valid = autopilotStateMachine.getExternalOutputs().out.data.nav_e_gs_valid;
-      autopilotLawsInput.in.data.nav_gs_error_deg = autopilotStateMachine.getExternalOutputs().out.data.nav_e_gs_error_deg;
+      autopilotLawsInput.in.data.nav_dme_nmi = idRadioReceiverLocalizerDistance->get();
+      autopilotLawsInput.in.data.nav_loc_valid = idRadioReceiverLocalizerValid->get() != 0;
+      autopilotLawsInput.in.data.nav_loc_error_deg = idRadioReceiverLocalizerDeviation->get();
+      autopilotLawsInput.in.data.nav_gs_valid = idRadioReceiverGlideSlopeValid->get() != 0;
+      autopilotLawsInput.in.data.nav_gs_error_deg = idRadioReceiverGlideSlopeDeviation->get();
     } else {
       autopilotLawsInput.in.data.nav_dme_valid = (simData.nav_dme_valid != 0);
       autopilotLawsInput.in.data.nav_dme_nmi = simData.nav_dme_nmi;
