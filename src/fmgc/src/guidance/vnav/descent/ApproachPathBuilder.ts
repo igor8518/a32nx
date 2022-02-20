@@ -111,11 +111,12 @@ export class ApproachPathBuilder {
 
         const speedTarget = speedProfile.getTarget(profile.lastCheckpoint.distanceFromStart, profile.lastCheckpoint.altitude, ManagedSpeedType.Descent);
 
-        if (speedTarget - profile.lastCheckpoint.speed) {
-            this.buildDecelerationPath(profile, this.idleStrategy, speedProfile, 0);
+        if (speedTarget - profile.lastCheckpoint.speed > 0.1) {
+            const decelerationToDescentSpeed = this.buildDecelerationPath(profile, this.idleStrategy, speedProfile, 0);
+            profile.checkpoints.push(...decelerationToDescentSpeed.get());
         }
 
-        profile.addCheckpointFromLast((lastCheckpoint) => ({ ...lastCheckpoint, reason: VerticalCheckpointReason.Decel }));
+        // profile.addCheckpointFromLast((lastCheckpoint) => ({ ...lastCheckpoint, reason: VerticalCheckpointReason.Decel }));
     }
 
     private addLandingCheckpoint(profile: NavGeometryProfile, finalAltitude: Feet, estimatedFuelOnBoardAtDestination: number, estimatedSecondsFromPresentAtDestination: number) {
@@ -227,10 +228,10 @@ export class ApproachPathBuilder {
         const sequence = new TemporaryCheckpointSequence(profile.lastCheckpoint);
 
         const { managedDescentSpeedMach } = this.observer.get();
-        const speedToBuildSequenceUpTo = speedProfile.getTarget(targetDistanceFromStart, sequence.lastCheckpoint.altitude, ManagedSpeedType.Descent);
 
         let i = 0;
         while (i++ < 10
+            && sequence.lastCheckpoint.reason !== VerticalCheckpointReason.Decel
             && Math.abs(sequence.lastCheckpoint.distanceFromStart - targetDistanceFromStart) > 0.1
         ) {
             const { distanceFromStart, altitude, speed, remainingFuelOnBoard } = sequence.lastCheckpoint;
@@ -244,6 +245,10 @@ export class ApproachPathBuilder {
 
             // Constraint is constraining
             if (speedConstraint !== null && speedConstraint.maxSpeed < flapTargetSpeed) {
+                const speedToBuildSequenceUpTo = targetDistanceFromStart > 0
+                    ? speedProfile.getTarget(targetDistanceFromStart, sequence.lastCheckpoint.altitude, ManagedSpeedType.Descent)
+                    : Infinity;
+
                 // Make sure we don't accelerate too far
                 if (speedConstraint.maxSpeed - speedToBuildSequenceUpTo > 0.1) {
                     return sequence;
@@ -288,11 +293,14 @@ export class ApproachPathBuilder {
                 }
             } else {
                 const remainingDistance = distanceFromStart - targetDistanceFromStart;
+                const speedTargetWithConstraints = speedProfile.getTarget(distanceFromStart, sequence.lastCheckpoint.altitude, ManagedSpeedType.Descent);
+
+                const targetSpeed = Math.min(flapTargetSpeed, speedTargetWithConstraints);
                 // flapTarget is constraining
                 const decelerationStep = strategy.predictToSpeedBackwards(
                     altitude,
                     speed,
-                    flapTargetSpeed,
+                    targetSpeed,
                     managedDescentSpeedMach,
                     remainingFuelOnBoard,
                     AircraftConfigurationProfile.getBySpeed(speed),
@@ -306,7 +314,7 @@ export class ApproachPathBuilder {
                     return sequence;
                 }
 
-                sequence.addCheckpointFromStepBackwards(decelerationStep, this.getFlapCheckpointReasonByFlapConf(FlapConfigurationProfile.getBySpeed(speed)));
+                sequence.addCheckpointFromStepBackwards(decelerationStep, this.getFlapCheckpointReasonByFlapConf(FlapConfigurationProfile.getBySpeed(targetSpeed)));
             }
         }
 
@@ -323,6 +331,8 @@ export class ApproachPathBuilder {
             return VerticalCheckpointReason.Flaps2;
         case FlapConf.CONF_1:
             return VerticalCheckpointReason.Flaps1;
+        case FlapConf.CLEAN:
+            return VerticalCheckpointReason.Decel;
         default:
             throw new Error(`[FMS/VNAV] Unknown flap config: ${flapConfig}`);
         }
