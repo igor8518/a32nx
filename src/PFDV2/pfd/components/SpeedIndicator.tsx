@@ -839,6 +839,8 @@ class SpeedTarget extends DisplayComponent <{ bus: EventBus }> {
 }
 
 class SpeedMargins extends DisplayComponent<{ bus: EventBus }> {
+    private entireComponentRef = FSComponent.createRef<SVGGElement>();
+
     private upperSpeedMarginRef = FSComponent.createRef<SVGPathElement>();
 
     private lowerSpeedMarginRef = FSComponent.createRef<SVGPathElement>();
@@ -848,6 +850,8 @@ class SpeedMargins extends DisplayComponent<{ bus: EventBus }> {
 
         const sub = this.props.bus.getSubscriber<PFDSimvars>();
 
+        sub.on('showSpeedMargins').handle(this.hideOrShow(this.entireComponentRef));
+
         sub.on('upperSpeedMargin').handle(this.moveToSpeed(this.upperSpeedMarginRef));
 
         sub.on('lowerSpeedMargin').handle(this.moveToSpeed(this.lowerSpeedMarginRef));
@@ -855,18 +859,28 @@ class SpeedMargins extends DisplayComponent<{ bus: EventBus }> {
 
     render(): VNode {
         return (
-            <g id="SpeedMargins">
-                <path id="UpperSpeedMargin" class="Fill Magenta" d="m19.7 60 h 5.3577 v 0.7 h-5.3577 z" />
-                <path id="LowerSpeedMargin" class="Fill Magenta" d="m19.7 40 h 5.3577 v 0.7 h-5.3577 z" />
+            <g ref={this.entireComponentRef} id="SpeedMargins" style="display: none;">
+                <path ref={this.upperSpeedMarginRef} id="UpperSpeedMargin" class="Fill Magenta" d="m19.7 60 h 5.3577 v 0.7 h-5.3577 z" />
+                <path ref={this.lowerSpeedMarginRef} id="LowerSpeedMargin" class="Fill Magenta" d="m19.7 40 h 5.3577 v 0.7 h-5.3577 z" />
             </g>
         );
     }
 
     private moveToSpeed<T extends(HTMLElement | SVGElement)>(component: NodeReference<T>) {
         return (speed: number) => {
-            const offset = speed * DistanceSpacing / ValueSpacing;
+            const offset = (Math.round(100 * speed * DistanceSpacing / ValueSpacing) / 100).toFixed(2);
 
             component.instance.style.transform = `translate3d(0px, ${offset}px, 0px)`;
+        };
+    }
+
+    private hideOrShow<T extends(HTMLElement | SVGElement)>(component: NodeReference<T>) {
+        return (isActive: boolean) => {
+            if (isActive) {
+                component.instance.removeAttribute('style');
+            } else {
+                component.instance.setAttribute('style', 'display: none');
+            }
         };
     }
 }

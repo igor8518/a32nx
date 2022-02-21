@@ -155,6 +155,9 @@ class A32NX_PFD extends BaseInstrument {
         this.simVarPublisher.subscribe('linearDeviationActive');
         this.simVarPublisher.subscribe('verticalProfileLatched');
         this.simVarPublisher.subscribe('linearDeviation');
+        this.simVarPublisher.subscribe('showSpeedMargins');
+        this.simVarPublisher.subscribe('upperSpeedMargin');
+        this.simVarPublisher.subscribe('lowerSpeedMargin');
 
         this.simVarPublisher.startPublish();
         this.hEventPublisher.startPublish();
