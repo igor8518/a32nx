@@ -845,6 +845,8 @@ class SpeedMargins extends DisplayComponent<{ bus: EventBus }> {
 
     private lowerSpeedMarginRef = FSComponent.createRef<SVGPathElement>();
 
+    private managedTargetSpeed: number = 100;
+
     onAfterRender(node: VNode): void {
         super.onAfterRender(node);
 
@@ -855,6 +857,10 @@ class SpeedMargins extends DisplayComponent<{ bus: EventBus }> {
         sub.on('upperSpeedMargin').handle(this.moveToSpeed(this.upperSpeedMarginRef));
 
         sub.on('lowerSpeedMargin').handle(this.moveToSpeed(this.lowerSpeedMarginRef));
+
+        sub.on('targetSpeedManaged').whenChanged().handle((s) => {
+            this.managedTargetSpeed = s;
+        });
     }
 
     render(): VNode {
@@ -868,7 +874,7 @@ class SpeedMargins extends DisplayComponent<{ bus: EventBus }> {
 
     private moveToSpeed<T extends(HTMLElement | SVGElement)>(component: NodeReference<T>) {
         return (speed: number) => {
-            const offset = (Math.round(100 * speed * DistanceSpacing / ValueSpacing) / 100).toFixed(2);
+            const offset = (Math.round(100 * (speed - this.managedTargetSpeed) * DistanceSpacing / ValueSpacing) / 100).toFixed(2);
 
             component.instance.style.transform = `translate3d(0px, ${offset}px, 0px)`;
         };

@@ -207,9 +207,9 @@ class InertialDistanceAlongTrack {
     private groundSpeedModifier: number = 0;
 
     // Alpha beta constants for Alpha beta filter
-    private alpha: number = 0.5;
+    private alpha: number = 1;
 
-    private beta: number = 0.5;
+    private beta: number = 0;
 
     updateCorrectInformation(actualDistanceAlongTrack: NauticalMiles) {
         const residual = actualDistanceAlongTrack - this.currentDistanceAlongTrack;
