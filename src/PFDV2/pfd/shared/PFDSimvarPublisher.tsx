@@ -97,6 +97,7 @@ export interface PFDSimvars {
     linearDeviationActive: boolean;
     linearDeviation: number;
     verticalProfileLatched: boolean;
+    showSpeedMargins: boolean,
     upperSpeedMargin: number,
     lowerSpeedMargin: number,
   }
@@ -199,6 +200,7 @@ export enum PFDVars {
     linearDeviationActive = 'L:A32NX_PFD_LINEAR_DEVIATION_ACTIVE',
     linearDeviation = 'L:A32NX_PFD_LINEAR_DEVIATION',
     verticalProfileLatched = 'L:A32NX_PFD_VERTICAL_PROFILE_LATCHED',
+    showSpeedMargins = 'L:A32NX_PFD_SHOW_SPEED_MARGINS',
     upperSpeedMargin = 'L:A32NX_PFD_UPPER_SPEED_MARGIN',
     lowerSpeedMargin = 'L:A32NX_PFD_LOWER_SPEED_MARGIN',
   }
@@ -319,6 +321,7 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['linearDeviation', { name: PFDVars.linearDeviation, type: SimVarValueType.Feet }],
         ['verticalProfileLatched', { name: PFDVars.verticalProfileLatched, type: SimVarValueType.Bool }],
 
+        ['showSpeedMargins', { name: PFDVars.showSpeedMargins, type: SimVarValueType.Bool }],
         ['upperSpeedMargin', { name: PFDVars.upperSpeedMargin, type: SimVarValueType.Knots }],
         ['lowerSpeedMargin', { name: PFDVars.lowerSpeedMargin, type: SimVarValueType.Knots }],
     ])
