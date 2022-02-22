@@ -1,6 +1,7 @@
 import { NavGeometryProfile, VerticalCheckpoint, VerticalCheckpointReason } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
+import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { VerticalMode } from '@shared/autopilot';
 import { FmgcFlightPhase } from '@shared/flightphase';
 import { MathUtils } from '@shared/MathUtils';
@@ -72,6 +73,15 @@ export class DescentGuidance {
 
         // TODO: Remove this
         profile.checkpoints = profile.checkpoints.filter(({ reason }) => reason !== VerticalCheckpointReason.PresentPosition);
+
+        if (VnavConfig.DEBUG_PROFILE && this.currentProfile) {
+            // How much the distance to the end of the path changed between the current profile and the new one.
+            // Ideally, this should be as low as possible. Otherwise, there might be a bug
+            const distanceToEndDeviation = profile.getDistanceFromStart(this.inertialDistanceAlongTrack.get())
+                - this.currentProfile.getDistanceFromStart(this.currentProfile.distanceToPresentPosition);
+            console.log(`[FMS/VNAV] distanceToEndDeviation: ${distanceToEndDeviation}`);
+        }
+
         this.currentProfile = profile;
 
         this.inertialDistanceAlongTrack.updateCorrectInformation(lastPosition.distanceFromStart);
