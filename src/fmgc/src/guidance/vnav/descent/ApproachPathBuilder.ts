@@ -116,7 +116,10 @@ export class ApproachPathBuilder {
             profile.checkpoints.push(...decelerationToDescentSpeed.get());
         }
 
-        // profile.addCheckpointFromLast((lastCheckpoint) => ({ ...lastCheckpoint, reason: VerticalCheckpointReason.Decel }));
+        // There are cases where the decel point is not added when we handle the constraints above, in this case, we just add it here.
+        if (profile.lastCheckpoint.reason !== VerticalCheckpointReason.Decel) {
+            profile.addCheckpointFromLast((lastCheckpoint) => ({ ...lastCheckpoint, reason: VerticalCheckpointReason.Decel }));
+        }
     }
 
     private addLandingCheckpoint(profile: NavGeometryProfile, finalAltitude: Feet, estimatedFuelOnBoardAtDestination: number, estimatedSecondsFromPresentAtDestination: number) {
