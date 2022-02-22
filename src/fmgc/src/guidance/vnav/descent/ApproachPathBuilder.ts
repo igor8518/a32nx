@@ -211,12 +211,12 @@ export class ApproachPathBuilder {
         }));
     }
 
-    private scaleStep(step: StepResults, scaling: number) {
+    private scaleStepBasedOnLastCheckpoint(lastCheckpoint: VerticalCheckpoint, step: StepResults, scaling: number) {
         step.distanceTraveled *= scaling;
         step.fuelBurned *= scaling;
         step.timeElapsed *= scaling;
-        step.finalAltitude *= scaling;
-        step.speed *= scaling;
+        step.finalAltitude = (1 - scaling) * lastCheckpoint.altitude + scaling * step.initialAltitude;
+        step.speed = (1 - scaling) * lastCheckpoint.speed + scaling * step.speed;
     }
 
     /**
@@ -272,7 +272,7 @@ export class ApproachPathBuilder {
                 if (decelerationStep.distanceTraveled > 1e-4) {
                     // We tried to declerate, but it took us beyond targetDistanceFromStart, so we scale down the step
                     const scaling = Math.min(1, remainingDistance / decelerationStep.distanceTraveled);
-                    this.scaleStep(decelerationStep, scaling);
+                    this.scaleStepBasedOnLastCheckpoint(sequence.lastCheckpoint, decelerationStep, scaling);
                     sequence.addCheckpointFromStepBackwards(decelerationStep, VerticalCheckpointReason.AtmosphericConditions);
                 }
 
@@ -310,8 +310,8 @@ export class ApproachPathBuilder {
                 );
 
                 if (decelerationStep.distanceTraveled > remainingDistance) {
-                    const scaling = Math.min(1, decelerationStep.distanceTraveled / remainingDistance);
-                    this.scaleStep(decelerationStep, scaling);
+                    const scaling = Math.min(1, remainingDistance / decelerationStep.distanceTraveled);
+                    this.scaleStepBasedOnLastCheckpoint(sequence.lastCheckpoint, decelerationStep, scaling);
                     sequence.addCheckpointFromStepBackwards(decelerationStep, VerticalCheckpointReason.AtmosphericConditions);
 
                     return sequence;
