@@ -36,7 +36,7 @@ class A32NX_InitFlight {
 
             if (await SimVar.GetSimVarValue("L:A32NX_FMGC_FLIGHT_PHASE", "Number") !== 5) {
                 if (await SimVar.GetSimVarValue("L:A32NX_APPROACH_STATE", "Number") === 1) {
-                    A32NX_InitFlight.MCDU.tryGoInApproachPhase();
+                    A32NX_InitFlight.MCDU.flightPhaseManager.tryGoInApproachPhase();
                 }
             } else {
                 await SimVar.SetSimVarValue("L:A32NX_APPROACH_STATE", "Number", 1);
