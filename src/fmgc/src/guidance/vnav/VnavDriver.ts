@@ -29,6 +29,7 @@ import { ProfileInterceptCalculator } from '@fmgc/guidance/vnav/descent/ProfileI
 import { ApproachPathBuilder } from '@fmgc/guidance/vnav/descent/ApproachPathBuilder';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { AircraftToDescentProfileRelation } from '@fmgc/guidance/vnav/descent/AircraftToProfileRelation';
+import { WindProfileFactory } from '@fmgc/guidance/vnav/wind/WindProfileFactory';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile, VerticalCheckpointReason } from './profile/NavGeometryProfile';
@@ -84,6 +85,7 @@ export class VnavDriver implements GuidanceComponent {
     constructor(
         private readonly guidanceController: GuidanceController,
         private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
+        private readonly windProfileFactory: WindProfileFactory,
         private readonly flightPlanManager: FlightPlanManager,
     ) {
         this.atmosphericConditions = new AtmosphericConditions(computationParametersObserver.get().tropoPause);
@@ -178,6 +180,8 @@ export class VnavDriver implements GuidanceComponent {
 
         const managedClimbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
         const stepDescentStrategy = new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, -1000);
+
+        const climbWinds = this.windProfileFactory.getClimbWinds();
 
         if (fromFlightPhase < FmgcFlightPhase.Climb) {
             this.takeoffPathBuilder.buildTakeoffPath(profile);

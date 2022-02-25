@@ -20,6 +20,7 @@ import { normaliseApproachName } from '@shared/flightplan';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
+import { WindProfileFactory } from '@fmgc/guidance/vnav/wind/WindProfileFactory';
 import { LnavDriver } from './lnav/LnavDriver';
 import { FlightPlanManager, FlightPlans } from '../flightplanning/FlightPlanManager';
 import { GuidanceManager } from './GuidanceManager';
@@ -99,6 +100,8 @@ export class GuidanceController {
     verticalProfileComputationParametersObserver: VerticalProfileComputationParametersObserver;
 
     private listener = RegisterViewListener('JS_LISTENER_SIMVARS', null, true);
+
+    private windProfileFactory: WindProfileFactory;
 
     get hasTemporaryFlightPlan() {
         // eslint-disable-next-line no-underscore-dangle
@@ -196,9 +199,10 @@ export class GuidanceController {
         this.guidanceManager = guidanceManager;
 
         this.verticalProfileComputationParametersObserver = new VerticalProfileComputationParametersObserver(fmgc);
+        this.windProfileFactory = new WindProfileFactory(fmgc, 1);
 
         this.lnavDriver = new LnavDriver(this);
-        this.vnavDriver = new VnavDriver(this, this.verticalProfileComputationParametersObserver, flightPlanManager);
+        this.vnavDriver = new VnavDriver(this, this.verticalProfileComputationParametersObserver, this.windProfileFactory, flightPlanManager);
         this.pseudoWaypoints = new PseudoWaypoints(this);
         this.efisVectors = new EfisVectors(this);
     }
@@ -254,6 +258,7 @@ export class GuidanceController {
         this.updateEfisState('R', this.rightEfisState);
 
         this.verticalProfileComputationParametersObserver.update();
+        this.windProfileFactory.updateFmgcInputs();
 
         try {
             // Generate new geometry when flight plan changes
