@@ -95,7 +95,6 @@ export class DescentGuidance {
     }
 
     private updateDesModeGuidance() {
-        const targetPathAngle = this.aircraftToDescentProfileRelation.currentTargetPathAngle();
         const isOnGeometricPath = this.aircraftToDescentProfileRelation.isOnGeometricPath();
         const isAboveSpeedLimitAltitude = this.aircraftToDescentProfileRelation.isAboveSpeedLimitAltitude();
         const isBeforeTopOfDescent = !this.aircraftToDescentProfileRelation.isPastTopOfDescent();
@@ -109,7 +108,7 @@ export class DescentGuidance {
             // below path
             if (isOnGeometricPath) {
                 this.requestedVerticalMode = RequestedVerticalMode.FpaSpeed;
-                this.targetVerticalSpeed = targetPathAngle / 2;
+                this.targetVerticalSpeed = this.aircraftToDescentProfileRelation.currentTargetPathAngle() / 2;
             } else {
                 this.requestedVerticalMode = RequestedVerticalMode.VsSpeed;
                 this.targetVerticalSpeed = (isAboveSpeedLimitAltitude ? -1000 : -500);
@@ -121,7 +120,7 @@ export class DescentGuidance {
             // on geometric path
 
             this.requestedVerticalMode = RequestedVerticalMode.VpathSpeed;
-            this.targetVerticalSpeed = targetPathAngle;
+            this.targetVerticalSpeed = this.aircraftToDescentProfileRelation.currentTargetVerticalSpeed();
         } else {
             // on idle path
 
