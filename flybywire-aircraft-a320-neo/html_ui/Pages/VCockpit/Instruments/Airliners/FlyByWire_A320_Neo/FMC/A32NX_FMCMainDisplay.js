@@ -4661,6 +4661,22 @@ class FMCMainDisplay extends BaseAirliners {
     getCleanSpeed() {
         return this.approachSpeeds && this.approachSpeeds.valid ? this.approachSpeeds.gd : 0;
     }
+    getTripWind() {
+        return this.averageWind;
+    }
+    getWinds() {
+        return this.winds;
+    }
+    getApproachWind() {
+        const destination = this.flightPlanManager.getDestination();
+        if (!destination || !destination.infos && !destination.infos.coordinates || !isFinite(this.perfApprWindHeading)) {
+            return { direction: 0, speed: 0 };
+        }
+
+        const trueHeading = MagVar.magneticToTrue(this.perfApprWindHeading, destination.infos.coordinates);
+
+        return { direction: trueHeading, speed: this.perfApprWindSpeed };
+    }
 }
 
 FMCMainDisplay.clrValue = "\xa0\xa0\xa0\xa0\xa0CLR";

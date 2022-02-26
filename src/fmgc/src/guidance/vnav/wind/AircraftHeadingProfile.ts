@@ -1,4 +1,5 @@
 import { Geometry } from '@fmgc/guidance/Geometry';
+import { VnavConfig } from '@fmgc/guidance/vnav/VnavConfig';
 import { FlightPlanManager } from '@fmgc/wtsdk';
 
 interface CourseAtDistance {
@@ -6,7 +7,11 @@ interface CourseAtDistance {
     course: DegreesTrue,
 }
 
-export class AircraftHeadingProfile {
+export interface AircraftHeadingProfile {
+    get(distanceFromStart: NauticalMiles): DegreesTrue
+}
+
+export class NavHeadingProfile implements AircraftHeadingProfile {
     private courses: CourseAtDistance[] = [];
 
     constructor(private flightPlanManager: FlightPlanManager) { }
@@ -16,8 +21,8 @@ export class AircraftHeadingProfile {
             return this.courses[0].course;
         }
 
-        for (let i = 0; i < this.courses.length; i++) {
-            if (distanceFromStart > this.courses[i].distanceFromStart) {
+        for (let i = 0; i < this.courses.length - 1; i++) {
+            if (distanceFromStart > this.courses[i].distanceFromStart && distanceFromStart <= this.courses[i + 1].distanceFromStart) {
                 return this.courses[i].course;
             }
         }
@@ -46,6 +51,14 @@ export class AircraftHeadingProfile {
             ).reduce((sum, el) => sum + (!Number.isNaN(el) ? el : 0), 0);
 
             distanceFromStart += legDistance;
+
+            if (!Number.isFinite(leg.outboundCourse)) {
+                if (VnavConfig.DEBUG_PROFILE) {
+                    console.warn('[FMS/VNAV] Non-numerical outbound course encountered on leg: ', leg);
+                }
+
+                continue;
+            }
 
             this.courses.push({
                 distanceFromStart,

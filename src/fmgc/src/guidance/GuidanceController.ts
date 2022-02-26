@@ -21,6 +21,7 @@ import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vna
 import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { WindProfileFactory } from '@fmgc/guidance/vnav/wind/WindProfileFactory';
+import { FmcWinds, FmcWindVector } from '@fmgc/guidance/vnav/wind/types';
 import { LnavDriver } from './lnav/LnavDriver';
 import { FlightPlanManager, FlightPlans } from '../flightplanning/FlightPlanManager';
 import { GuidanceManager } from './GuidanceManager';
@@ -52,6 +53,9 @@ export interface Fmgc {
     getFlapRetractionSpeed(): Knots,
     getSlatRetractionSpeed(): Knots,
     getCleanSpeed(): Knots,
+    getTripWind(): number,
+    getWinds(): FmcWinds,
+    getApproachWind(): FmcWindVector,
 }
 
 export class GuidanceController {

@@ -20,7 +20,7 @@ export class ClimbWindProfile {
 
                 return new WindVector(
                     (1 - scaling) * this.inputs.climbWinds[i].vector.direction + scaling * this.inputs.climbWinds[i + 1].vector.direction,
-                    (1 - scaling) * this.inputs.climbWinds[i].vector.velocity + scaling * this.inputs.climbWinds[i + 1].vector.velocity,
+                    (1 - scaling) * this.inputs.climbWinds[i].vector.speed + scaling * this.inputs.climbWinds[i + 1].vector.speed,
                 );
             }
         }
@@ -55,7 +55,7 @@ export class ClimbWindProfile {
     private interpolateVectors(vector1: WindVector, vector2: WindVector, scaling: number): WindVector {
         return new WindVector(
             (1 - scaling) * vector1.direction + scaling * vector2.direction,
-            (1 - scaling) * vector1.velocity + scaling * vector2.velocity,
+            (1 - scaling) * vector1.speed + scaling * vector2.speed,
         );
     }
 }

@@ -30,6 +30,7 @@ import { ApproachPathBuilder } from '@fmgc/guidance/vnav/descent/ApproachPathBui
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { AircraftToDescentProfileRelation } from '@fmgc/guidance/vnav/descent/AircraftToProfileRelation';
 import { WindProfileFactory } from '@fmgc/guidance/vnav/wind/WindProfileFactory';
+import { NavHeadingProfile } from '@fmgc/guidance/vnav/wind/AircraftHeadingProfile';
 import { Geometry } from '../Geometry';
 import { GuidanceComponent } from '../GuidanceComponent';
 import { NavGeometryProfile, VerticalCheckpointReason } from './profile/NavGeometryProfile';
@@ -82,6 +83,8 @@ export class VnavDriver implements GuidanceComponent {
 
     private descentGuidance: DescentGuidance;
 
+    private headingProfile: NavHeadingProfile;
+
     constructor(
         private readonly guidanceController: GuidanceController,
         private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
@@ -107,6 +110,8 @@ export class VnavDriver implements GuidanceComponent {
 
         this.aircraftToDescentProfileRelation = new AircraftToDescentProfileRelation(this.computationParametersObserver);
         this.descentGuidance = new DescentGuidance(this.aircraftToDescentProfileRelation, computationParametersObserver);
+
+        this.headingProfile = new NavHeadingProfile(flightPlanManager);
     }
 
     init(): void {
@@ -123,6 +128,7 @@ export class VnavDriver implements GuidanceComponent {
 
         this.stepCoordinator.updateGeometryProfile(this.currentNavGeometryProfile);
         this.descentGuidance.updateProfile(this.currentNavGeometryProfile);
+        this.headingProfile.updateGeometry(geometry);
 
         this.version++;
     }
@@ -195,7 +201,7 @@ export class VnavDriver implements GuidanceComponent {
         );
 
         if (fromFlightPhase < FmgcFlightPhase.Cruise) {
-            this.climbPathBuilder.computeClimbPath(profile, managedClimbStrategy, this.currentMcduSpeedProfile, cruiseAltitude);
+            this.climbPathBuilder.computeClimbPath(profile, managedClimbStrategy, this.currentMcduSpeedProfile, climbWinds, this.headingProfile, cruiseAltitude);
         }
 
         if (profile instanceof NavGeometryProfile && this.cruiseToDescentCoordinator.canCompute(profile)) {
@@ -282,8 +288,9 @@ export class VnavDriver implements GuidanceComponent {
                 ? new VerticalSpeedStrategy(this.computationParametersObserver, this.atmosphericConditions, fcuVerticalSpeed)
                 : new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
 
-            this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile,
-                climbStrategy, speedProfile, fcuAltitude);
+            const climbWinds = this.windProfileFactory.getClimbWinds();
+
+            this.climbPathBuilder.computeClimbPath(this.currentNdGeometryProfile, climbStrategy, speedProfile, climbWinds, this.headingProfile, fcuAltitude);
         } else if (tacticalDescentModes.includes(fcuVerticalMode) || fcuVerticalMode === VerticalMode.VS && fcuVerticalSpeed < 0) {
             const descentStrategy = this.getAppropriateTacticalDescentStrategy(fcuVerticalMode, fcuVerticalSpeed);
 
@@ -392,9 +399,10 @@ export class VnavDriver implements GuidanceComponent {
         const selectedSpeedProfile = new ExpediteSpeedProfile(greenDotSpeed);
         const expediteGeometryProfile = new SelectedGeometryProfile();
         const climbStrategy = new ClimbThrustClimbStrategy(this.computationParametersObserver, this.atmosphericConditions);
+        const climbWinds = this.windProfileFactory.getClimbWinds();
 
         expediteGeometryProfile.addPresentPositionCheckpoint(presentPosition, fuelOnBoard * Constants.TONS_TO_POUNDS);
-        this.climbPathBuilder.computeClimbPath(expediteGeometryProfile, climbStrategy, selectedSpeedProfile, fcuAltitude);
+        this.climbPathBuilder.computeClimbPath(expediteGeometryProfile, climbStrategy, selectedSpeedProfile, climbWinds, this.headingProfile, fcuAltitude);
 
         expediteGeometryProfile.finalizeProfile();
 

@@ -1,6 +1,7 @@
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { Constants } from '@shared/Constants';
 import { DescentStrategy } from '@fmgc/guidance/vnav/descent/DescentStrategy';
+import { WindComponent } from '@fmgc/guidance/vnav/wind';
 import { EngineModel } from '../EngineModel';
 import { FlapConf } from '../common';
 import { Predictions, StepResults } from '../Predictions';
@@ -16,17 +17,17 @@ export interface ClimbStrategy {
      * @param fuelOnBoard Remainging fuel on board at the start of the climb
      * @returns `StepResults`
      */
-    predictToAltitude(initialAltitude: number, finalAltitude: number, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
+    predictToAltitude(initialAltitude: number, finalAltitude: number, speed: Knots, mach: Mach, fuelOnBoard: number, headwindComponent: WindComponent): StepResults;
 
-    predictToDistance(initialAltitude: number, distance: NauticalMiles, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
+    predictToDistance(initialAltitude: number, distance: NauticalMiles, speed: Knots, mach: Mach, fuelOnBoard: number, headwindComponent: WindComponent): StepResults;
 
-    predictToSpeed(initialAltitude: number, finalSpeed: Knots, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults;
+    predictToSpeed(initialAltitude: number, finalSpeed: Knots, speed: Knots, mach: Mach, fuelOnBoard: number, headwindComponent: WindComponent): StepResults;
 }
 
 export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {
     constructor(private observer: VerticalProfileComputationParametersObserver, private atmosphericConditions: AtmosphericConditions, private verticalSpeed: FeetPerMinute) { }
 
-    predictToAltitude(initialAltitude: Feet, finalAltitude: Feet, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
+    predictToAltitude(initialAltitude: Feet, finalAltitude: Feet, speed: Knots, mach: Mach, fuelOnBoard: number, headwindComponent: WindComponent): StepResults {
         const { zeroFuelWeight, perfFactor } = this.observer.get();
 
         return Predictions.verticalSpeedStep(
@@ -38,11 +39,12 @@ export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             fuelOnBoard,
             this.atmosphericConditions.isaDeviation,
+            headwindComponent.value,
             perfFactor,
         );
     }
 
-    predictToDistance(initialAltitude: Feet, distance: NauticalMiles, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
+    predictToDistance(initialAltitude: Feet, distance: NauticalMiles, speed: Knots, mach: Mach, fuelOnBoard: number, headwindComponent: WindComponent): StepResults {
         const { zeroFuelWeight, perfFactor } = this.observer.get();
 
         return Predictions.verticalSpeedDistanceStep(
@@ -54,11 +56,12 @@ export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             fuelOnBoard,
             this.atmosphericConditions.isaDeviation,
+            headwindComponent.value,
             perfFactor,
         );
     }
 
-    predictToSpeed(initialAltitude: Feet, finalSpeed: Knots, speed: Knots, mach: Mach, fuelOnBoard: number): StepResults {
+    predictToSpeed(initialAltitude: Feet, finalSpeed: Knots, speed: Knots, mach: Mach, fuelOnBoard: number, headwindComponent: WindComponent): StepResults {
         const { zeroFuelWeight, perfFactor, tropoPause } = this.observer.get();
 
         return Predictions.verticalSpeedStepWithSpeedChange(
@@ -70,7 +73,7 @@ export class VerticalSpeedStrategy implements ClimbStrategy, DescentStrategy {
             getClimbThrustN1Limit(this.atmosphericConditions, initialAltitude, speed),
             zeroFuelWeight * Constants.TONS_TO_POUNDS,
             fuelOnBoard,
-            0,
+            headwindComponent.value,
             this.atmosphericConditions.isaDeviation,
             tropoPause,
             false,
