@@ -222,6 +222,7 @@
 1. [FMGC] FAF altitude constraints on precision approaches treated correctly - @tracernz (Mike)
 1. [EICAS] Fixed issue where CRUISE page was viewable on ground. - @patmack14 (Patrick Macken)
 1. [PFD] Reimplement PFD with msfs-avionics framework for improved performance - @saschl (saschl#9432)
+1. [EIS] Implement display switching - @tracernz (Mike)
 
 ## 0.7.0
 
