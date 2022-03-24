@@ -221,6 +221,7 @@
 1. [EFB] EFB Setting to enable MCDU Server connection to avoid too many connection attempts - @frankkopp (Frank Kopp)
 1. [FMGC] FAF altitude constraints on precision approaches treated correctly - @tracernz (Mike)
 1. [EICAS] Fixed issue where CRUISE page was viewable on ground. - @patmack14 (Patrick Macken)
+1. [PFD] Reimplement PFD with msfs-avionics framework for improved performance - @saschl (saschl#9432)
 
 ## 0.7.0
 
