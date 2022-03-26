@@ -223,6 +223,7 @@
 1. [EICAS] Fixed issue where CRUISE page was viewable on ground. - @patmack14 (Patrick Macken)
 1. [EWD] Rewritten EWD in React - @RichardPilbery (tricky_dicky#3571) & @beheh (Benedict Etzel)
 1. [EWD] Rewritten logic for FWC into React - @RichardPilbery (tricky_dicky#3571) & @beheh (Benedict Etzel)
+1. [PFD] Reimplement PFD with msfs-avionics framework for improved performance - @saschl (saschl#9432)
 
 ## 0.7.0
 
