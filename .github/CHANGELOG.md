@@ -226,6 +226,7 @@
 1. [PFD] Reimplement PFD with msfs-avionics framework for improved performance - @saschl (saschl#9432)
 1. [EIS] Implement display switching - @tracernz (Mike)
 1. [HYD] Removed ground spoiler group until animations are modified - @Crocket63
+1. [EFB] Presets for Lighting and Aircraft states - @frankkopp (Frank Kopp)
 
 ## 0.7.0
 
