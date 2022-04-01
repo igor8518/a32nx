@@ -1,4 +1,3 @@
-import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { MaxSpeedConstraint } from '@fmgc/guidance/vnav/profile/NavGeometryProfile';
 import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { FmgcFlightPhase } from '@shared/flightphase';
@@ -66,7 +65,6 @@ export class McduSpeedProfile implements SpeedProfile {
      */
     constructor(
         private parameters: VerticalProfileComputationParametersObserver,
-        private atmosphericConditions: AtmosphericConditions,
         private aircraftDistanceAlongTrack: NauticalMiles,
         private climbSpeedConstraints: MaxSpeedConstraint[],
         private descentSpeedConstraints: MaxSpeedConstraint[],
@@ -103,7 +101,7 @@ export class McduSpeedProfile implements SpeedProfile {
     }
 
     getTargetWithoutConstraints(altitude: Feet, managedSpeedType: ManagedSpeedType) {
-        let managedSpeed = this.getManagedSpeedForType(managedSpeedType, altitude);
+        let managedSpeed = this.getManagedSpeedForType(managedSpeedType);
         const { speed, underAltitude } = this.parameters.get().climbSpeedLimit;
 
         if (this.isValidSpeedLimit() && altitude < underAltitude) {
@@ -114,7 +112,7 @@ export class McduSpeedProfile implements SpeedProfile {
     }
 
     private getManagedTarget(distanceFromStart: NauticalMiles, altitude: Feet, managedSpeedType: ManagedSpeedType): Knots {
-        let managedSpeed = this.getManagedSpeedForType(managedSpeedType, altitude);
+        let managedSpeed = this.getManagedSpeedForType(managedSpeedType);
         const { speed, underAltitude } = this.parameters.get().climbSpeedLimit;
 
         if (this.isValidSpeedLimit() && altitude < underAltitude) {
@@ -196,7 +194,7 @@ export class McduSpeedProfile implements SpeedProfile {
         }
 
         console.log(
-            `[FMS/VNAV] Performed ${this.maxSpeedLookups} max speed lookups. Of which ${this.maxSpeedCacheHits} (${100 * this.maxSpeedCacheHits / this.maxSpeedLookups}%) had been cached`,
+            `[FMS/VNAV] Performed ${this.maxSpeedLookups} max speed lookups. Of whics ${this.maxSpeedCacheHits} (${100 * this.maxSpeedCacheHits / this.maxSpeedLookups}%) had been cached`,
         );
     }
 
@@ -204,29 +202,19 @@ export class McduSpeedProfile implements SpeedProfile {
         return this.isValidSpeedLimit();
     }
 
-    private getManagedSpeedForType(managedSpeedType: ManagedSpeedType, altitude: Feet) {
-        const { managedClimbSpeed, managedCruiseSpeed, managedDescentSpeed, managedClimbSpeedMach, managedCruiseSpeedMach, managedDescentSpeedMach } = this.parameters.get();
+    private getManagedSpeedForType(managedSpeedType: ManagedSpeedType) {
+        const { managedClimbSpeed, managedCruiseSpeed, managedDescentSpeed } = this.parameters.get();
 
         switch (managedSpeedType) {
         case ManagedSpeedType.Climb:
-            return this.iasOrMach(managedClimbSpeed, managedClimbSpeedMach, altitude);
+            return managedClimbSpeed;
         case ManagedSpeedType.Cruise:
-            return this.iasOrMach(managedCruiseSpeed, managedCruiseSpeedMach, altitude);
+            return managedCruiseSpeed;
         case ManagedSpeedType.Descent:
-            return this.iasOrMach(managedDescentSpeed, managedDescentSpeedMach, altitude);
+            return managedDescentSpeed;
         default:
             throw new Error(`[FMS/VNAV] Invalid managedSpeedType: ${managedSpeedType}`);
         }
-    }
-
-    private iasOrMach(ias: Knots, mach: Mach, altitude: Feet) {
-        const machAsIas = this.atmosphericConditions.computeCasFromMach(altitude, mach);
-
-        if (ias > machAsIas) {
-            return machAsIas;
-        }
-
-        return ias;
     }
 }
 
@@ -271,7 +259,6 @@ export class NdSpeedProfile implements SpeedProfile {
 
     constructor(
         private parameters: VerticalProfileComputationParametersObserver,
-        private atmosphericConditions: AtmosphericConditions,
         private aircraftDistanceAlongTrack: NauticalMiles,
         private maxSpeedConstraints: MaxSpeedConstraint[],
         private descentSpeedConstraints: MaxSpeedConstraint[],
@@ -301,7 +288,7 @@ export class NdSpeedProfile implements SpeedProfile {
     }
 
     getTargetWithoutConstraints(altitude: Feet, managedSpeedType: ManagedSpeedType) {
-        let managedSpeed = this.getManagedSpeedForType(managedSpeedType, altitude);
+        let managedSpeed = this.getManagedSpeedForType(managedSpeedType);
         const { speed, underAltitude } = this.parameters.get().climbSpeedLimit;
 
         if (this.isValidSpeedLimit() && altitude < underAltitude) {
@@ -312,7 +299,7 @@ export class NdSpeedProfile implements SpeedProfile {
     }
 
     private getManaged(distanceFromStart: NauticalMiles, altitude: Feet, managedSpeedType: ManagedSpeedType): Knots {
-        let managedSpeed = this.getManagedSpeedForType(managedSpeedType, altitude);
+        let managedSpeed = this.getManagedSpeedForType(managedSpeedType);
         const { speed, underAltitude } = this.parameters.get().climbSpeedLimit;
 
         if (this.isValidSpeedLimit() && altitude < underAltitude) {
@@ -412,28 +399,18 @@ export class NdSpeedProfile implements SpeedProfile {
         return this.isValidSpeedLimit() && !this.isSelectedSpeed();
     }
 
-    private getManagedSpeedForType(managedSpeedType: ManagedSpeedType, altitude: Feet) {
-        const { managedClimbSpeed, managedCruiseSpeed, managedDescentSpeed, managedClimbSpeedMach, managedCruiseSpeedMach, managedDescentSpeedMach } = this.parameters.get();
+    private getManagedSpeedForType(managedSpeedType: ManagedSpeedType) {
+        const { managedClimbSpeed, managedCruiseSpeed, managedDescentSpeed } = this.parameters.get();
 
         switch (managedSpeedType) {
         case ManagedSpeedType.Climb:
-            return this.iasOrMach(managedClimbSpeed, managedClimbSpeedMach, altitude);
+            return managedClimbSpeed;
         case ManagedSpeedType.Cruise:
-            return this.iasOrMach(managedCruiseSpeed, managedCruiseSpeedMach, altitude);
+            return managedCruiseSpeed;
         case ManagedSpeedType.Descent:
-            return this.iasOrMach(managedDescentSpeed, managedDescentSpeedMach, altitude);
+            return managedDescentSpeed;
         default:
             throw new Error(`[FMS/VNAV] Invalid managedSpeedType: ${managedSpeedType}`);
         }
-    }
-
-    private iasOrMach(ias: Knots, mach: Mach, altitude: Feet) {
-        const machAsIas = this.atmosphericConditions.computeCasFromMach(altitude, mach);
-
-        if (ias > machAsIas) {
-            return machAsIas;
-        }
-
-        return ias;
     }
 }

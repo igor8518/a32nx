@@ -22,6 +22,7 @@ import { SpeedLimit } from '@fmgc/guidance/vnav/SpeedLimit';
 import { FlapConf } from '@fmgc/guidance/vnav/common';
 import { WindProfileFactory } from '@fmgc/guidance/vnav/wind/WindProfileFactory';
 import { FmcWinds, FmcWindVector } from '@fmgc/guidance/vnav/wind/types';
+import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { LnavDriver } from './lnav/LnavDriver';
 import { FlightPlanManager, FlightPlans } from '../flightplanning/FlightPlanManager';
 import { GuidanceManager } from './GuidanceManager';
@@ -106,6 +107,8 @@ export class GuidanceController {
     private listener = RegisterViewListener('JS_LISTENER_SIMVARS', null, true);
 
     private windProfileFactory: WindProfileFactory;
+
+    private atmosphericConditions: AtmosphericConditions;
 
     get hasTemporaryFlightPlan() {
         // eslint-disable-next-line no-underscore-dangle
@@ -205,9 +208,11 @@ export class GuidanceController {
         this.verticalProfileComputationParametersObserver = new VerticalProfileComputationParametersObserver(fmgc);
         this.windProfileFactory = new WindProfileFactory(this.verticalProfileComputationParametersObserver, fmgc, 1);
 
+        this.atmosphericConditions = new AtmosphericConditions(this.verticalProfileComputationParametersObserver);
+
         this.lnavDriver = new LnavDriver(this);
-        this.vnavDriver = new VnavDriver(this, this.verticalProfileComputationParametersObserver, this.windProfileFactory, flightPlanManager);
-        this.pseudoWaypoints = new PseudoWaypoints(this);
+        this.vnavDriver = new VnavDriver(this, this.verticalProfileComputationParametersObserver, this.atmosphericConditions, this.windProfileFactory, flightPlanManager);
+        this.pseudoWaypoints = new PseudoWaypoints(this, this.atmosphericConditions);
         this.efisVectors = new EfisVectors(this);
     }
 
@@ -304,6 +309,8 @@ export class GuidanceController {
                 console.error(e);
             }
         }
+
+        this.atmosphericConditions.update();
 
         try {
             this.updateMrpState();

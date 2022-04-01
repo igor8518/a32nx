@@ -136,6 +136,7 @@ export abstract class BaseGeometryProfile {
                 altitude: this.checkpoints[0].altitude,
                 remainingFuelOnBoard: this.checkpoints[0].remainingFuelOnBoard,
                 speed: this.checkpoints[0].speed,
+                mach: this.checkpoints[0].mach,
             };
         }
 
@@ -171,6 +172,13 @@ export abstract class BaseGeometryProfile {
                         this.checkpoints[i].speed,
                         this.checkpoints[i + 1].speed,
                     ),
+                    mach: Common.interpolate(
+                        distanceFromStart,
+                        this.checkpoints[i].distanceFromStart,
+                        this.checkpoints[i + 1].distanceFromStart,
+                        this.checkpoints[i].mach,
+                        this.checkpoints[i + 1].mach,
+                    ),
                 };
             }
         }
@@ -181,6 +189,7 @@ export abstract class BaseGeometryProfile {
             altitude: this.lastCheckpoint.altitude,
             remainingFuelOnBoard: this.lastCheckpoint.remainingFuelOnBoard,
             speed: this.lastCheckpoint.speed,
+            mach: this.lastCheckpoint.mach,
         };
     }
 
@@ -278,6 +287,7 @@ export abstract class BaseGeometryProfile {
                 altitude: this.checkpoints[0].altitude,
                 remainingFuelOnBoard: this.checkpoints[0].remainingFuelOnBoard,
                 speed: this.checkpoints[0].speed,
+                mach: this.checkpoints[0].mach,
                 ...additionalProperties,
             });
 
@@ -316,6 +326,13 @@ export abstract class BaseGeometryProfile {
                         this.checkpoints[i].speed,
                         this.checkpoints[i + 1].speed,
                     ),
+                    mach: Common.interpolate(
+                        distanceFromStart,
+                        this.checkpoints[i].distanceFromStart,
+                        this.checkpoints[i + 1].distanceFromStart,
+                        this.checkpoints[i].mach,
+                        this.checkpoints[i + 1].mach,
+                    ),
                     ...additionalProperties,
                 });
 
@@ -329,6 +346,7 @@ export abstract class BaseGeometryProfile {
             altitude: this.lastCheckpoint.altitude,
             remainingFuelOnBoard: this.lastCheckpoint.remainingFuelOnBoard,
             speed: this.lastCheckpoint.speed,
+            mach: this.lastCheckpoint.mach,
             ...additionalProperties,
         });
     }
@@ -438,6 +456,7 @@ export abstract class BaseGeometryProfile {
             altitude: presentPosition.alt,
             remainingFuelOnBoard,
             speed: SimVar.GetSimVarValue('AIRSPEED INDICATED', 'knots'),
+            mach: SimVar.GetSimVarValue('AIRSPEED MACH', 'number'),
         });
     }
 

@@ -344,7 +344,7 @@ class CDUFlightPlanPage {
                 let speedPrefix = "";
 
                 if (verticalWaypoint && verticalWaypoint.speed) {
-                    speedConstraint = Math.round(verticalWaypoint.speed);
+                    speedConstraint = verticalWaypoint.speed < 1 ? formatMachNumber(verticalWaypoint.speed) : Math.round(verticalWaypoint.speed);
 
                     if (wp.speedConstraint > 10 && ident !== "MANUAL") {
                         speedPrefix = verticalWaypoint.isSpeedConstraintMet ? "{magenta}*{end}" : "{amber}*{end}";
@@ -519,6 +519,11 @@ class CDUFlightPlanPage {
                         : `${FMCMainDisplay.secondsTohhmm(pwp.flightPlanInfo.secondsFromPresent)}[s-text]`;
                 }
 
+                let speed = "---";
+                if (pwp.flightPlanInfo) {
+                    speed = pwp.flightPlanInfo.speed < 1 ? formatMachNumber(pwp.flightPlanInfo.speed) : Math.round(pwp.flightPlanInfo.speed).toFixed(0);
+                }
+
                 scrollWindow[rowI] = {
                     fpIndex: fpIndex,
                     active: false,
@@ -526,7 +531,7 @@ class CDUFlightPlanPage {
                     color,
                     distance: pwp.distanceInFP ? pwp.distanceInFP.toFixed(0) : "",
                     spdColor: pwp.flightPlanInfo ? "green" : "white",
-                    speedConstraint: pwp.flightPlanInfo ? Math.round(pwp.flightPlanInfo.speed).toFixed(0) : "---",
+                    speedConstraint: speed,
                     altColor: pwp.flightPlanInfo ? "green" : "white",
                     altitudeConstraint: { alt: pwp.flightPlanInfo ? formatAltitudeOrLevel(pwp.flightPlanInfo.altitude) : "-----", altPrefix: "\xa0" },
                     timeCell,
@@ -830,4 +835,8 @@ function emptyFplnPage() {
         ["\xa0DEST", "DIST EFOB", "TIME{sp}{sp}"],
         ["------", "---- ----", "----{sp}{sp}"]
     ];
+}
+
+function formatMachNumber(rawNumber) {
+    return (Math.round(100 * rawNumber) / 100).toFixed(2).slice(1);
 }

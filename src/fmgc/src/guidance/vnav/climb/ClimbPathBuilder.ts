@@ -216,20 +216,13 @@ export class ClimbPathBuilder {
 
             if (speedTarget > currentSpeed) {
                 const step = this.computeLevelFlightAccelerationStep(altitude, currentSpeed, speedTarget, profile.lastCheckpoint.remainingFuelOnBoard);
-                const { distanceTraveled, timeElapsed, fuelBurned, speed } = step;
 
                 // We could not accelerate in time
-                if (profile.lastCheckpoint.distanceFromStart + distanceTraveled > speedConstraint.distanceFromStart) {
-                    const scaling = distanceTraveled / (speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart);
+                if (profile.lastCheckpoint.distanceFromStart + step.distanceTraveled > speedConstraint.distanceFromStart) {
+                    const scaling = step.distanceTraveled / (speedConstraint.distanceFromStart - profile.lastCheckpoint.distanceFromStart);
 
-                    profile.checkpoints.push({
-                        reason: VerticalCheckpointReason.AtmosphericConditions,
-                        distanceFromStart: speedConstraint.distanceFromStart,
-                        secondsFromPresent: profile.lastCheckpoint.secondsFromPresent + timeElapsed * scaling,
-                        altitude,
-                        remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - fuelBurned * scaling,
-                        speed: speed * scaling,
-                    });
+                    this.scaleStepBasedOnLastCheckpoint(profile.lastCheckpoint, step, scaling);
+                    this.addCheckpointFromStep(profile, step, VerticalCheckpointReason.AtmosphericConditions);
 
                     continue;
                 } else {
@@ -255,28 +248,16 @@ export class ClimbPathBuilder {
 
         if (speedTarget > currentSpeed) {
             const accelerationStep = this.computeLevelFlightAccelerationStep(altitude, currentSpeed, speedTarget, profile.lastCheckpoint.remainingFuelOnBoard);
-            const {
-                distanceTraveled,
-                timeElapsed,
-                fuelBurned,
-                speed,
-            } = accelerationStep;
 
             // We could not accelerate in time
-            if (profile.lastCheckpoint.distanceFromStart + distanceTraveled > toDistanceFromStart) {
-                const scaling = distanceTraveled / (toDistanceFromStart - profile.lastCheckpoint.distanceFromStart);
-
-                profile.checkpoints.push({
-                    reason: VerticalCheckpointReason.AtmosphericConditions,
-                    distanceFromStart: toDistanceFromStart,
-                    secondsFromPresent: profile.lastCheckpoint.secondsFromPresent + timeElapsed * scaling,
-                    altitude,
-                    remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - fuelBurned * scaling,
-                    speed: speed * scaling,
-                });
+            if (profile.lastCheckpoint.distanceFromStart + accelerationStep.distanceTraveled > toDistanceFromStart) {
+                const scaling = accelerationStep.distanceTraveled / (toDistanceFromStart - profile.lastCheckpoint.distanceFromStart);
+                this.scaleStepBasedOnLastCheckpoint(profile.lastCheckpoint, accelerationStep, scaling);
+                this.addCheckpointFromStep(profile, accelerationStep, VerticalCheckpointReason.AtmosphericConditions);
 
                 return;
             }
+
             // End of acceleration
             this.addCheckpointFromStep(profile, accelerationStep, VerticalCheckpointReason.AtmosphericConditions);
         }
@@ -374,6 +355,7 @@ export class ClimbPathBuilder {
             secondsFromPresent: secondsFromPresent + step.timeElapsed,
             speed: step.speed,
             remainingFuelOnBoard: remainingFuelOnBoard - step.fuelBurned,
+            mach: this.computationParametersObserver.get().managedClimbSpeedMach,
         }));
     }
 

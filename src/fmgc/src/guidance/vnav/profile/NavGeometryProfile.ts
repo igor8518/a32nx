@@ -1,5 +1,6 @@
 import { BaseGeometryProfile } from '@fmgc/guidance/vnav/profile/BaseGeometryProfile';
 import { ConstraintReader } from '@fmgc/guidance/vnav/ConstraintReader';
+import { AtmosphericConditions } from '@fmgc/guidance/vnav/AtmosphericConditions';
 import { Geometry } from '../../Geometry';
 import { AltitudeConstraint, AltitudeConstraintType, PathAngleConstraint, SpeedConstraint, SpeedConstraintType } from '../../lnav/legs';
 
@@ -9,7 +10,7 @@ export interface VerticalWaypointPrediction {
     distanceFromStart: NauticalMiles,
     secondsFromPresent: Seconds,
     altitude: Feet,
-    speed: Knots,
+    speed: Knots | Mach,
     altitudeConstraint: AltitudeConstraint,
     speedConstraint: SpeedConstraint,
     isAltitudeConstraintMet: boolean,
@@ -69,6 +70,7 @@ export interface VerticalCheckpoint {
     altitude: Feet,
     remainingFuelOnBoard: number,
     speed: Knots,
+    mach: Mach,
 }
 
 export interface MaxAltitudeConstraint {
@@ -97,6 +99,7 @@ export class NavGeometryProfile extends BaseGeometryProfile {
     constructor(
         public geometry: Geometry,
         private constraintReader: ConstraintReader,
+        private atmosphericConditions: AtmosphericConditions,
         public waypointCount: number,
     ) {
         super();
@@ -164,14 +167,14 @@ export class NavGeometryProfile extends BaseGeometryProfile {
                 leg, (inboundTransition?.isNull || !inboundTransition?.isComputed) ? null : inboundTransition, this.geometry.transitions.get(i),
             ).reduce((sum, el) => sum + (!Number.isNaN(el) ? el : 0), 0);
 
-            const { secondsFromPresent, altitude, speed } = this.interpolateEverythingFromStart(totalDistance);
+            const { secondsFromPresent, altitude, speed, mach } = this.interpolateEverythingFromStart(totalDistance);
 
             predictions.set(i, {
                 waypointIndex: i,
                 distanceFromStart: totalDistance,
                 secondsFromPresent,
                 altitude,
-                speed,
+                speed: this.atmosphericConditions.casOrMach(speed, mach, altitude),
                 altitudeConstraint: leg.metadata.altitudeConstraint,
                 isAltitudeConstraintMet: this.isAltitudeConstraintMet(altitude, leg.metadata.altitudeConstraint),
                 speedConstraint: leg.metadata.speedConstraint,

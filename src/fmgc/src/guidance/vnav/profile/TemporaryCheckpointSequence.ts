@@ -32,6 +32,7 @@ export class TemporaryCheckpointSequence {
             secondsFromPresent: this.lastCheckpoint.secondsFromPresent - step.timeElapsed,
             remainingFuelOnBoard: this.lastCheckpoint.remainingFuelOnBoard + step.fuelBurned,
             speed: step.speed,
+            mach: this.lastCheckpoint.mach,
         });
     }
 
@@ -43,6 +44,7 @@ export class TemporaryCheckpointSequence {
             secondsFromPresent: this.lastCheckpoint.secondsFromPresent + step.timeElapsed,
             remainingFuelOnBoard: this.lastCheckpoint.remainingFuelOnBoard - step.fuelBurned,
             speed: step.speed,
+            mach: this.lastCheckpoint.mach,
         });
     }
 

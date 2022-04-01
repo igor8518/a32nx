@@ -38,8 +38,6 @@ import { NavGeometryProfile, VerticalCheckpointReason } from './profile/NavGeome
 import { ClimbPathBuilder } from './climb/ClimbPathBuilder';
 
 export class VnavDriver implements GuidanceComponent {
-    atmosphericConditions: AtmosphericConditions
-
     version: number = 0;
 
     takeoffPathBuilder: TakeoffPathBuilder;
@@ -89,13 +87,12 @@ export class VnavDriver implements GuidanceComponent {
     constructor(
         private readonly guidanceController: GuidanceController,
         private readonly computationParametersObserver: VerticalProfileComputationParametersObserver,
+        private readonly atmosphericConditions: AtmosphericConditions,
         private readonly windProfileFactory: WindProfileFactory,
         private readonly flightPlanManager: FlightPlanManager,
     ) {
-        this.atmosphericConditions = new AtmosphericConditions(computationParametersObserver.get().tropoPause);
-
         this.headingProfile = new NavHeadingProfile(flightPlanManager);
-        this.currentMcduSpeedProfile = new McduSpeedProfile(this.computationParametersObserver, this.atmosphericConditions, 0, [], []);
+        this.currentMcduSpeedProfile = new McduSpeedProfile(this.computationParametersObserver, 0, [], []);
 
         this.takeoffPathBuilder = new TakeoffPathBuilder(computationParametersObserver, this.atmosphericConditions);
         this.climbPathBuilder = new ClimbPathBuilder(computationParametersObserver, this.atmosphericConditions);
@@ -138,8 +135,6 @@ export class VnavDriver implements GuidanceComponent {
 
     update(_: number): void {
         try {
-            this.atmosphericConditions.update();
-
             const newCruiseAltitude = SimVar.GetSimVarValue('L:AIRLINER_CRUISE_ALTITUDE', 'number');
 
             if (newCruiseAltitude !== this.lastCruiseAltitude) {
@@ -168,7 +163,6 @@ export class VnavDriver implements GuidanceComponent {
             }
 
             this.updateTimeMarkers();
-            this.atmosphericConditions.update();
             this.descentGuidance.update();
         } catch (e) {
             console.error('[FMS] Failed to calculate vertical profil. See exception below.');
@@ -210,7 +204,6 @@ export class VnavDriver implements GuidanceComponent {
 
         this.currentMcduSpeedProfile = new McduSpeedProfile(
             this.computationParametersObserver,
-            this.atmosphericConditions,
             this.currentNavGeometryProfile.distanceToPresentPosition,
             this.currentNavGeometryProfile.maxClimbSpeedConstraints,
             this.currentNavGeometryProfile.descentSpeedConstraints,
@@ -232,7 +225,7 @@ export class VnavDriver implements GuidanceComponent {
     private computeVerticalProfileForMcdu(geometry: Geometry) {
         const { flightPhase, presentPosition, fuelOnBoard } = this.computationParametersObserver.get();
 
-        this.currentNavGeometryProfile = new NavGeometryProfile(geometry, this.constraintReader, this.flightPlanManager.getWaypointsCount());
+        this.currentNavGeometryProfile = new NavGeometryProfile(geometry, this.constraintReader, this.atmosphericConditions, this.flightPlanManager.getWaypointsCount());
 
         if (geometry.legs.size <= 0 || !this.computationParametersObserver.canComputeProfile()) {
             return;
@@ -263,7 +256,7 @@ export class VnavDriver implements GuidanceComponent {
         const { fcuAltitude, fcuVerticalMode, presentPosition, fuelOnBoard, fcuVerticalSpeed, flightPhase } = this.computationParametersObserver.get();
 
         this.currentNdGeometryProfile = this.isInManagedNav()
-            ? new NavGeometryProfile(geometry, this.constraintReader, this.flightPlanManager.getWaypointsCount())
+            ? new NavGeometryProfile(geometry, this.constraintReader, this.atmosphericConditions, this.flightPlanManager.getWaypointsCount())
             : new SelectedGeometryProfile();
 
         if (!this.computationParametersObserver.canComputeProfile()) {
@@ -287,7 +280,6 @@ export class VnavDriver implements GuidanceComponent {
             ? this.currentMcduSpeedProfile
             : new NdSpeedProfile(
                 this.computationParametersObserver,
-                this.atmosphericConditions,
                 this.currentNdGeometryProfile.distanceToPresentPosition,
                 this.currentNdGeometryProfile.maxClimbSpeedConstraints,
                 this.currentNdGeometryProfile.descentSpeedConstraints,

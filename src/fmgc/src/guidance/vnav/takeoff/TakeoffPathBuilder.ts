@@ -16,7 +16,7 @@ export class TakeoffPathBuilder {
     }
 
     private addTakeoffRollCheckpoint(profile: BaseGeometryProfile) {
-        const { originAirfieldElevation, v2Speed, fuelOnBoard } = this.observer.get();
+        const { originAirfieldElevation, v2Speed, fuelOnBoard, managedClimbSpeedMach } = this.observer.get();
 
         profile.checkpoints.push({
             reason: VerticalCheckpointReason.Liftoff,
@@ -24,12 +24,13 @@ export class TakeoffPathBuilder {
             secondsFromPresent: 20,
             altitude: originAirfieldElevation,
             remainingFuelOnBoard: fuelOnBoard,
-            speed: v2Speed + 10, // I know this is not perfectly accurate
+            speed: v2Speed + 10,
+            mach: managedClimbSpeedMach,
         });
     }
 
     private buildPathToThrustReductionAltitude(profile: BaseGeometryProfile) {
-        const { perfFactor, zeroFuelWeight, v2Speed, tropoPause, thrustReductionAltitude, takeoffFlapsSetting } = this.observer.get();
+        const { perfFactor, zeroFuelWeight, v2Speed, tropoPause, thrustReductionAltitude, takeoffFlapsSetting, managedClimbSpeedMach } = this.observer.get();
 
         const lastCheckpoint = profile.lastCheckpoint;
 
@@ -60,12 +61,13 @@ export class TakeoffPathBuilder {
             altitude: thrustReductionAltitude,
             remainingFuelOnBoard: profile.lastCheckpoint.remainingFuelOnBoard - fuelBurned,
             speed,
+            mach: managedClimbSpeedMach,
         });
     }
 
     private buildPathToAccelerationAltitude(profile: BaseGeometryProfile) {
         const lastCheckpoint = profile.lastCheckpoint;
-        const { accelerationAltitude, v2Speed, zeroFuelWeight, perfFactor, tropoPause } = this.observer.get();
+        const { accelerationAltitude, v2Speed, zeroFuelWeight, perfFactor, tropoPause, managedClimbSpeedMach } = this.observer.get();
 
         const speed = v2Speed + 10;
         const startingAltitude = lastCheckpoint.altitude;
@@ -98,6 +100,7 @@ export class TakeoffPathBuilder {
             altitude: accelerationAltitude,
             remainingFuelOnBoard: lastCheckpoint.remainingFuelOnBoard - fuelBurned,
             speed,
+            mach: managedClimbSpeedMach,
         });
     }
 }

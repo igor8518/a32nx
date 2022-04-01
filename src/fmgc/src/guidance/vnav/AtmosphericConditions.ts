@@ -1,6 +1,7 @@
 //  Copyright (c) 2022 FlyByWire Simulations
 //  SPDX-License-Identifier: GPL-3.0
 
+import { VerticalProfileComputationParametersObserver } from '@fmgc/guidance/vnav/VerticalProfileComputationParameters';
 import { Common } from './common';
 
 export class AtmosphericConditions {
@@ -14,7 +15,7 @@ export class AtmosphericConditions {
 
     private pressureAltFromSim: Feet;
 
-    constructor(private tropoPause: Feet) {
+    constructor(private observer: VerticalProfileComputationParametersObserver) {
         this.update();
     }
 
@@ -41,6 +42,10 @@ export class AtmosphericConditions {
 
     get isaDeviation(): Celcius {
         return this.computedIsaDeviation;
+    }
+
+    private get tropoPause(): Feet {
+        return this.observer.get().tropoPause;
     }
 
     predictStaticAirTemperatureAtAltitude(altitude: Feet): number {
@@ -118,5 +123,22 @@ export class AtmosphericConditions {
     estimatePressureAltitudeInMsfs(altitude: Feet) {
         // We add 2000 to avoid a division by zero
         return this.pressureAltFromSim * (2000 + altitude) / (2000 + this.altitudeFromSim);
+    }
+
+    /**
+     * Returns a Mach number if the CAS is taken above crossover altitude.
+     * @param cas The corrected airspeed
+     * @param mach The Mach number which will be used if it is lower than the Mach number corresponding ot `cas`.
+     * @param altitude The altitude at which to perform the conversion
+     * @returns
+     */
+    casOrMach(cas: Knots, mach: Mach, altitude: Feet): Knots | Mach {
+        const machAsIas = this.computeCasFromMach(altitude, mach);
+
+        if (cas > machAsIas) {
+            return mach;
+        }
+
+        return cas;
     }
 }

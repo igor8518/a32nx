@@ -89,6 +89,7 @@ export class ApproachPathBuilder {
             altitude: this.canUseLastAltConstraintAsStartingPoint(profile) ? approachConstraints[0].constraint.altitude1 : destinationAirfieldElevation,
             remainingFuelOnBoard: estimatedFuelOnBoardAtDestination,
             secondsFromPresent: estimatedSecondsFromPresentAtDestination,
+            mach: managedDescentSpeedMach,
         });
 
         // 6076.12
