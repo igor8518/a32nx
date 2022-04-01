@@ -236,17 +236,17 @@ export class LatchedDescentGuidance {
     private updateOverspeedCondition() {
         const airspeed = this.atmosphericConditions.currentAirspeed;
 
-        let limit = this.speedTarget;
+        let overspeedResolutionSpeed = this.speedTarget;
         if (this.speedState === DescentSpeedGuidanceState.TargetAndMargins) {
             const [_, upper] = this.speedMargin.getMargins(this.speedTarget);
-            limit = upper;
+            overspeedResolutionSpeed = upper;
         }
 
-        const vmo = this.iasOrMach(350, 0.82);
+        const overspeedTriggerSpeed = this.iasOrMach(345, 0.81);
 
-        if (this.isInOverspeedCondition && airspeed < limit) {
+        if (this.isInOverspeedCondition && airspeed < overspeedResolutionSpeed) {
             this.isInOverspeedCondition = false;
-        } if (!this.isInOverspeedCondition && airspeed > vmo) {
+        } if (!this.isInOverspeedCondition && airspeed > overspeedTriggerSpeed) {
             this.isInOverspeedCondition = true;
         }
     }
