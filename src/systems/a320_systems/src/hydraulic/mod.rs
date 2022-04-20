@@ -1616,6 +1616,7 @@ impl A320Hydraulic {
         absolute_delta_pressure
             > Pressure::new::<psi>(Self::HIGH_PITCH_PTU_SOUND_DELTA_PRESS_THRESHOLD_PSI)
             && is_ptu_rotating
+            && !self.ptu_high_pitch_sound_active.output()
     }
 }
 impl SimulationElement for A320Hydraulic {
