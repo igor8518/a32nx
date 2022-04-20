@@ -3,12 +3,13 @@ use crate::failures::{Failure, FailureType};
 use crate::hydraulic::electrical_pump_physics::ElectricalPumpPhysics;
 use crate::pneumatic::PressurizeableReservoir;
 use crate::shared::{
-    interpolation, low_pass_filter::LowPassFilter, DelayedTrueLogicGate, ElectricalBusType,
-    ElectricalBuses, HydraulicColor, SectionPressure,
+    interpolation, low_pass_filter::LowPassFilter, random_from_normal_distribution,
+    random_from_range, DelayedTrueLogicGate, ElectricalBusType, ElectricalBuses, HydraulicColor,
+    SectionPressure,
 };
 use crate::simulation::{
-    InitContext, SimulationElement, SimulationElementVisitor, SimulatorWriter, UpdateContext,
-    VariableIdentifier, Write,
+    InitContext, Read, SimulationElement, SimulationElementVisitor, SimulatorReader,
+    SimulatorWriter, UpdateContext, VariableIdentifier, Write,
 };
 
 use std::time::Duration;
@@ -170,11 +171,12 @@ pub trait PowerTransferUnitController {
 }
 
 pub struct PowerTransferUnit {
-    active_l2r_id: VariableIdentifier,
-    active_r2l_id: VariableIdentifier,
-    motor_flow_id: VariableIdentifier,
     valve_opened_id: VariableIdentifier,
     shaft_rpm_id: VariableIdentifier,
+    bark_strength_id: VariableIdentifier,
+
+    dev_efficiency_id: VariableIdentifier,
+    dev_delta_pressure: VariableIdentifier,
 
     is_enabled: bool,
     is_active_right: bool,
@@ -193,15 +195,48 @@ pub struct PowerTransferUnit {
 
     is_in_continuous_mode: bool,
     is_rotating_after_delay: DelayedTrueLogicGate,
+
+    activation_delta_pressure: Pressure,
+    desactivation_delta_pressure: Pressure,
+    shot_to_shot_activation_coefficient: f64,
+    shot_to_shot_desactivation_coefficient: f64,
+
+    duration_since_active: Duration,
+    speed_captured_at_active_duration: AngularVelocity,
+    bark_strength: u8,
+    has_stopped_since_last_write: bool,
+
+    efficiency: f64,
 }
 impl PowerTransferUnit {
-    const ACTIVATION_DELTA_PRESSURE_PSI: f64 = 500.;
-    const DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 35.;
+    // Randomisation parameters
+    // As ptu wear parameters are non linear, for now we simulate two normal distributions:
+    // -Nominal distribution which is the PTU you'll find in wide majority of planes
+    // -Worn out distribution, which is the PTU which is still acceptable but has degraded behaviour
+    const MEAN_ACTIVATION_DELTA_PRESSURE_PSI: f64 = 500.;
+    const STD_DEV_ACTIVATION_DELTA_PRESSURE_PSI: f64 = 5.;
+
+    // Ratio of worn PTU : 0.1 means 10% of cases we get a worn out ptu
+    const WORN_PTU_CASE_PROBABILITY: f64 = 0.15;
+
+    const WORN_MEAN_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 20.;
+    const WORN_STD_DEV_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 5.;
+    const WORN_MIN_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 5.;
+    const WORN_MAX_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 30.;
+
+    const NOMINAL_MEAN_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 90.;
+    const NOMINAL_STD_DEV_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 15.;
+    const NOMINAL_MIN_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 5.;
+    const NOMINAL_MAX_DEACTIVATION_DELTA_PRESSURE_PSI: f64 = 180.;
+
+    const WORN_EFFICIENCY_MEAN: f64 = 0.6;
+    const WORN_EFFICIENCY_STD_DEV: f64 = 0.06;
+    const NOMINAL_EFFICIENCY_MEAN: f64 = 0.85;
+    const NOMINAL_EFFICIENCY_STD_DEV: f64 = 0.04;
+    const EFFICIENCY_MIN_ALLOWED: f64 = 0.5;
+    const EFFICIENCY_MAX: f64 = 0.9;
 
     const MIN_SPEED_SIMULATION_RPM: f64 = 50.;
-    const EFFICIENCY_LEFT_TO_RIGHT: f64 = 0.85;
-    const EFFICIENCY_RIGHT_TO_LEFT: f64 = 0.85;
-
     const DEFAULT_LEFT_DISPLACEMENT_CUBIC_INCH: f64 = 0.92;
     const MIN_RIGHT_DISPLACEMENT_CUBIC_INCH: f64 = 0.65;
     const MAX_RIGHT_DISPLACEMENT_CUBIC_INCH: f64 = 1.21;
@@ -231,14 +266,16 @@ impl PowerTransferUnit {
 
     const DELAY_TO_DECLARE_CONTINUOUS: Duration = Duration::from_millis(1500);
     const THRESHOLD_DELTA_TO_DECLARE_CONTINUOUS_RPM: f64 = 400.;
+    const DURATION_BEFORE_CAPTURING_BARK_STRENGTH_SPEED: Duration = Duration::from_millis(133);
 
     pub fn new(context: &mut InitContext) -> Self {
+        let randomized_is_ptu_worn_out = Self::randomized_is_ptu_worn_out();
         Self {
-            active_l2r_id: context.get_identifier("HYD_PTU_ACTIVE_L2R".to_owned()),
-            active_r2l_id: context.get_identifier("HYD_PTU_ACTIVE_R2L".to_owned()),
-            motor_flow_id: context.get_identifier("HYD_PTU_MOTOR_FLOW".to_owned()),
             valve_opened_id: context.get_identifier("HYD_PTU_VALVE_OPENED".to_owned()),
             shaft_rpm_id: context.get_identifier("HYD_PTU_SHAFT_RPM".to_owned()),
+            dev_delta_pressure: context.get_identifier("HYD_PTU_DEV_DEACTIVATION_DELTA".to_owned()),
+            bark_strength_id: context.get_identifier("HYD_PTU_BARK_STRENGTH".to_owned()),
+            dev_efficiency_id: context.get_identifier("HYD_PTU_DEV_EFFICIENCY".to_owned()),
 
             is_enabled: false,
             is_active_right: false,
@@ -261,6 +298,23 @@ impl PowerTransferUnit {
 
             is_in_continuous_mode: false,
             is_rotating_after_delay: DelayedTrueLogicGate::new(Self::DELAY_TO_DECLARE_CONTINUOUS),
+
+            activation_delta_pressure: Pressure::new::<psi>(random_from_normal_distribution(
+                Self::MEAN_ACTIVATION_DELTA_PRESSURE_PSI,
+                Self::STD_DEV_ACTIVATION_DELTA_PRESSURE_PSI,
+            )),
+            desactivation_delta_pressure: Self::randomized_deactivation_delta_pressure(
+                randomized_is_ptu_worn_out,
+            ),
+            shot_to_shot_activation_coefficient: 1.,
+            shot_to_shot_desactivation_coefficient: 1.,
+
+            duration_since_active: Duration::default(),
+            speed_captured_at_active_duration: AngularVelocity::default(),
+            bark_strength: 0,
+            has_stopped_since_last_write: false,
+
+            efficiency: Self::randomized_efficiency(randomized_is_ptu_worn_out),
         }
     }
 
@@ -291,8 +345,9 @@ impl PowerTransferUnit {
 
         self.update_displacement(context, loop_left_section, loop_right_section);
         self.update_shaft_physics(context, loop_left_section, loop_right_section);
+        self.update_active_state(context);
         self.update_continuous_state(context);
-        self.update_active_state();
+        self.capture_bark_strength();
         self.update_flows();
     }
 
@@ -308,9 +363,14 @@ impl PowerTransferUnit {
             Pressure::new::<psi>(0.)
         };
 
-        if delta_p.abs().get::<psi>() > Self::ACTIVATION_DELTA_PRESSURE_PSI {
+        if delta_p.abs() > self.activation_delta_pressure * self.shot_to_shot_activation_coefficient
+        {
             self.control_valve_opened = true;
-        } else if delta_p.abs().get::<psi>() < Self::DEACTIVATION_DELTA_PRESSURE_PSI {
+            self.shot_to_shot_activation_coefficient = random_from_range(0.97, 1.03);
+        } else if delta_p.abs()
+            < self.desactivation_delta_pressure * self.shot_to_shot_desactivation_coefficient
+        {
+            self.shot_to_shot_desactivation_coefficient = random_from_range(0.97, 1.03);
             self.control_valve_opened = false;
         }
 
@@ -331,9 +391,31 @@ impl PowerTransferUnit {
             .update(context.delta(), new_displacement);
     }
 
-    fn update_active_state(&mut self) {
-        let is_rotating =
-            self.shaft_speed.get::<revolution_per_minute>().abs() > Self::MIN_SPEED_SIMULATION_RPM;
+    /// Snapshots the ptu rotational speed after a fixed time to measure its expected "sound power level"
+    fn capture_bark_strength(&mut self) {
+        if self.duration_since_active > Self::DURATION_BEFORE_CAPTURING_BARK_STRENGTH_SPEED
+            && self
+                .speed_captured_at_active_duration
+                .get::<revolution_per_minute>()
+                == 0.
+        {
+            self.speed_captured_at_active_duration = self.shaft_speed.abs();
+            self.bark_strength =
+                Self::speed_to_bark_strength(self.speed_captured_at_active_duration);
+        }
+    }
+
+    fn update_active_state(&mut self, context: &UpdateContext) {
+        let is_rotating = self.is_rotating();
+
+        if is_rotating {
+            self.duration_since_active += context.delta();
+        } else {
+            self.duration_since_active = Duration::default();
+            self.speed_captured_at_active_duration = AngularVelocity::default();
+            self.bark_strength = 0;
+            self.has_stopped_since_last_write = true;
+        }
 
         let active_direction = self.shaft_speed.get::<revolution_per_minute>().signum();
 
@@ -382,7 +464,7 @@ impl PowerTransferUnit {
     fn update_continuous_state(&mut self, context: &UpdateContext) {
         self.is_rotating_after_delay.update(
             context,
-            self.shaft_speed.get::<revolution_per_minute>()
+            self.shaft_speed.abs().get::<revolution_per_minute>()
                 > Self::THRESHOLD_DELTA_TO_DECLARE_CONTINUOUS_RPM,
         );
 
@@ -423,12 +505,12 @@ impl PowerTransferUnit {
             // Left sends flow to right
             let flow = Self::calc_flow(self.shaft_speed.abs(), self.left_displacement);
             self.flow_to_left = -flow;
-            self.flow_to_right = flow * Self::EFFICIENCY_LEFT_TO_RIGHT;
+            self.flow_to_right = flow * self.efficiency;
             self.last_flow = flow;
         } else if shaft_rpm > Self::MIN_SPEED_SIMULATION_RPM {
             // Right sends flow to left
             let flow = Self::calc_flow(self.shaft_speed.abs(), self.right_displacement.output());
-            self.flow_to_left = flow * Self::EFFICIENCY_RIGHT_TO_LEFT;
+            self.flow_to_left = flow * self.efficiency;
             self.flow_to_right = -flow;
             self.last_flow = flow;
         } else {
@@ -451,17 +533,103 @@ impl PowerTransferUnit {
     pub fn is_in_continuous_mode(&self) -> bool {
         self.is_in_continuous_mode
     }
+
+    fn speed_to_bark_strength(speed: AngularVelocity) -> u8 {
+        let rpm = speed.get::<revolution_per_minute>();
+
+        if rpm > 1700. {
+            5
+        } else if rpm > 1560. {
+            4
+        } else if rpm > 1470. {
+            3
+        } else if rpm > 1370. {
+            2
+        } else {
+            1
+        }
+    }
+
+    fn randomized_is_ptu_worn_out() -> bool {
+        random_from_range(0., 1.) < Self::WORN_PTU_CASE_PROBABILITY
+    }
+
+    fn randomized_efficiency(is_worn_out: bool) -> f64 {
+        if is_worn_out {
+            random_from_normal_distribution(
+                Self::WORN_EFFICIENCY_MEAN,
+                Self::WORN_EFFICIENCY_STD_DEV,
+            )
+            .max(Self::EFFICIENCY_MIN_ALLOWED)
+            .min(Self::EFFICIENCY_MAX)
+        } else {
+            random_from_normal_distribution(
+                Self::NOMINAL_EFFICIENCY_MEAN,
+                Self::NOMINAL_EFFICIENCY_STD_DEV,
+            )
+            .max(Self::EFFICIENCY_MIN_ALLOWED)
+            .min(Self::EFFICIENCY_MAX)
+        }
+    }
+
+    fn randomized_deactivation_delta_pressure(is_worn_out: bool) -> Pressure {
+        if is_worn_out {
+            Pressure::new::<psi>(
+                random_from_normal_distribution(
+                    Self::WORN_MEAN_DEACTIVATION_DELTA_PRESSURE_PSI,
+                    Self::WORN_STD_DEV_DEACTIVATION_DELTA_PRESSURE_PSI,
+                )
+                .min(Self::WORN_MAX_DEACTIVATION_DELTA_PRESSURE_PSI)
+                .max(Self::WORN_MIN_DEACTIVATION_DELTA_PRESSURE_PSI),
+            )
+        } else {
+            Pressure::new::<psi>(
+                random_from_normal_distribution(
+                    Self::NOMINAL_MEAN_DEACTIVATION_DELTA_PRESSURE_PSI,
+                    Self::NOMINAL_STD_DEV_DEACTIVATION_DELTA_PRESSURE_PSI,
+                )
+                .min(Self::NOMINAL_MAX_DEACTIVATION_DELTA_PRESSURE_PSI)
+                .max(Self::NOMINAL_MIN_DEACTIVATION_DELTA_PRESSURE_PSI),
+            )
+        }
+    }
 }
 impl SimulationElement for PowerTransferUnit {
     fn write(&self, writer: &mut SimulatorWriter) {
-        writer.write(&self.active_l2r_id, self.is_active_left);
-        writer.write(&self.active_r2l_id, self.is_active_right);
-        writer.write(&self.motor_flow_id, self.flow());
         writer.write(&self.valve_opened_id, self.is_enabled());
         writer.write(
             &self.shaft_rpm_id,
             (self.shaft_speed_filtered.output()).abs(),
         );
+
+        // As write can happen slower than ptu update, if we had ptu stopping between two writes
+        // we ensure here we send the 0 value for 1 tick at least
+        // This flag is reset in the read() to finish the handshake
+        let refreshed_bark_strength = if self.has_stopped_since_last_write {
+            0
+        } else {
+            self.bark_strength
+        };
+
+        writer.write(&self.bark_strength_id, refreshed_bark_strength);
+    }
+
+    fn read(&mut self, reader: &mut SimulatorReader) {
+        // Ensuring we take dev value into account only if not zero
+        let desactivation_delta_pressure_raw = reader.read(&self.dev_delta_pressure);
+        if desactivation_delta_pressure_raw != 0. {
+            self.desactivation_delta_pressure =
+                Pressure::new::<psi>(desactivation_delta_pressure_raw);
+        }
+
+        let efficiency_raw = reader.read(&self.dev_efficiency_id);
+        if efficiency_raw != 0. {
+            self.efficiency = efficiency_raw;
+        }
+
+        // As read/write can happen slower than ptu update, if we had ptu stopping between two writes
+        // we ensure here to reset the flag indicating we missed a stop
+        self.has_stopped_since_last_write = false;
     }
 }
 
