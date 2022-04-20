@@ -27,6 +27,18 @@ const createOrchestrator = () => new FailuresOrchestrator('A32NX', [
     [29, A320Failure.YellowReservoirReturnLeak, 'Yellow reservoir return leak'],
     [34, A320Failure.RadioAltimeter1, 'RA 1'],
     [34, A320Failure.RadioAltimeter2, 'RA 2'],
+    [32, A320Failure.LgciuPowerSupply1, 'LGCIU 1 Power supply'],
+    [32, A320Failure.LgciuPowerSupply2, 'LGCIU 2 Power supply'],
+    [32, A320Failure.LgciuInternalError1, 'LGCIU 1 Internal error'],
+    [32, A320Failure.LgciuInternalError2, 'LGCIU 2 Internal error'],
+    [32, A320Failure.GearProxSensorDamageGearUplockLeft1, 'LGCIU 2 Internal error'],
+    [32, A320Failure.GearProxSensorDamageDoorDownlockRight2, 'LGCIU 2 Internal error'],
+    [32, A320Failure.GearProxSensorDamageGearUplockCenter1, 'LGCIU 2 Internal error'],
+    [32, A320Failure.GearProxSensorDamageDoorUplockLeft2, 'LGCIU 2 Internal error'],
+    [32, A320Failure.GearProxSensorDamageGearUplockLeft1, 'Proximity Sensor Uplock Damage Left Gear #1'],
+    [32, A320Failure.GearProxSensorDamageDoorDownlockRight2, 'Proximity Sensor Downlock Damage Right Door #2'],
+    [32, A320Failure.GearProxSensorDamageGearUplockCenter1, 'Proximity Sensor Uplock Damage Center Gear #1'],
+    [32, A320Failure.GearProxSensorDamageDoorUplockLeft2, 'Proximity Sensor Uplock Damage Left Door #2'],
 ]);
 
 const Context = React.createContext<FailuresOrchestratorContext>({
