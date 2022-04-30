@@ -46,7 +46,7 @@ class A32NX_InitFlight {
                 return;
             }
             if (initFlightState === 1) {
-                A32NX_InitFlight.MCDU.addNewMessage(NXFictionalMessages.upLink);
+                A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.upLink);
                 A32NX_InitFlight.UPDATE_VIEW();
                 await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 2);
                 getSimBriefOfp(A32NX_InitFlight.MCDU, () => {
@@ -95,7 +95,7 @@ class A32NX_InitFlight {
                 }
                 if ((await SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_LOADFUEL", "Number") == 2) && !(await SimVar.GetSimVarValue("L:A32NX_REFUEL_STARTED_BY_USR", "Bool"))) {
                     await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 5);
-                    await A32NX_InitFlight.MCDU.addNewMessage(NXFictionalMessages.loadPax);
+                    await A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.loadPax);
                     A32NX_InitFlight.UPDATE_VIEW();
                 }
 
@@ -113,7 +113,7 @@ class A32NX_InitFlight {
                     await SimVar.SetSimVarValue("L:A32NX_PAX_TOTAL_ROWS_14_21", "Int", 0);
                     await SimVar.SetSimVarValue("L:A32NX_PAX_TOTAL_ROWS_22_29", "Int", 0);
                     await SimVar.SetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number", 1);
-                    await A32NX_InitFlight.MCDU.addNewMessage(NXFictionalMessages.loadPayload);
+                    await A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.loadPayload);
                     A32NX_InitFlight.UPDATE_VIEW();
                 }
 
@@ -127,7 +127,7 @@ class A32NX_InitFlight {
             if (initFlightState === 8) {
                 if (boarding == 0) {
                     await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 9);
-                    await A32NX_InitFlight.MCDU.addNewMessage(NXFictionalMessages.prepareCDU);
+                    await A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.prepareCDU);
                     A32NX_InitFlight.UPDATE_VIEW();
                 }
             }
@@ -135,7 +135,8 @@ class A32NX_InitFlight {
             if (initFlightState === 9) {
                 await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 10);
                 A32NX_InitFlight.MCDU.updateZfwVars();
-                A32NX_InitFlight.MCDU.trySetZeroFuelWeightZFWCG((isFinite(A32NX_InitFlight.MCDU.zeroFuelWeight) ? (NXUnits.kgToUser(A32NX_InitFlight.MCDU.zeroFuelWeight)).toFixed(1) : "") +
+                A32NX_InitFlight.MCDU.trySetZeroFuelWeightZFWCG(
+                    (isFinite(getZfw()) ? (NXUnits.kgToUser(getZfw() / 1000)).toFixed(1) : "") +
                     "/" +
                     (isFinite(getZfwcg()) ? getZfwcg().toFixed(1) : ""));
             }
@@ -181,14 +182,14 @@ class A32NX_InitFlight {
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET V2");
                         A32NX_InitFlight.MCDU.trySetV2Speed((A32NX_InitFlight.MCDU._getV2Speed() + 10).toString());
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET FLEX");
-                        A32NX_InitFlight.MCDU.setPerfTOFlexTemp(59);
+                        A32NX_InitFlight.MCDU.setPerfTOFlexTemp(69);
                         A32NX_InitFlight.MCDU.scratchpad.setText("DONE");
-                        A32NX_InitFlight.MCDU.addNewMessage(NXFictionalMessages.done);
+                        A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.done);
                         const cur = A32NX_InitFlight.MCDU.page.Current;
                         setTimeout(() => {
                             if (A32NX_InitFlight.MCDU.page.Current === cur) {
                                 CDUPerformancePage.ShowTAKEOFFPage(A32NX_InitFlight.MCDU);
-                                A32NX_InitFlight.MCDU.addNewMessage(NXFictionalMessages.done);
+                                A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.done);
                                 SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 20);
                             }
                         }, A32NX_InitFlight.MCDU.getDelaySwitchPage());
