@@ -265,9 +265,9 @@ __attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVar
                           VarNames.push_back("A320_Neo_MFD_NAV_MODE_1");
                           VarNames.push_back("A320_Neo_MFD_NAV_MODE_2");
                           VarNames.push_back("A32NX_AIRCOND_PACK1_FAULT");
-                          VarNames.push_back("A32NX_AIRCOND_PACK1_TOGGLE");
+                          VarNames.push_back("A32NX_OVHD_COND_PACK_1_PB_IS_ON");
                           VarNames.push_back("A32NX_AIRCOND_PACK2_FAULT");
-                          VarNames.push_back("A32NX_AIRCOND_PACK2_TOGGLE");
+                          VarNames.push_back("A32NX_OVHD_COND_PACK_2_PB_IS_ON");
                           VarNames.push_back("A32NX_AIRCOND_HOTAIR_FAULT");
                           VarNames.push_back("A32NX_AIRCOND_HOTAIR_TOGGLE");
                           VarNames.push_back("A32NX_AIRCOND_RAMAIRLOCK_TOGGLE");
