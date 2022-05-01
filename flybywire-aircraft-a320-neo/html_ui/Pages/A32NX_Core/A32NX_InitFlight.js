@@ -107,34 +107,43 @@ class A32NX_InitFlight {
             }
             if (initFlightState === 6) {
                 if (await SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number") == 2) {
-                    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 7);
+
                     await SimVar.SetSimVarValue("L:A32NX_PAX_TOTAL_ROWS_1_6", "Int", 0);
                     await SimVar.SetSimVarValue("L:A32NX_PAX_TOTAL_ROWS_7_13", "Int", 0);
                     await SimVar.SetSimVarValue("L:A32NX_PAX_TOTAL_ROWS_14_21", "Int", 0);
                     await SimVar.SetSimVarValue("L:A32NX_PAX_TOTAL_ROWS_22_29", "Int", 0);
-                    await SimVar.SetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number", 1);
+                    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 7);
                     await A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.loadPayload);
                     A32NX_InitFlight.UPDATE_VIEW();
                 }
 
             }
-            const boarding = await SimVar.GetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number");
             if (initFlightState === 7) {
+                await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 8);
+                setDefaultWeights(A32NX_InitFlight.MCDU.simbrief.paxWeight, A32NX_InitFlight.MCDU.simbrief.bagWeight);
+                setTargetPax(A32NX_InitFlight.MCDU.simbrief.paxCount).then(() => {
+                    setTargetCargo(A32NX_InitFlight.MCDU.simbrief.bagCount, A32NX_InitFlight.MCDU.simbrief.freight).then(() => {
+                            SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 9);
+                            SimVar.SetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number", 1);
+                        });
+                    });
+            }
+            const boarding = await SimVar.GetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number");
+            if (initFlightState === 9) {
                 if (boarding === 1) {
-                    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 8);
+                    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 10);
                 }
             }
-            if (initFlightState === 8) {
+            if (initFlightState === 10) {
                 if (boarding == 0) {
-                    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 9);
+                    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 11);
                     await A32NX_InitFlight.MCDU.setScratchpadMessage(NXFictionalMessages.prepareCDU);
                     A32NX_InitFlight.UPDATE_VIEW();
                 }
             }
 
-            if (initFlightState === 9) {
-                await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 10);
-                A32NX_InitFlight.MCDU.updateZfwVars();
+            if (initFlightState === 11) {
+                await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 12);
                 A32NX_InitFlight.MCDU.trySetZeroFuelWeightZFWCG(
                     (isFinite(getZfw()) ? (NXUnits.kgToUser(getZfw() / 1000)).toFixed(1) : "") +
                     "/" +
@@ -152,7 +161,7 @@ class A32NX_InitFlight {
                     CDUInitPage.trySetFuelPred(A32NX_InitFlight.MCDU);
                 }
             }
-            if (initFlightState === 10) {
+            if (initFlightState === 12) {
 
                 A32NX_InitFlight.MCDU._fuelPlanningPhase = A32NX_InitFlight.MCDU._fuelPlanningPhases.PLANNING;
                 A32NX_InitFlight.MCDU._blockFuelEntered = false;
@@ -172,7 +181,7 @@ class A32NX_InitFlight {
                     if (A32NX_InitFlight.MCDU._fuelPlanningPhase === A32NX_InitFlight.MCDU._fuelPlanningPhases.COMPLETED) {
                         await A32NX_InitFlight.MCDU.trySetBlockFuel(Math.round(Number(A32NX_InitFlight.MCDU.simbrief.blockFuel) / 100) / 10);
 
-                        await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 11);
+                        await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 13);
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET FLAPS");
                         A32NX_InitFlight.MCDU.trySetFlapsTHS("2/UP" + String(0));
                         A32NX_InitFlight.MCDU.scratchpad.setText("SET V1");
