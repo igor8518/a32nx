@@ -45,14 +45,15 @@ class CDUAocOfpData {
 
         let zfwcg = "__._[color]amber";
         let requestButton = "SEND*[color]cyan";
-        let loadButton = "START*[color]cyan";
+        const loadButton = "START*[color]cyan";
 
         if (mcdu.simbrief.sendStatus !== "READY" && mcdu.simbrief.sendStatus !== "DONE") {
             requestButton = "SEND [color]cyan";
         }
 
         if (boardingStartedByUser) {
-            loadButton = "STOP*[color]yellow";
+            lo;
+            adButton = "STOP*[color]yellow";
         }
 
         async function setDefaultWeights(simbriefPaxWeight, simbriefBagWeight) {
@@ -239,6 +240,13 @@ class CDUAocOfpData {
     }
 }
 
+async function setDefaultWeights(simbriefPaxWeight, simbriefBagWeight) {
+    const perPaxWeight = (simbriefPaxWeight === 0) ? 84 : simbriefPaxWeight;
+    const perBagWeight = (simbriefBagWeight === 0) ? 20 : simbriefBagWeight;
+    SimVar.SetSimVarValue("L:A32NX_WB_PER_PAX_WEIGHT", "Number", parseInt(perPaxWeight));
+    SimVar.SetSimVarValue("L:A32NX_WB_PER_BAG_WEIGHT", "Number", parseInt(perBagWeight));
+}
+
 async function setTargetPax(numberOfPax) {
     await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 1);
     let paxRemaining = parseInt(numberOfPax);
@@ -259,6 +267,30 @@ async function setTargetPax(numberOfPax) {
     await fillStation(paxStations['rows1_6'], 1 , paxRemaining);
 
     await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 2);
+    return;
+}
+
+async function setTargetCargo(numberOfPax, simbriefFreight) {
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETCARGO", "Number", 1);
+    const BAG_WEIGHT = SimVar.GetSimVarValue("L:A32NX_WB_PER_BAG_WEIGHT", "Number");
+    const bagWeight = numberOfPax * BAG_WEIGHT;
+    const maxLoadInCargoHold = 9435; // from flight_model.cfg
+    const loadableCargoWeight = Math.min(bagWeight + parseInt(simbriefFreight), maxLoadInCargoHold);
+
+    let remainingWeight = loadableCargoWeight;
+
+    async function fillCargo(station, percent, loadableCargoWeight) {
+        const weight = Math.round(percent * loadableCargoWeight);
+        station.load = weight;
+        remainingWeight -= weight;
+        await SimVar.SetSimVarValue(`L:${station.simVar}_DESIRED`, "Number", parseInt(weight));
+    }
+
+    await fillCargo(cargoStations['fwdBag'], .361 , loadableCargoWeight);
+    await fillCargo(cargoStations['aftBag'], .220, loadableCargoWeight);
+    await fillCargo(cargoStations['aftCont'], .251, loadableCargoWeight);
+    await fillCargo(cargoStations['aftBulk'], 1, remainingWeight);
+    await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETCARGO", "Number", 2);
     return;
 }
 
