@@ -246,13 +246,15 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
 
     for (let i = 0; i < destinationRunways.length; i++) {
         rwy = destinationRunways[i].designation;
-        shortRwy = rwy;
+        const re1 = /[1-9]+[0]?[A-Z]?/;
+        shortRwy = rwy.match(re1)[0];
+        //shortRwy = rwy;
         const re = /[0-9]+/;
         const rwyDig = rwy.match(re);
-        if (rwyDig < 10) {
+        /*if (rwyDig < 2) {
 
             rwy = "0" + rwy;
-        }
+        }*/
         if (mcdu.simbrief.destinationRwy === rwy) {
             gr = i;
             break;
@@ -260,7 +262,7 @@ const AddSTAR = (RWEnd, fix, mcdu) => {
     }
     //Not found rwy in navdata
     if (gr < 0) {
-        return SIDss;
+        return STARs;
     }
 
     for (let j = 0; j < destinationAirportInfo.approaches.length; j++) {
@@ -444,13 +446,15 @@ const AddSID = (RWEnd, fix, mcdu) => {
 
     for (let i = 0; i < originRunways.length; i++) {
         rwy = originRunways[i].designation;
-        shortRwy = rwy;
+        const re1 = /[1-9]+[0]?[A-Z]?/;
+        shortRwy = rwy.match(re1)[0];
+        //shortRwy = rwy;
         const re = /[0-9]+/;
         const rwyDig = rwy.match(re);
-        if (rwyDig < 10) {
+        /*if (rwyDig < 2) {
 
             rwy = "0" + rwy;
-        }
+        }*/
         if (mcdu.simbrief.originRwy === rwy) {
             gr = i;
             break;
@@ -654,10 +658,10 @@ const uplinkRoute = async (mcdu) => {
                 });
             // origin runway
             if (OrigSids[findSID].tr !== -1) {
-                await mcdu.flightPlanManager.setOriginRunwayIndex(OrigSids[findSID].tr)
-                    .then(() => console.log(`[FP LOAD] Setting Origin  ${OrigSids[findSID].tr} ... SUCCESS`))
+                await mcdu.flightPlanManager.setOriginRunwayIndex(OrigSids[findSID].r)
+                    .then(() => console.log(`[FP LOAD] Setting Origin  ${OrigSids[findSID].r} ... SUCCESS`))
                     .catch((e) => {
-                        console.error(`[FP LOAD] Setting Origin ${OrigSids[findSID].tr} ... FAILED`);
+                        console.error(`[FP LOAD] Setting Origin ${OrigSids[findSID].r} ... FAILED`);
                         console.error(e);
                     });
             } else if (OrigSids[findSID].tr !== -1 && OrigSids[findSID].j !== -1) {
