@@ -1144,6 +1144,7 @@ __attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVar
                           VarNames.push_back("A32NX_ADIRS_ADIRU_2_STATE");
                           VarNames.push_back("A32NX_ADIRS_ADIRU_3_STATE");
                           VarNames.push_back("A32NX_INITFLIGHT_STATE");
+                          VarNames.push_back("A32NX_PFD_MSG_TD_REACHED");
                         }
 
                         hr = SimConnect_CallDispatch(hSimConnect, ProcessVars, 0);
