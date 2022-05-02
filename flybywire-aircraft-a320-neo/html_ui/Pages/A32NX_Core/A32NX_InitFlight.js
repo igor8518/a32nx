@@ -123,10 +123,10 @@ class A32NX_InitFlight {
                 setDefaultWeights(A32NX_InitFlight.MCDU.simbrief.paxWeight, A32NX_InitFlight.MCDU.simbrief.bagWeight);
                 setTargetPax(A32NX_InitFlight.MCDU.simbrief.paxCount).then(() => {
                     setTargetCargo(A32NX_InitFlight.MCDU.simbrief.bagCount, A32NX_InitFlight.MCDU.simbrief.freight).then(() => {
-                            SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 9);
-                            SimVar.SetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number", 1);
-                        });
+                        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 9);
+                        SimVar.SetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number", 1);
                     });
+                });
             }
             const boarding = await SimVar.GetSimVarValue("L:A32NX_BOARDING_STARTED_BY_USR", "Number");
             if (initFlightState === 9) {
