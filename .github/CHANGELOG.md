@@ -8,6 +8,7 @@
 
 1. [MODEL] Add Wheel Chocks and GSE Safety Cones - @bouveng (Johan Bouveng)
 1. [MCDU] Allow Wind Request from Simbrief flight plan - @USA-RedDragon (Jacob McSwain)
+1. [FMGC] Map leg course with station declination where required - @tracernz (Mike)
 1. [HYD] Fix fluid return handling of actuators - @Crocket63 (crocket)
 1. [ENGINE] Fuel persistency between each flight - @juliansebline (Julian Sebline#8476)
 1. [HYD] Now allowing reverting gravity gear extension - @Crocket63 (crocket)
