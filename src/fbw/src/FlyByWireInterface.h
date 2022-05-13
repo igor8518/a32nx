@@ -123,6 +123,7 @@ class FlyByWireInterface {
 
   std::unique_ptr<LocalVariable> idPerformanceWarningActive;
 
+  std::unique_ptr<LocalVariable> idTrackingMode;
   std::unique_ptr<LocalVariable> idExternalOverride;
 
   std::unique_ptr<LocalVariable> idFdrEvent;
@@ -317,6 +318,10 @@ class FlyByWireInterface {
   std::unique_ptr<LocalVariable> idAileronPositionLeft;
   std::unique_ptr<LocalVariable> idAileronPositionRight;
   std::shared_ptr<AnimationAileronHandler> animationAileronHandler;
+
+  std::unique_ptr<LocalVariable> idElevatorPosition;
+
+  std::unique_ptr<LocalVariable> idRudderPosition;
 
   std::unique_ptr<LocalVariable> idRadioReceiverUsageEnabled;
   std::unique_ptr<LocalVariable> idRadioReceiverLocalizerValid;

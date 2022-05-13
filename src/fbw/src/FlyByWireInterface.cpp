@@ -245,6 +245,7 @@ void FlyByWireInterface::setupLocalVariables() {
   idPerformanceWarningActive = make_unique<LocalVariable>("A32NX_PERFORMANCE_WARNING_ACTIVE");
 
   // register L variable for external override
+  idTrackingMode = make_unique<LocalVariable>("A32NX_FLIGHT_CONTROLS_TRACKING_MODE");
   idExternalOverride = make_unique<LocalVariable>("A32NX_EXTERNAL_OVERRIDE");
 
   // register L variable for FDR event
@@ -439,6 +440,10 @@ void FlyByWireInterface::setupLocalVariables() {
 
   idAileronPositionLeft = make_unique<LocalVariable>("A32NX_AILERON_LEFT_DEFLECTION_DEMAND");
   idAileronPositionRight = make_unique<LocalVariable>("A32NX_AILERON_RIGHT_DEFLECTION_DEMAND");
+
+  idElevatorPosition = make_unique<LocalVariable>("A32NX_ELEVATOR_DEFLECTION_DEMAND");
+
+  idRudderPosition = make_unique<LocalVariable>("A32NX_RUDDER_DEFLECTION_DEMAND");
 
   idRadioReceiverUsageEnabled = make_unique<LocalVariable>("A32NX_RADIO_RECEIVER_USAGE_ENABLED");
   idRadioReceiverLocalizerValid = make_unique<LocalVariable>("A32NX_RADIO_RECEIVER_LOC_IS_VALID");
@@ -1487,17 +1492,8 @@ bool FlyByWireInterface::updateFlyByWire(double sampleTime) {
   idRudderPedalPosition->set(max(-100, min(100, (-100.0 * simInput.inputs[2]))));
   idRudderPedalAnimationPosition->set(max(-100, min(100, (-100.0 * simInput.inputs[2]) + (100.0 * simData.zeta_trim_pos))));
 
-  // set outputs
-  if (!flyByWireOutput.sim.data_computed.tracking_mode_on) {
-    // object to write with trim
-    SimOutput output = {flyByWireOutput.output.eta_pos, flyByWireOutput.output.xi_pos, flyByWireOutput.output.zeta_pos};
-
-    // send data via sim connect
-    if (!simConnectInterface.sendData(output)) {
-      cout << "WASM: Write data failed!" << endl;
-      return false;
-    }
-  }
+  // provide tracking mode state
+  idTrackingMode->set(flyByWireOutput.sim.data_computed.tracking_mode_on);
 
   // determine if nosewheel demand shall be set
   if (!flyByWireOutput.sim.data_computed.tracking_mode_on) {
@@ -1553,6 +1549,12 @@ bool FlyByWireInterface::updateFlyByWire(double sampleTime) {
                                   idExternalOverride->get() == 1 ? simData.xi_pos : flyByWireOutput.output.xi_pos, sampleTime);
   idAileronPositionLeft->set(animationAileronHandler->getPositionLeft());
   idAileronPositionRight->set(animationAileronHandler->getPositionRight());
+
+  // set elevator demand
+  idElevatorPosition->set(flyByWireOutput.output.eta_pos);
+
+  // set rudder demand
+  idRudderPosition->set(flyByWireOutput.output.zeta_pos);
 
   // determine if beta target needs to be active (blue)
   bool conditionDifferenceEngineN1Larger35 = (abs(simData.engine_N1_1_percent - simData.engine_N1_2_percent) > 35);

@@ -364,8 +364,8 @@ impl A320AileronFactory {
         AerodynamicModel::new(
             &body,
             Some(Vector3::new(0., 1., 0.)),
-            Some(Vector3::new(0., 0., 1.)),
-            Some(Vector3::new(0., 1., 0.)),
+            Some(Vector3::new(0., 0.208, 0.978)),
+            Some(Vector3::new(0., 0.978, -0.208)),
             Ratio::new::<ratio>(1.),
         )
     }
@@ -542,8 +542,8 @@ impl A320ElevatorFactory {
             cg_offset,
             control_arm,
             anchor,
-            Angle::new::<degree>(-17.),
-            Angle::new::<degree>(47.),
+            Angle::new::<degree>(-11.5),
+            Angle::new::<degree>(27.5),
             init_position,
             100.,
             false,
@@ -5017,7 +5017,7 @@ impl ElevatorAssembly {
             ],
         );
 
-        self.position = self.hydraulic_assembly.position_normalized();
+        self.position = self.hydraulic_assembly.actuator_position_normalized(0);
     }
 }
 impl SimulationElement for ElevatorAssembly {
