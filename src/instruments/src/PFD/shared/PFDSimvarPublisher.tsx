@@ -144,6 +144,10 @@ export interface PFDSimvars {
     showSpeedMargins: boolean;
     upperSpeedMargin: number;
     lowerSpeedMargin: number;
+    fwc1AltAlertPulsing: boolean,
+    fwc2AltAlertPulsing: boolean,
+    fwc1AltAlertFlashing: boolean,
+    fwc2AltAlertFlashing: boolean,
   }
 
 export enum PFDVars {
@@ -177,8 +181,8 @@ export enum PFDVars {
     athrModeMessage = 'L:A32NX_AUTOTHRUST_MODE_MESSAGE',
     machPreselVal = 'L:A32NX_MachPreselVal',
     speedPreselVal = 'L:A32NX_SpeedPreselVal',
-    mda = 'L:AIRLINER_MINIMUM_DESCENT_ALTITUDE',
-    dh = 'L:AIRLINER_DECISION_HEIGHT',
+    mda = 'L:A32NX_MINIMUM_DESCENT_ALTITUDE',
+    dh = 'L:A32NX_DECISION_HEIGHT',
     attHdgKnob = 'L:A32NX_ATT_HDG_SWITCHING_KNOB',
     airKnob = 'L:A32NX_AIR_DATA_SWITCHING_KNOB',
     vsBaro = 'L:A32NX_ADIRS_ADR_1_BAROMETRIC_VERTICAL_SPEED',
@@ -289,6 +293,10 @@ export enum PFDVars {
     showSpeedMargins = 'L:A32NX_PFD_SHOW_SPEED_MARGINS',
     upperSpeedMargin = 'L:A32NX_PFD_UPPER_SPEED_MARGIN',
     lowerSpeedMargin = 'L:A32NX_PFD_LOWER_SPEED_MARGIN',
+    fwc1AltAlertPulsing = 'L:A32NX_FWS_FWC_1_ALT_ALERT_PULSING',
+    fwc2AltAlertPulsing = 'L:A32NX_FWS_FWC_2_ALT_ALERT_PULSING',
+    fwc1AltAlertFlashing = 'L:A32NX_FWS_FWC_1_ALT_ALERT_FLASHING',
+    fwc2AltAlertFlashing = 'L:A32NX_FWS_FWC_2_ALT_ALERT_FLASHING',
   }
 
 /** A publisher to poll and publish nav/com simvars. */
@@ -436,6 +444,10 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['showSpeedMargins', { name: PFDVars.showSpeedMargins, type: SimVarValueType.Bool }],
         ['upperSpeedMargin', { name: PFDVars.upperSpeedMargin, type: SimVarValueType.Knots }],
         ['lowerSpeedMargin', { name: PFDVars.lowerSpeedMargin, type: SimVarValueType.Knots }],
+        ['fwc1AltAlertPulsing', { name: PFDVars.fwc1AltAlertPulsing, type: SimVarValueType.Bool }],
+        ['fwc2AltAlertPulsing', { name: PFDVars.fwc2AltAlertPulsing, type: SimVarValueType.Bool }],
+        ['fwc1AltAlertFlashing', { name: PFDVars.fwc1AltAlertFlashing, type: SimVarValueType.Bool }],
+        ['fwc2AltAlertFlashing', { name: PFDVars.fwc2AltAlertFlashing, type: SimVarValueType.Bool }],
     ])
 
     public constructor(bus: EventBus) {
