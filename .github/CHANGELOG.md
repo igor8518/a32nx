@@ -22,6 +22,7 @@
 1. [MCDU] Added imperial runway length - @derl30n (Leon)
 1. [MCDU] Refactor and improve input handling and conversions in MCDU W&B - @sidnov (Sid)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [FLIGHTMODEL] Improve flight handling characteristics and landing gear simulation - @donstim (donbikes#4084)
 
 ## 0.8.0
 
