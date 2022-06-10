@@ -26,6 +26,7 @@
 1. [ECAM] Fix erroneous SLATS NOT IN T.O CONFIG warning during flaps 3 takeoff - @beheh (Benedict Etzel)
 1. [MODEL] Improved rivet mesh with more variation and detail - @Grinde (Grinde#4017)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [FLIGHTMODEL] Improve flight handling characteristics and landing gear simulation - @donstim (donbikes#4084)
 
 ## 0.8.0
 
