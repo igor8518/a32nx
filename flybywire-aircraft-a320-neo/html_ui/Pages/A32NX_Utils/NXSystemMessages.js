@@ -91,6 +91,8 @@ const NXSystemMessages = {
     arptTypeAlreadyInUse:   new TypeIMessage("ARPT/TYPE ALREADY USED"),
     cancelAtisUpdate:       new TypeIMessage("CANCEL UPDATE BEFORE"),
     stepAboveMaxFl:         new TypeIMessage("STEP ABOVE MAX FL"),
+    keyNotActive:           new TypeIMessage("KEY NOT ACTIVE"),
+    latLonAbreviated:       new TypeIMessage("LAT/LON DISPL ABREVIATED"),
 };
 
 const NXFictionalMessages = {
