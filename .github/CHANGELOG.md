@@ -34,6 +34,7 @@
 1. [MCDU] Added formatter to improve text alignment and ease integration - @derl30n (Leon)
 1. [FLIGHTMODEL] Improve flight handling characteristics, ground effect, and landing gear simulation - @donstim (donbikes#4084)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [MCDU] Added formatter to improve text alignment and ease integration - @derl30n (Leon)
 
 ## 0.8.0
 
