@@ -37,6 +37,7 @@
 1. [HYD] Fixed too slow leak measurement valves operation - @Crocket63 (crocket)
 1. [ISIS] Added temporary ISIS font with arrows - @aweissoertel (Alexibexi#7550)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [FLIGHTMODEL] Improve flight handling characteristics, ground effect, and landing gear simulation - @donstim (donbikes#4084)
 
 ## 0.8.0
 
