@@ -75,6 +75,7 @@
 1. [HYD] Added optional auxiliary hydraulic section in core hydraulic circuits - @Crocket63
 1. [EFB] Added SimBridge Health Check icon to Status Bar - @frankkopp (Frank Kopp)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [FLIGHTMODEL] Improve flight handling characteristics, ground effect, and landing gear simulation - @donstim (donbikes#4084)
 
 ## 0.8.0
 
