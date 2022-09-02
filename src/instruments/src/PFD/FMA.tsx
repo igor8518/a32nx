@@ -48,6 +48,8 @@ export class FMA extends DisplayComponent<{ bus: EventBus, isAttExcessive: Subsc
 
     private setHoldSpeed = false;
 
+    private tdReached = false;
+
     private tcasRaInhibited = Subject.create(false);
 
     private trkFpaDeselected = Subject.create(false);
@@ -66,7 +68,7 @@ export class FMA extends DisplayComponent<{ bus: EventBus, isAttExcessive: Subsc
         const sharedModeActive = this.activeLateralMode === 32 || this.activeLateralMode === 33
             || this.activeLateralMode === 34 || (this.activeLateralMode === 20 && this.activeVerticalMode === 24);
         const BC3Message = getBC3Message(this.props.isAttExcessive.get(), this.armedVerticalModeSub.get(),
-            this.setHoldSpeed, this.trkFpaDeselected.get(), this.tcasRaInhibited.get(), this.fcdcDiscreteWord1, this.fwcFlightPhase)[0] !== null;
+            this.setHoldSpeed, this.trkFpaDeselected.get(), this.tcasRaInhibited.get(), this.fcdcDiscreteWord1, this.fwcFlightPhase, this.tdReached)[0] !== null;
 
         const engineMessage = this.athrModeMessage;
         const AB3Message = (this.machPreselVal !== -1
@@ -138,6 +140,11 @@ export class FMA extends DisplayComponent<{ bus: EventBus, isAttExcessive: Subsc
 
         sub.on('trkFpaDeselectedTCAS').whenChanged().handle((trk) => {
             this.trkFpaDeselected.set(trk);
+            this.handleFMABorders();
+        });
+
+        sub.on('tdReached').whenChanged().handle((tdr) => {
+            this.tdReached = tdr;
             this.handleFMABorders();
         });
 
@@ -1179,6 +1186,7 @@ const getBC3Message = (
     tcasRaInhibited: boolean,
     fcdcWord1: Arinc429Word,
     fwcFlightPhase: number,
+    tdReached: boolean,
 ) => {
     const armedVerticalBitmask = armedVerticalMode;
     const TCASArmed = (armedVerticalBitmask >> 6) & 1;
@@ -1217,7 +1225,7 @@ const getBC3Message = (
     } else if (false) {
         text = 'SET GREEN DOT SPEED';
         className = 'White';
-    } else if (false) {
+    } else if (tdReached) {
         text = 'T/D REACHED';
         className = 'White';
     } else if (false) {
@@ -1263,14 +1271,14 @@ class BC3Cell extends DisplayComponent<{ isAttExcessive: Subscribable<boolean>, 
 
     private trkFpaDeselected = false;
 
+    private tdReached = false;
+
     private fcdcDiscreteWord1 = new Arinc429Word(0);
 
     private fwcFlightPhase = 0;
 
     private fillBC3Cell() {
-        const [text, className] = getBC3Message(
-            this.isAttExcessive, this.armedVerticalMode, this.setHoldSpeed, this.trkFpaDeselected, this.tcasRaInhibited, this.fcdcDiscreteWord1, this.fwcFlightPhase,
-        );
+        const [text, className] = getBC3Message(this.isAttExcessive, this.armedVerticalMode, this.setHoldSpeed, this.trkFpaDeselected, this.tcasRaInhibited, this.fcdcDiscreteWord1, this.fwcFlightPhase, this.tdReached);
         this.classNameSub.set(`FontMedium MiddleAlign ${className}`);
         if (text !== null) {
             this.bc3Cell.instance.innerHTML = text;
@@ -1306,6 +1314,11 @@ class BC3Cell extends DisplayComponent<{ isAttExcessive: Subscribable<boolean>, 
 
         sub.on('trkFpaDeselectedTCAS').whenChanged().handle((trk) => {
             this.trkFpaDeselected = trk;
+            this.fillBC3Cell();
+        });
+
+        sub.on('tdReached').whenChanged().handle((shs) => {
+            this.tdReached = shs;
             this.fillBC3Cell();
         });
 
