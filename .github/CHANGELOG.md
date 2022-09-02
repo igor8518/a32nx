@@ -76,6 +76,7 @@
 1. [EFB] Added SimBridge Health Check icon to Status Bar - @frankkopp (Frank Kopp)
 1. [HYD] Fix gear extending whith dual lgciu power loss - @Crocket63 (crocket)
 1. [EFB] flyPad pushback option to ignore controller inputs - @frankkopp (Frank Kopp)
+1. [FLIGHTMODEL] Improve flight handling characteristics, ground effect, and landing gear simulation - @donstim (donbikes#4084)
 
 ## 0.8.0
 
