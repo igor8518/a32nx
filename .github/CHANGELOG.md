@@ -77,6 +77,7 @@
 1. [EFB] flyPad pushback option to ignore controller inputs - @frankkopp (Frank Kopp)
 1. [FCTL] Add realistically simulated F/CTL computers: ELAC/SEC/FCDC/FAC - @lukecologne (luke)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 
 ## 0.8.0
 
