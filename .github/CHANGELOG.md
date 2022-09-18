@@ -78,6 +78,7 @@
 1. [FCTL] Add realistically simulated F/CTL computers: ELAC/SEC/FCDC/FAC - @lukecologne (luke)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
+1. [FLIGHTMODEL] Improve flight handling characteristics, ground effect, and landing gear simulation - @donstim (donbikes#4084)
 
 ## 0.8.0
 
