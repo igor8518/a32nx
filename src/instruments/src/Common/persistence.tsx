@@ -40,6 +40,17 @@ export function usePersistentNumberProperty(propertyName: string, defaultValue?:
     return [propertyValue, propertySetter];
 }
 
+export function usePersistentFloatProperty(propertyName: string, defaultValue: number): [number, (value: number) => void];
+export function usePersistentFloatProperty(propertyName: string, defaultValue?: number): [number | undefined, (value: number) => void];
+export function usePersistentFloatProperty(propertyName: string, defaultValue?: number): any {
+    const [strPropertyValue, strPropertySetter] = usePersistentProperty(propertyName, defaultValue !== undefined ? `${defaultValue}` : undefined);
+
+    const propertyValue = strPropertyValue !== undefined ? parseFloat(strPropertyValue) : undefined;
+    const propertySetter = (value: number) => strPropertySetter(`${value}`);
+
+    return [propertyValue, propertySetter];
+}
+
 const getLocalStorage = (propertyName: string, defaultValue?: string) => {
     const value: string | null = localStorage.getItem(propertyName);
     if (value) {
