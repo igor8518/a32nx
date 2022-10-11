@@ -84,6 +84,7 @@ export interface PFDSimvars {
     engTwoRunning: boolean;
     expediteMode: boolean;
     setHoldSpeed: boolean;
+    tdReached: boolean;
     trkFpaDeselectedTCAS: boolean;
     tcasRaInhibited: boolean;
     groundSpeed: number;
@@ -149,6 +150,12 @@ export interface PFDSimvars {
     fwc2AltAlertPulsing: boolean,
     fwc1AltAlertFlashing: boolean,
     fwc2AltAlertFlashing: boolean,
+    linearDeviationActive: boolean;
+    targetAltitude: number;
+    verticalProfileLatched: boolean;
+    showSpeedMargins: boolean;
+    upperSpeedMargin: number;
+    lowerSpeedMargin: number;
   }
 
 export enum PFDVars {
@@ -234,6 +241,7 @@ export enum PFDVars {
     engTwoRunning = 'GENERAL ENG COMBUSTION:2',
     expediteMode = 'L:A32NX_FMA_EXPEDITE_MODE',
     setHoldSpeed = 'L:A32NX_PFD_MSG_SET_HOLD_SPEED',
+    tdReached = 'L:A32NX_PFD_MSG_TD_REACHED',
     trkFpaDeselectedTCAS= 'L:A32NX_AUTOPILOT_TCAS_MESSAGE_TRK_FPA_DESELECTION',
     tcasRaInhibited = 'L:A32NX_AUTOPILOT_TCAS_MESSAGE_RA_INHIBITED',
     groundSpeed = 'L:A32NX_ADIRS_IR_1_GROUND_SPEED',
@@ -299,6 +307,12 @@ export enum PFDVars {
     fwc2AltAlertPulsing = 'L:A32NX_FWS_FWC_2_ALT_ALERT_PULSING',
     fwc1AltAlertFlashing = 'L:A32NX_FWS_FWC_1_ALT_ALERT_FLASHING',
     fwc2AltAlertFlashing = 'L:A32NX_FWS_FWC_2_ALT_ALERT_FLASHING',
+    linearDeviationActive = 'L:A32NX_PFD_LINEAR_DEVIATION_ACTIVE',
+    targetAltitude = 'L:A32NX_PFD_TARGET_ALTITUDE',
+    verticalProfileLatched = 'L:A32NX_PFD_VERTICAL_PROFILE_LATCHED',
+    showSpeedMargins = 'L:A32NX_PFD_SHOW_SPEED_MARGINS',
+    upperSpeedMargin = 'L:A32NX_PFD_UPPER_SPEED_MARGIN',
+    lowerSpeedMargin = 'L:A32NX_PFD_LOWER_SPEED_MARGIN',
   }
 
 /** A publisher to poll and publish nav/com simvars. */
@@ -386,6 +400,7 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['engTwoRunning', { name: PFDVars.engTwoRunning, type: SimVarValueType.Bool }],
         ['expediteMode', { name: PFDVars.expediteMode, type: SimVarValueType.Bool }],
         ['setHoldSpeed', { name: PFDVars.setHoldSpeed, type: SimVarValueType.Bool }],
+        ['tdReached', { name: PFDVars.tdReached, type: SimVarValueType.Bool }],
         ['trkFpaDeselectedTCAS', { name: PFDVars.trkFpaDeselectedTCAS, type: SimVarValueType.Bool }],
         ['tcasRaInhibited', { name: PFDVars.tcasRaInhibited, type: SimVarValueType.Bool }],
         ['groundSpeed', { name: PFDVars.groundSpeed, type: SimVarValueType.Number }],
@@ -451,6 +466,12 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['fwc2AltAlertPulsing', { name: PFDVars.fwc2AltAlertPulsing, type: SimVarValueType.Bool }],
         ['fwc1AltAlertFlashing', { name: PFDVars.fwc1AltAlertFlashing, type: SimVarValueType.Bool }],
         ['fwc2AltAlertFlashing', { name: PFDVars.fwc2AltAlertFlashing, type: SimVarValueType.Bool }],
+        ['linearDeviationActive', { name: PFDVars.linearDeviationActive, type: SimVarValueType.Bool }],
+        ['targetAltitude', { name: PFDVars.targetAltitude, type: SimVarValueType.Feet }],
+        ['verticalProfileLatched', { name: PFDVars.verticalProfileLatched, type: SimVarValueType.Bool }],
+        ['showSpeedMargins', { name: PFDVars.showSpeedMargins, type: SimVarValueType.Bool }],
+        ['upperSpeedMargin', { name: PFDVars.upperSpeedMargin, type: SimVarValueType.Knots }],
+        ['lowerSpeedMargin', { name: PFDVars.lowerSpeedMargin, type: SimVarValueType.Knots }],
     ])
 
     public constructor(bus: EventBus) {

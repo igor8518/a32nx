@@ -122,6 +122,7 @@
 1. [EFB] Added deboarding button to flyPad Payload - @frankkopp (Frank Kopp)
 1. [EFB] Improved simbridge-client connection handling - @frankkopp (Frank Kopp)
 1. [HYD] Tilting gear mechanism - @Crocket63 (crocket)
+1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 
 ## 0.8.0
 
