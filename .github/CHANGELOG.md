@@ -92,6 +92,7 @@
 1. [FMGC] Rework f-pln departure page - @tracernz (Mike)
 1. [MCDU] Support coroute loading and viewing - @lucky38i (Alex)
 1. [HYD] Fixed autobrake controller tuning - @Crocket63 (crocket)
+1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 
 ## 0.8.0
 
