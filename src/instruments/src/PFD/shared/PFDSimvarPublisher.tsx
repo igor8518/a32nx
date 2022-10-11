@@ -83,6 +83,7 @@ export interface PFDSimvars {
     engTwoRunning: boolean;
     expediteMode: boolean;
     setHoldSpeed: boolean;
+    tdReached: boolean;
     trkFpaDeselectedTCAS: boolean;
     tcasRaInhibited: boolean;
     groundSpeed: number;
@@ -153,6 +154,12 @@ export interface PFDSimvars {
     trueHeadingRaw: number;
     trueTrackRaw: number;
     slatPosLeft: number;
+    linearDeviationActive: boolean;
+    targetAltitude: number;
+    verticalProfileLatched: boolean;
+    showSpeedMargins: boolean;
+    upperSpeedMargin: number;
+    lowerSpeedMargin: number;
   }
 
 export enum PFDVars {
@@ -237,6 +244,7 @@ export enum PFDVars {
     engTwoRunning = 'GENERAL ENG COMBUSTION:2',
     expediteMode = 'L:A32NX_FMA_EXPEDITE_MODE',
     setHoldSpeed = 'L:A32NX_PFD_MSG_SET_HOLD_SPEED',
+    tdReached = 'L:A32NX_PFD_MSG_TD_REACHED',
     trkFpaDeselectedTCAS= 'L:A32NX_AUTOPILOT_TCAS_MESSAGE_TRK_FPA_DESELECTION',
     tcasRaInhibited = 'L:A32NX_AUTOPILOT_TCAS_MESSAGE_RA_INHIBITED',
     groundSpeed = 'L:A32NX_ADIRS_IR_1_GROUND_SPEED',
@@ -307,6 +315,12 @@ export enum PFDVars {
     trueHeadingRaw = 'L:A32NX_ADIRS_IR_1_TRUE_HEADING',
     trueTrackRaw = 'L:A32NX_ADIRS_IR_1_TRUE_TRACK',
     slatPosLeft = 'L:A32NX_LEFT_SLATS_ANGLE',
+    linearDeviationActive = 'L:A32NX_PFD_LINEAR_DEVIATION_ACTIVE',
+    targetAltitude = 'L:A32NX_PFD_TARGET_ALTITUDE',
+    verticalProfileLatched = 'L:A32NX_PFD_VERTICAL_PROFILE_LATCHED',
+    showSpeedMargins = 'L:A32NX_PFD_SHOW_SPEED_MARGINS',
+    upperSpeedMargin = 'L:A32NX_PFD_UPPER_SPEED_MARGIN',
+    lowerSpeedMargin = 'L:A32NX_PFD_LOWER_SPEED_MARGIN',
   }
 
 /** A publisher to poll and publish nav/com simvars. */
@@ -393,6 +407,7 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['engTwoRunning', { name: PFDVars.engTwoRunning, type: SimVarValueType.Bool }],
         ['expediteMode', { name: PFDVars.expediteMode, type: SimVarValueType.Bool }],
         ['setHoldSpeed', { name: PFDVars.setHoldSpeed, type: SimVarValueType.Bool }],
+        ['tdReached', { name: PFDVars.tdReached, type: SimVarValueType.Bool }],
         ['trkFpaDeselectedTCAS', { name: PFDVars.trkFpaDeselectedTCAS, type: SimVarValueType.Bool }],
         ['tcasRaInhibited', { name: PFDVars.tcasRaInhibited, type: SimVarValueType.Bool }],
         ['groundSpeed', { name: PFDVars.groundSpeed, type: SimVarValueType.Number }],
@@ -463,6 +478,12 @@ export class PFDSimvarPublisher extends SimVarPublisher<PFDSimvars> {
         ['trueHeadingRaw', { name: PFDVars.trueHeadingRaw, type: SimVarValueType.Number }],
         ['trueTrackRaw', { name: PFDVars.trueTrackRaw, type: SimVarValueType.Number }],
         ['slatPosLeft', { name: PFDVars.slatPosLeft, type: SimVarValueType.Number }],
+        ['linearDeviationActive', { name: PFDVars.linearDeviationActive, type: SimVarValueType.Bool }],
+        ['targetAltitude', { name: PFDVars.targetAltitude, type: SimVarValueType.Feet }],
+        ['verticalProfileLatched', { name: PFDVars.verticalProfileLatched, type: SimVarValueType.Bool }],
+        ['showSpeedMargins', { name: PFDVars.showSpeedMargins, type: SimVarValueType.Bool }],
+        ['upperSpeedMargin', { name: PFDVars.upperSpeedMargin, type: SimVarValueType.Knots }],
+        ['lowerSpeedMargin', { name: PFDVars.lowerSpeedMargin, type: SimVarValueType.Knots }],
     ])
 
     public constructor(bus: EventBus) {
