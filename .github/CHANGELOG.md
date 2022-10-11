@@ -84,6 +84,7 @@
 1. [EFB] Added Local Files support - @ErickSharp (Erick Torres) @frankkopp (Frank Kopp)
 1. [BLEED] Added custom Wing Anti-Ice model - @omrygin, @Eagle941 (Joe)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 
 ## 0.8.0
 
