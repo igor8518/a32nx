@@ -83,6 +83,7 @@
 1. [MODEL] Fixed screens flickering in SU10 - @tyler58546 (tyler58546)
 1. [EFB] Added Local Files support - @ErickSharp (Erick Torres) @frankkopp (Frank Kopp)
 1. [BLEED] Added custom Wing Anti-Ice model - @omrygin, @Eagle941 (Joe)
+1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 
 ## 0.8.0
 
