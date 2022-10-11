@@ -97,6 +97,7 @@
 1. [FLIGHTMODEL] Flight Model update - @donstim (donbikes#4084)
 1. [HYD] Fix incorrect gain in down pitch commands - @Crocket63 (crocket)
 1. [PFD] Improve appearance of L/DEV and V/DEV scales - @tracernz (Mike)
+1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 
 ## 0.8.0
 

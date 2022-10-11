@@ -628,6 +628,11 @@ export class LegsProcedure {
       // our fallback for threshold crossing altitude is threshold + 50 feet
       let threshCrossAlt = runway.thresholdElevation + 15.24;
 
+      // if the last waypoint is the MAP, use its altitude instead
+      if (this._legs[this._legs.length - 1].fixTypeFlags & FixTypeFlags.MAP) {
+        threshCrossAlt = this._legs[this._legs.length - 1].altitude1;
+      }
+
       // see if we have a runway fix, to give us coded TCH
       // it can either be the MAP, or be before the MAP (MAP must be last leg of final approach)
       // TCH altitude must be coded in altitude1 according to ARINC

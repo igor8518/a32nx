@@ -80,7 +80,16 @@ export const ArcMode: React.FC<ArcModeProps> = ({ symbols, adirsAlign, rangeSett
                             || fmaLatMode === LateralMode.HDG
                             || fmaLatMode === LateralMode.TRACK)
                             && !isArmed(armedLateralBitmask, ArmedLateralMode.NAV)) && (
-                            <TrackLine x={384} y={620} heading={heading} track={track} />
+                            <TrackLine
+                                x={384}
+                                y={620}
+                                heading={heading}
+                                track={track}
+                                groundSpeed={Number(MathUtils.fastToFixed(groundSpeed, 2))}
+                                mapParams={mapParams}
+                                symbols={symbols}
+                                ndRange={rangeSetting}
+                            />
                         )}
                     </g>
                     <RadioNeedle index={1} side={side} displayMode={Mode.ARC} centreHeight={620} />
@@ -160,22 +169,22 @@ const Overlay: React.FC<OverlayProps> = memo(({ heading, rangeSetting, tcasMode 
             )}
             { (tcasMode > 0 && rangeSetting === 10) && (
                 <g>
-                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="White rounded" transform="rotate(-60 384 620)" />
-                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="White rounded" transform="rotate(-30 384 620)" />
-                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="White rounded" transform="rotate(0 384 620)" />
-                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="White rounded" transform="rotate(30 384 620)" />
-                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="White rounded" transform="rotate(60 384 620)" />
+                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="rounded White" transform="rotate(-60 384 620)" />
+                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="rounded White" transform="rotate(-30 384 620)" />
+                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="rounded White" transform="rotate(0 384 620)" />
+                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="rounded White" transform="rotate(30 384 620)" />
+                    <line x1={384} x2={384} y1={497 - 6} y2={497 + 6} className="rounded White" transform="rotate(60 384 620)" />
                 </g>
             )}
 
             {/* R = 62 */}
             { (tcasMode > 0 && rangeSetting === 20) && (
                 <g>
-                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="White rounded" transform="rotate(-60 384 620)" />
-                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="White rounded" transform="rotate(-30 384 620)" />
-                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="White rounded" transform="rotate(0 384 620)" />
-                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="White rounded" transform="rotate(30 384 620)" />
-                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="White rounded" transform="rotate(60 384 620)" />
+                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="rounded White" transform="rotate(-60 384 620)" />
+                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="rounded White" transform="rotate(-30 384 620)" />
+                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="rounded White" transform="rotate(0 384 620)" />
+                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="rounded White" transform="rotate(30 384 620)" />
+                    <line x1={384} x2={384} y1={558 - 6} y2={558 + 6} className="rounded White" transform="rotate(60 384 620)" />
                 </g>
             )}
         </g>
@@ -606,13 +615,13 @@ const TrackBug: React.FC<{heading: number, track: number}> = memo(({ heading, tr
             <path
                 d="M384,128 L378,138 L384,148 L390,138 L384,128"
                 transform={`rotate(${diff} 384 620)`}
-                className="shadow rounded"
+                className="rounded shadow"
                 strokeWidth={3.5}
             />
             <path
                 d="M384,128 L378,138 L384,148 L390,138 L384,128"
                 transform={`rotate(${diff} 384 620)`}
-                className="Green rounded"
+                className="rounded Green"
                 strokeWidth={3}
             />
         </>
@@ -630,13 +639,13 @@ const LsCourseBug: React.FC<{heading: number, lsCourse: number}> = ({ heading, l
             <path
                 d="M384,122 L384,74 M376,114 L392,114"
                 transform={`rotate(${diff} 384 620)`}
-                className="shadow rounded"
+                className="rounded shadow"
                 strokeWidth={2.5}
             />
             <path
                 d="M384,122 L384,74 M376,114 L392,114"
                 transform={`rotate(${diff} 384 620)`}
-                className="Magenta rounded"
+                className="rounded Magenta"
                 strokeWidth={2}
             />
         </>
@@ -655,13 +664,13 @@ const SelectedHeadingBug: React.FC<{heading: number, selected: number}> = ({ hea
                 <path
                     d="M382,126 L370,99 L398,99 L386,126"
                     transform={`rotate(${diff} 384 620)`}
-                    className="shadow rounded"
+                    className="rounded shadow"
                     strokeWidth={3.5}
                 />
                 <path
                     d="M382,126 L370,99 L398,99 L386,126"
                     transform={`rotate(${diff} 384 620)`}
-                    className="Cyan rounded"
+                    className="rounded Cyan"
                     strokeWidth={3}
                 />
             </>
@@ -673,7 +682,7 @@ const SelectedHeadingBug: React.FC<{heading: number, selected: number}> = ({ hea
             y={60}
             textAnchor="middle"
             transform={`rotate(${(diff) < 0 ? -38 : 38} 384 620)`}
-            className="Cyan shadow"
+            className="shadow Cyan"
             fontSize={22}
         >
             {`${Math.round(selected).toString().padStart(3, '0')}`}
