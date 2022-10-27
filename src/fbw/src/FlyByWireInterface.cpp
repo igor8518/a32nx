@@ -233,7 +233,7 @@ void FlyByWireInterface::loadConfiguration() {
   std::cout << "WASM: FLIGHT_CONTROLS : KEY_CHANGE_ELEVATOR = " << flightControlsKeyChangeElevator << std::endl;
   std::cout << "WASM: FLIGHT_CONTROLS : KEY_CHANGE_RUDDER = " << flightControlsKeyChangeRudder << std::endl;
   std::cout << "WASM: FLIGHT_CONTROLS : DISABLE_XBOX_COMPATIBILITY_RUDDER_AXIS_PLUS_MINUS = " << disableXboxCompatibilityRudderAxisPlusMinus
-       << std::endl;
+            << std::endl;
 
   // --------------------------------------------------------------------------
   // load values - logging
@@ -354,7 +354,7 @@ void FlyByWireInterface::setupLocalVariables() {
   idFmgcAccelerationAltitudeGoAround = std::make_unique<LocalVariable>("AIRLINER_ACC_ALT_GOAROUND");
   idFmgcAccelerationAltitudeGoAroundEngineOut = std::make_unique<LocalVariable>("AIRLINER_ENG_OUT_ACC_ALT_GOAROUND");
   idFmgcCruiseAltitude = std::make_unique<LocalVariable>("AIRLINER_CRUISE_ALTITUDE");
-  idFmgcFlexTemperature = std::make_unique<LocalVariable>("AIRLINER_TO_FLEX_TEMP");
+  idFmgcFlexTemperature = std::make_unique<LocalVariable>("A32NX_TO_FLEX_TEMP");
 
   idFlightGuidanceAvailable = std::make_unique<LocalVariable>("A32NX_FG_AVAIL");
   idFlightGuidanceCrossTrackError = std::make_unique<LocalVariable>("A32NX_FG_CROSS_TRACK_ERROR");
@@ -643,15 +643,19 @@ void FlyByWireInterface::setupLocalVariables() {
     std::string yawDamperString = i == 0 ? "GREEN" : "YELLOW";
     std::string idString = std::to_string(i + 1);
 
-    idLeftAileronSolenoidEnergized[i] = std::make_unique<LocalVariable>("A32NX_LEFT_AIL_" + aileronStringLeft + "_SERVO_SOLENOID_ENERGIZED");
+    idLeftAileronSolenoidEnergized[i] =
+        std::make_unique<LocalVariable>("A32NX_LEFT_AIL_" + aileronStringLeft + "_SERVO_SOLENOID_ENERGIZED");
     idLeftAileronCommandedPosition[i] = std::make_unique<LocalVariable>("A32NX_LEFT_AIL_" + aileronStringLeft + "_COMMANDED_POSITION");
-    idRightAileronSolenoidEnergized[i] = std::make_unique<LocalVariable>("A32NX_RIGHT_AIL_" + aileronStringRight + "_SERVO_SOLENOID_ENERGIZED");
+    idRightAileronSolenoidEnergized[i] =
+        std::make_unique<LocalVariable>("A32NX_RIGHT_AIL_" + aileronStringRight + "_SERVO_SOLENOID_ENERGIZED");
     idRightAileronCommandedPosition[i] = std::make_unique<LocalVariable>("A32NX_RIGHT_AIL_" + aileronStringRight + "_COMMANDED_POSITION");
-    idLeftElevatorSolenoidEnergized[i] = std::make_unique<LocalVariable>("A32NX_LEFT_ELEV_" + elevatorStringLeft + "_SERVO_SOLENOID_ENERGIZED");
+    idLeftElevatorSolenoidEnergized[i] =
+        std::make_unique<LocalVariable>("A32NX_LEFT_ELEV_" + elevatorStringLeft + "_SERVO_SOLENOID_ENERGIZED");
     idLeftElevatorCommandedPosition[i] = std::make_unique<LocalVariable>("A32NX_LEFT_ELEV_" + elevatorStringLeft + "_COMMANDED_POSITION");
     idRightElevatorSolenoidEnergized[i] =
         std::make_unique<LocalVariable>("A32NX_RIGHT_ELEV_" + elevatorStringRight + "_SERVO_SOLENOID_ENERGIZED");
-    idRightElevatorCommandedPosition[i] = std::make_unique<LocalVariable>("A32NX_RIGHT_ELEV_" + elevatorStringRight + "_COMMANDED_POSITION");
+    idRightElevatorCommandedPosition[i] =
+        std::make_unique<LocalVariable>("A32NX_RIGHT_ELEV_" + elevatorStringRight + "_COMMANDED_POSITION");
 
     idYawDamperSolenoidEnergized[i] = std::make_unique<LocalVariable>("A32NX_YAW_DAMPER_" + yawDamperString + "_SERVO_SOLENOID_ENERGIZED");
     idYawDamperCommandedPosition[i] = std::make_unique<LocalVariable>("A32NX_YAW_DAMPER_" + yawDamperString + "_COMMANDED_POSITION");
