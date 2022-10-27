@@ -93,6 +93,7 @@
 1. [MCDU] Support coroute loading and viewing - @lucky38i (Alex)
 1. [HYD] Fixed autobrake controller tuning - @Crocket63 (crocket)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 
 ## 0.8.0
 
