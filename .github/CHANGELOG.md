@@ -96,6 +96,7 @@
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 1. [ENGINE] Improved engine primary parameters performance (EGT & Fuel Flow) - @Taz5150 (TazX [Z+2]#0405)
+1. [ENGINE] Fix Engine Flex Calculations - @Taz5150 (TazX [Z+2]#0405)
 
 ## 0.8.0
 
