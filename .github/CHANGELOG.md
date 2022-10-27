@@ -98,6 +98,7 @@
 1. [HYD] Fix incorrect gain in down pitch commands - @Crocket63 (crocket)
 1. [PFD] Improve appearance of L/DEV and V/DEV scales - @tracernz (Mike)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [RMP] RMPs navigation backup - Julian Sebline (Julian Sebline#8476 on Discord)
 
 ## 0.8.0
 
