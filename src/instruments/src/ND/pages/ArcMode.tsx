@@ -13,6 +13,7 @@ import { ApproachMessage } from '../elements/ApproachMessage';
 import { CrossTrack } from '../elements/CrossTrack';
 import { TrackLine } from '../elements/TrackLine';
 import { Traffic } from '../elements/Traffic';
+import { TerrainMap } from '../elements/TerrainMap';
 
 export interface ArcModeProps {
     symbols: NdSymbol[],
@@ -58,6 +59,7 @@ export const ArcMode: React.FC<ArcModeProps> = ({ symbols, adirsAlign, rangeSett
     if (adirsAlign) {
         return (
             <>
+                <TerrainMap x={-108} y={128} width={984} height={492} side={side} potentiometerIndex={side === 'L' ? 94 : 95} clipName="arc-mode-map-clip" />
                 <Overlay
                     heading={heading}
                     rangeSetting={rangeSetting}
