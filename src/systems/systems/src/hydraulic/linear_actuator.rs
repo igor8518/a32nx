@@ -45,7 +45,7 @@ pub trait BoundedLinearLength {
     fn absolute_length_to_anchor(&self) -> Length;
 }
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum LinearActuatorMode {
     ClosedValves,
     PositionControl,
