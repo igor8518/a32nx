@@ -94,8 +94,8 @@ export class ConstraintReader {
                 }
             }
 
-            if (i === fpm.getDestinationIndex() && waypoint.verticalAngle) {
-                this.finalDescentAngle = waypoint.verticalAngle;
+            if (i === fpm.getDestinationIndex() && waypoint.additionalData.verticalAngle) {
+                this.finalDescentAngle = -waypoint.additionalData.verticalAngle;
             }
 
             if ((waypoint.additionalData.fixTypeFlags & FixTypeFlags.FAF) > 0) {
