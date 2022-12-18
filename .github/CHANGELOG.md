@@ -24,6 +24,7 @@
 1. [MISC] Added aircraft version check and uer notification - @frankkopp (Frank Kopp)
 1. [EFB] Added boarding time indication to Payload page - @ChristianLutzCL (Christian Lutz) @frankkopp (Frank Kopp)
 1. [ADIRU/ND/PFD] Initial support for polar navigation - @tracernz (Mike)
+1. [MISC] Added aircraft version check and uer notification - @frankkopp (Frank Kopp) 
 
 ## 0.9.0
 
@@ -1160,4 +1161,3 @@
 1. [DCDU] Fixed MSG- and MSG+ button labels - @tyler58546 (tyler58546)
 1. [ISIS] Fixed issue where ISIS was allowing a bug to be set while in the OFF state - Patrick Macken (@Pat M on
    Discord)
-1. [EFB] Added estimated boarding time to Payload screen - @ChristianLutzCL (Christian Lutz)
