@@ -9,7 +9,7 @@ function airplaneCanBoard() {
     return !(gs > 0.1 || eng1Running || eng2Running || !isOnGround || (!busDC2 && !busDCHot1));
 }
 
-function setDefaultWeights(simbriefPaxWeight, simbriefBagWeight) {
+async function setDefaultWeights(simbriefPaxWeight, simbriefBagWeight) {
     const perPaxWeight = (simbriefPaxWeight === 0) ? Math.round(NXUnits.kgToUser(84)) : simbriefPaxWeight;
     const perBagWeight = (simbriefBagWeight === 0) ? Math.round(NXUnits.kgToUser(20)) : simbriefBagWeight;
     const conversionFactor = (getUserUnit() == "Kilograms") ? 0.4535934 : 1;
