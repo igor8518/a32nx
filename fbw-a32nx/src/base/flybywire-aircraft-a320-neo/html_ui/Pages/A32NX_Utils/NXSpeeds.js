@@ -512,7 +512,7 @@ class NXSpeedsTo {
      * @param alt {number} field altitude
      */
     constructor(m = 60, fPos = 1, alt = 0) {
-        this.v2 = Math.floor(to[fPos - 1][_correctMass(m)](m) + (fPos === 2 ? (Math.abs(alt * 0.0002)) : 0));
+        this.v2 = Math.floor(to[fPos - 1][_correctMass(m)](m) + (fPos === 2 ? (Math.abs(alt * 0.0002)) : 0)) + 5;
         this.vr = this.v2 - 4;
         this.v1 = this.v2 - 5;
     }
@@ -527,11 +527,11 @@ class NXSpeedsApp {
      */
     constructor(m, isConf3, wind = (SimVar.GetSimVarValue("AIRCRAFT WIND Z", "knots") * -1)) {
         const cm = _correctMass(m);
-        this.vls = vls[isConf3 ? 3 : 4][cm](m, 1);
+        this.vls = vls[isConf3 ? 3 : 4][cm](m, 1) + 5;
         this.vapp = this.vls + NXSpeedsUtils.addWindComponent(wind / 3);
-        this.f = f[cm](m);
-        this.s = s[cm](m);
-        this.gd = _computeGD(m);
+        this.f = f[cm](m) + 5;
+        this.s = s[cm](m) + 5;
+        this.gd = _computeGD(m) + 5;
         this.valid = true;
     }
 }
