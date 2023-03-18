@@ -81,6 +81,8 @@
 1. [HYD] New aerodynamic model for RAT turbine / Added A320 RAT anti stall valve system - @Crocket63 (crocket)
 1. [FMS] Implement vertical navigation functions - @BlueberryKing (BlueberryKing)
 1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
+1. [EFB] Allow payload page passenger seating to be manipulated by external apps & WASM via LocalVars - @2hwk (2Cas#1022)
+1. [EFB] GW and GWCG display on payload page - @2hwk (2Cas#1022)
 
 ## 0.9.0
 
