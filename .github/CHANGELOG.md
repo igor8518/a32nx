@@ -79,6 +79,8 @@
 1. [MCDU] Implemented TUNE BBB FFF.FF, SPECIF NDB UNAVAIL messages - @tracernz (Mike)
 1. [F/CTL] Add ELAC 2 Emergency Powersupply - @lukecologne (lukecologne#1156)
 1. [HYD] New aerodynamic model for RAT turbine / Added A320 RAT anti stall valve system - @Crocket63 (crocket)
+1. [FMS] Implement vertical navigation functions - @BlueberryKing (BlueberryKing)
+1. [EFB] Added pause at T/D function - @2hwk (2Cas#1022)
 
 ## 0.9.0
 
