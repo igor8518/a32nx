@@ -1129,6 +1129,23 @@ __attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVar
 
             // VarNames.push_back("A32NX_TARGET_GALLON");
             // VarNames.push_back("A32NX_CURRENT_GALLON");
+
+            VarNames.push_back("AI_ANGLE_HEAD");
+            VarNames.push_back("AI_NOSE_HEAD");
+
+            VarNames.push_back("AI_RUDDER_K");
+            VarNames.push_back("AI_RUDDER_P");
+            VarNames.push_back("AI_RUDDER_I");
+            VarNames.push_back("AI_RUDDER_D");
+            VarNames.push_back("AI_RUDDER_IB");
+            VarNames.push_back("AI_RUDDER_ID");
+
+            VarNames.push_back("AI_PITCH_K");
+            VarNames.push_back("AI_PITCH_P");
+            VarNames.push_back("AI_PITCH_I");
+            VarNames.push_back("AI_PITCH_D");
+            VarNames.push_back("AI_PITCH_IB");
+            VarNames.push_back("AI_PITCH_ID");
           }
 
           hr = SimConnect_CallDispatch(hSimConnect, ProcessVars, 0);
