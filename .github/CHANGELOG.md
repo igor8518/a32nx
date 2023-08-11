@@ -67,6 +67,7 @@
 1. [ATSU] Fix ATIS Auto Update LSK6L to ATIS page instead of ATC MENU - @BravoMike99 (bruno_pt99)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
+1. [MCDU] Add menu item for automatic init flight, and prepare mcdu - @igor8518 (Igor Milovidov)
 
 ## 0.10.0
 
