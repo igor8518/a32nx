@@ -10,7 +10,7 @@ type SimVarEnum = [name: string, type: string, defaultValue: string, map: Map<st
 
 function syncSetting(simVar: SimVar, propertyName: string) {
     NXDataStore.getAndSubscribe(propertyName, (prop, value) => {
-        SimVar.SetSimVarValue(simVar[0], simVar[1], parseInt(value)).catch((e) => console.log(propertyName, e));
+        SimVar.SetSimVarValue(simVar[0], simVar[1], parseFloat(value)).catch((e) => console.log(propertyName, e));
     }, simVar[2]);
 }
 
@@ -49,6 +49,20 @@ const settingsToSync: Map<string, SimVar> = new Map([
     ['CONFIG_USING_PORTABLE_DEVICES', ['L:A32NX_CONFIG_USING_PORTABLE_DEVICES', 'bool', '1']],
     ['AUTO_DELETE_DISCONTINUITY', ['L:A32NX_AUTO_DELETE_DISCONTINUITY', 'number', '1']],
     ['AUTO_SID_STAR', ['L:A32NX_AUTO_SID_STAR', 'number', '1']],
+
+    ['RUDDER_K', ['L:AI_RUDDER_K', 'float', '0']],
+    ['RUDDER_P', ['L:AI_RUDDER_P', 'float', '0']],
+    ['RUDDER_I', ['L:AI_RUDDER_I', 'float', '0']],
+    ['RUDDER_D', ['L:AI_RUDDER_D', 'float', '0']],
+    ['RUDDER_IB', ['L:AI_RUDDER_IB', 'float', '0']],
+    ['RUDDER_ID', ['L:AI_RUDDER_ID', 'float', '0']],
+
+    ['PITCH_K', ['L:AI_PITCH_K', 'float', '0']],
+    ['PITCH_P', ['L:AI_PITCH_P', 'float', '0']],
+    ['PITCH_I', ['L:AI_PITCH_I', 'float', '0']],
+    ['PITCH_D', ['L:AI_PITCH_D', 'float', '0']],
+    ['PITCH_IB', ['L:AI_PITCH_IB', 'float', '0']],
+    ['PITCH_ID', ['L:AI_PITCH_ID', 'float', '0']],
 ]);
 
 const settingEnumToSync: Map<string, SimVarEnum> = new Map([
