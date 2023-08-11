@@ -77,6 +77,7 @@
 1. [LIGHTS] Movement of landing lights now requires power and position is output into LVAR -  @Maximilian-Reuter
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
+1. [MCDU] Add menu item for automatic init flight, and prepare mcdu - @igor8518 (Igor Milovidov)
 
 ## 0.11.0
 
