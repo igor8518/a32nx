@@ -10,6 +10,8 @@ class CDUMenuPage {
         const aidsActive = mcdu.activeSystem === "AIDS";
         const cfdsActive = mcdu.activeSystem === "CFDS";
 
+        let textIF = "*INIT FLIGHT";
+        let colorIF = Column.white;
         // delay to get text and draw already connected subsystem page
         const connectedSubsystemDelay = 200;
         // delay to establish initial communication with disconnect systems on low speed ports
@@ -20,6 +22,14 @@ class CDUMenuPage {
          * @param {"FMGC" | "ATSU" | "AIDS" | "CFDS" | null} selectedSystem Newly selected system establishing comms, or null if none.
          */
         const updateView = (selectedSystem = null) => {
+            textIF = "*INIT FLIGHT";
+            if (SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 0 || SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 20) {
+                textIF = "*INIT FLIGHT";
+                colorIF = Column.cyan;
+            } else {
+                textIF = " INIT FLIGHT";
+                colorIF = Column.red;
+            }
             const getText = (name, isRequesting = false, isLeft = true) => {
                 let flag = null;
                 if (selectedSystem !== null) {
@@ -51,7 +61,9 @@ class CDUMenuPage {
                 [""],
                 [new Column(0, getText("<CFDS", mcdu.isSubsystemRequesting("CFDS")), getColor(cfdsActive, selectedSystem === "CFDS"))],
                 [""],
-                [""],
+                //TO DO Fact required
+                [new Column(0, getText(textIF), colorIF)],
+                ///////////////
                 [""],
                 [""]
             ]));
@@ -60,6 +72,15 @@ class CDUMenuPage {
         updateView();
 
         mcdu.mcduScratchpad.setMessage(NXSystemMessages.selectDesiredSystem);
+        A32NX_InitFlight.MCDU = mcdu;
+        A32NX_InitFlight.UPDATE_VIEW = updateView;
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_AOC", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_FLTNBR", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_UPLINK", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_LOADFUEL", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_TARGETPAX", "Number", 0); // For tests
+        SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 0);
+
 
         mcdu.onLeftInput[0] = () => {
             mcdu.mcduScratchpad.setMessage(NXSystemMessages.waitForSystemResponse);
@@ -95,6 +116,15 @@ class CDUMenuPage {
                 mcdu.mcduScratchpad.removeMessage(NXSystemMessages.waitForSystemResponse.text);
                 CDUCfdsMainMenu.ShowPage(mcdu);
             }, cfdsActive ? connectedSubsystemDelay : disconnectedSubsystemDelay);
+        };
+
+        mcdu.onLeftInput[4] = async () => {
+            if (SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 0 || SimVar.GetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Int") === 20) {
+                A32NX_InitFlight.MCDU = mcdu;
+                A32NX_InitFlight.UPDATE_VIEW = updateView;
+                await SimVar.SetSimVarValue("L:A32NX_INITFLIGHT_STATE", "Number", 1);
+                updateView();
+            }
         };
     }
 }

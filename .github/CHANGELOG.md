@@ -45,6 +45,7 @@
 1. [TELEX] Decrease API poll rate to random number between 45-70 seconds - @auroraisluna (alepouna)
 1. [MISC] Add LVarsWrapper module for interaction with outgside simconnect programms - @igor8518 (Igor Milovidov)
 1. [MCDU] Add init SID STAR from SimBrief - @igor8518 (Igor Milovidov)
+1. [MCDU] Add menu item for automatic init flight, and prepare mcdu - @igor8518 (Igor Milovidov)
 
 ## 0.11.0
 

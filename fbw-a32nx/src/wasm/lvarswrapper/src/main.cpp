@@ -1126,6 +1126,9 @@ __attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVar
             VarNames.push_back("A32NX_EFIS_R_TO_WPT_IDENT_0");
             VarNames.push_back("A32NX_EFIS_R_TO_WPT_IDENT_1");
             VarNames.push_back("A32NX_AUTOBRAKES_ARMED_MODE_SET");
+
+            // VarNames.push_back("A32NX_TARGET_GALLON");
+            // VarNames.push_back("A32NX_CURRENT_GALLON");
           }
 
           hr = SimConnect_CallDispatch(hSimConnect, ProcessVars, 0);
