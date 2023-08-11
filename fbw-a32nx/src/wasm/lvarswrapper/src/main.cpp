@@ -1146,6 +1146,75 @@ __attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVar
             VarNames.push_back("AI_PITCH_D");
             VarNames.push_back("AI_PITCH_IB");
             VarNames.push_back("AI_PITCH_ID");
+
+            // Add Couatl
+            VarNames.push_back("FSDT_GSX_AIRCRAFT_EXIT_1_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_EXIT_2_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_EXIT_3_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_EXIT_4_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_EXIT_5_TOGGLE");
+            VarNames.push_back("FSDT_GSX_AIRCRAFT_CARGO_1_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_CARGO_2_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_CARGO_3_TOGGLE");
+            VarNames.push_back("FSDT_GSX_AIRCRAFT_SERVICE_1_TOGGLE");
+            VarNames.push_back("FSDT_GSX_AIRCRAFT_SERVICE_2_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_SERVICE_3_TOGGLE");
+            // VarNames.push_back("FSDT_GSX_AIRCRAFT_MAINCARGO_TOGGLE");
+
+            // VarNames.push_back("FSDT_GSX_DEICING_STATE");
+            // VarNames.push_back("FSDT_GSX_DEICING_TYPE");
+            // VarNames.push_back("FSDT_GSX_DEICING_CONCENTRATION");
+            VarNames.push_back("FSDT_GSX_NUMPASSENGERS");
+            // VarNames.push_back("FSDT_GSX_NUMPASSENGERS_BOARDING");
+            // VarNames.push_back("FSDT_GSX_NUMPASSENGERS_BOARDING_TOTAL");
+            // VarNames.push_back("FSDT_GSX_NUMPASSENGERS_DEBOARDING");
+            // VarNames.push_back("FSDT_GSX_NUMPASSENGERS_DEBOARDING_TOTAL");
+            VarNames.push_back("FSDT_GSX_NUMPASSENGERS_TOTAL");
+            // VarNames.push_back("FSDT_GSX_BATTERY_VOLTAGE");
+            // VarNames.push_back("FSDT_GSX_MAX_BATTERY_VOLTAGE");
+            VarNames.push_back("FSDT_GSX_DISABLE_DOORS_MSG");
+            VarNames.push_back("FSDT_GSX_DISABLE_DETECT_REFUELING");
+            VarNames.push_back("FSDT_GSX_BOARDING_CARGO_PERCENT");
+            VarNames.push_back("FSDT_GSX_DEBOARDING_CARGO_PERCENT");
+            VarNames.push_back("FSDT_GSX_NUMPILOTS");
+            VarNames.push_back("FSDT_GSX_PILOTS_NOT_BOARDING");
+            VarNames.push_back("FSDT_GSX_PILOTS_NOT_DEBOARDING");
+            VarNames.push_back("FSDT_GSX_PILOTS_ON_BOARD");
+            VarNames.push_back("FSDT_GSX_NUMCREW");
+            VarNames.push_back("FSDT_GSX_CREW_NOT_BOARDING");
+            VarNames.push_back("FSDT_GSX_CREW_NOT_DEBOARDING");
+            VarNames.push_back("FSDT_GSX_CREW_ON_BOARD");
+            VarNames.push_back("FSDT_GSX_FUEL_COUNTER");
+            VarNames.push_back("FSDT_GSX_FUEL_COUNTER_MAX");
+            VarNames.push_back("FSDT_GSX_FUEL_PRICE");
+            VarNames.push_back("FSDT_GSX_FUELHOSE_CONNECTED");
+            VarNames.push_back("FSDT_GSX_STATE");
+            VarNames.push_back("FSDT_GSX_ENGINE_START_CONFIRMED");
+            VarNames.push_back("FSDT_GSX_MENU_OPEN");
+            VarNames.push_back("FSDT_GSX_PASSENGERGATE");
+            VarNames.push_back("FSDT_GSX_CARGO_STAND");
+
+            VarNames.push_back("FSDT_GSX_MENU_CHOICE");
+            VarNames.push_back("FSDT_VAR_EnginesStopped");
+            VarNames.push_back("FSDT_GSX_JETWAY_POWER");
+            VarNames.push_back("FSDT_GSX_JETWAY_AIR");
+            VarNames.push_back("FSDT_GSX_JETWAY");
+            VarNames.push_back("FSDT_GSX_STAIRS");
+            VarNames.push_back("FSDT_GSX_SIMBRIEF_SUCCESS");
+            VarNames.push_back("FSDT_VAR_YouControlIsAvailable");
+
+            VarNames.push_back("FSDT_GSX_COUATL_STARTED");
+            VarNames.push_back("FSDT_GSX_OPERATESTAIRS_STATE");
+            VarNames.push_back("FSDT_GSX_OPERATEJETWAYS_STATE");
+            VarNames.push_back("FSDT_GSX_CATERING_STATE");
+            VarNames.push_back("FSDT_GSX_REFUELING_STATE");
+            VarNames.push_back("FSDT_GSX_GPU_STATE");
+            VarNames.push_back("FSDT_GSX_LAVATORY_STATE");
+            VarNames.push_back("FSDT_GSX_WATER_STATE");
+            VarNames.push_back("FSDT_GSX_FOLLOWME_STATE");
+            VarNames.push_back("FSDT_GSX_BOARDING_STATE");
+            VarNames.push_back("FSDT_GSX_DEPARTURE_STATE");
+            VarNames.push_back("FSDT_GSX_DEBOARDING_STATE");
           }
 
           hr = SimConnect_CallDispatch(hSimConnect, ProcessVars, 0);
