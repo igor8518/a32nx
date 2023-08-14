@@ -1215,6 +1215,11 @@ __attribute__((export_name("LVarsWrapper_gauge_callback"))) extern "C" bool LVar
             VarNames.push_back("FSDT_GSX_BOARDING_STATE");
             VarNames.push_back("FSDT_GSX_DEPARTURE_STATE");
             VarNames.push_back("FSDT_GSX_DEBOARDING_STATE");
+
+            // Add pushback system
+            VarNames.push_back("A32NX_PUSHBACK_SYSTEM_ENABLED");
+            VarNames.push_back("A32NX_PUSHBACK_SPD_FACTOR");
+            VarNames.push_back("A32NX_PUSHBACK_HDG_FACTOR");
           }
 
           hr = SimConnect_CallDispatch(hSimConnect, ProcessVars, 0);
