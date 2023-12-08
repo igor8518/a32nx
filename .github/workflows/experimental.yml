@@ -1,9 +1,8 @@
-#15.05.2022
-name: igor-experimental-22-05-15
+name: igor-experimental
 on:
   push:
     branches:
-      - igor-experimental-22-05-15
+      - igor-experimental-23-12-08
 
 jobs:
   build:
@@ -13,9 +12,9 @@ jobs:
     env:
       A32NX_PRODUCTION_BUILD: 1
       A32NX_INSTRUMENTS_BUILD_WORKERS: 2
-      EXPERIMENTAL_PRE_RELEASE_ID: 66882377
-      EXPERIMENTAL_PRE_RELEASE_TAG: A32NX-igor-v-ex-22.05.15.0
-      EXPERIMENTAL_ZIP_NAME: A32NX-igor-v-ex-22.05.15.0.zip
+      EXPERIMENTAL_PRE_RELEASE_ID: 98150347
+      EXPERIMENTAL_PRE_RELEASE_TAG: A32NX-igor-v-ex
+      EXPERIMENTAL_ZIP_NAME: A32NX-igor-v-ex.zip
       BUILD_DIR_NAME: experimental
       # https://api.github.com/repos/igor8518/a32nx/releases
     steps:
