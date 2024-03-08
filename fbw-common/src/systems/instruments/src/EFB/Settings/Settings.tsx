@@ -18,6 +18,7 @@ import { AtsuAocPage } from './Pages/AtsuAocPage';
 import { AudioPage } from './Pages/AudioPage';
 import { FlyPadPage } from './Pages/FlyPadPage';
 import { ThirdPartyOptionsPage } from './Pages/ThirdPartyOptionsPage';
+import { PIDPage } from './Pages/PIDPage';
 
 export type ButtonType = {
   name: string;
@@ -57,6 +58,7 @@ export const Settings = () => {
     { alias: t('Settings.Audio.Title'), name: 'Audio', component: <AudioPage /> },
     { alias: t('Settings.flyPad.Title'), name: 'flyPad', component: <FlyPadPage /> },
     { alias: t('Settings.About.Title'), name: 'About', component: <AboutPage /> },
+    { alias: t('Settings.PID.Title'), name: 'PID', component: <PIDPage /> },
   ];
 
   return (
