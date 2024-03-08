@@ -18,6 +18,7 @@ import { AtsuAocPage } from './Pages/AtsuAocPage';
 import { AudioPage } from './Pages/AudioPage';
 import { FlyPadPage } from './Pages/FlyPadPage';
 import { ThirdPartyOptionsPage } from './Pages/ThirdPartyOptionsPage';
+import { PIDPage } from './Pages/PIDPage';
 
 export type ButtonType = {
     name: string,
@@ -35,7 +36,7 @@ export const SelectionTabs = ({ tabs }: SelectionTabsProps) => (
                 <Link
                     key={tab.name}
                     to={`settings/${pathify(tab.name)}`}
-                    className="flex items-center justify-between rounded-md border-2 border-transparent bg-theme-accent p-6 transition duration-100 hover:border-theme-highlight"
+                    className="bg-theme-accent hover:border-theme-highlight flex items-center justify-between rounded-md border-2 border-transparent p-6 transition duration-100"
                 >
                     <p className="text-2xl">{tab.alias ?? tab.name}</p>
                     <ChevronRight size={30} />
@@ -55,6 +56,7 @@ export const Settings = () => {
         { alias: t('Settings.Audio.Title'), name: 'Audio', component: <AudioPage /> },
         { alias: t('Settings.flyPad.Title'), name: 'flyPad', component: <FlyPadPage /> },
         { alias: t('Settings.About.Title'), name: 'About', component: <AboutPage /> },
+        { alias: t('Settings.PID.Title'), name: 'PID', component: <PIDPage /> },
     ];
 
     return (
@@ -78,7 +80,7 @@ type SettingsPageProps = {
 export const SettingsPage: FC<SettingsPageProps> = ({ name, backRoute, children }) => (
     <div>
         <Link to={backRoute ?? '/settings'} className="mb-4 inline-block">
-            <div className="flex flex-row items-center space-x-3 transition duration-100 hover:text-theme-highlight">
+            <div className="hover:text-theme-highlight flex flex-row items-center space-x-3 transition duration-100">
                 <ArrowLeft size={30} />
                 <h1 className="font-bold text-current">
                     {t('Settings.Title')}
@@ -87,9 +89,9 @@ export const SettingsPage: FC<SettingsPageProps> = ({ name, backRoute, children 
                 </h1>
             </div>
         </Link>
-        <div className="h-content-section-reduced w-full rounded-lg border-2 border-theme-accent px-6 py-2">
+        <div className="h-content-section-reduced border-theme-accent w-full rounded-lg border-2 px-6 py-2">
             <ScrollableContainer height={54} innerClassName="h-full">
-                <div className="h-full divide-y-2 divide-theme-accent">
+                <div className="divide-theme-accent h-full divide-y-2">
                     {children}
                 </div>
             </ScrollableContainer>
@@ -100,7 +102,7 @@ export const SettingsPage: FC<SettingsPageProps> = ({ name, backRoute, children 
 export const FullscreenSettingsPage: FC<SettingsPageProps> = ({ name, children }) => (
     <div>
         <Link to="/settings" className="mb-4 inline-block">
-            <div className="flex flex-row items-center space-x-3 transition duration-100 hover:text-theme-highlight">
+            <div className="hover:text-theme-highlight flex flex-row items-center space-x-3 transition duration-100">
                 <ArrowLeft size={30} />
                 <h1 className="font-bold text-current">
                     {t('Settings.Title')}
@@ -109,7 +111,7 @@ export const FullscreenSettingsPage: FC<SettingsPageProps> = ({ name, children }
                 </h1>
             </div>
         </Link>
-        <div className="h-content-section-reduced w-full rounded-lg border-2 border-theme-accent px-6 py-2">
+        <div className="h-content-section-reduced border-theme-accent w-full rounded-lg border-2 px-6 py-2">
             {children}
         </div>
     </div>
@@ -132,7 +134,7 @@ type SettingItemProps = {
 
 export const SettingItem: FC<SettingItemProps> = ({ name, unrealistic, groupType, disabled, children }) => {
     const UnrealisticHint = () => (
-        <span className="ml-2 text-theme-highlight">
+        <span className="text-theme-highlight ml-2">
             {' '}
             (
             {t('Settings.Unrealistic')}
