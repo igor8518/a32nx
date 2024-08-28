@@ -5,25 +5,26 @@ name: master
 on:
   push:
     branches:
-      - master
+      - igor-experimental-24-05-18
 
 jobs:
   build_a32nx:
     name: Build and deploy A32NX
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'igor8518'
     runs-on: ubuntu-latest
     env:
       FBW_PRODUCTION_BUILD: 1
       A32NX_INSTRUMENTS_BUILD_WORKERS: 2
-      MASTER_PRE_RELEASE_ID: 66067756
-      MASTER_PRE_RELEASE_TAG: assets/master
-      MASTER_ZIP_NAME: A32NX-master.7z
+      MASTER_PRE_RELEASE_ID: 98150347
+      MASTER_PRE_RELEASE_TAG: A32NX-igor-v-ex
+      MASTER_ZIP_NAME: A32NX-igor-v-ex.zip
       VMASTER_PRE_RELEASE_ID: 32243965
       VMASTER_PRE_RELEASE_TAG: vmaster
       BUILD_DIR_NAME: master-a32nx
       AIRCRAFT_PROJECT_PREFIX: a32nx
       AIRCRAFT_VARIANT: a320-251n
+      # https://api.github.com/repos/igor8518/a32nx/releases
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -59,12 +60,6 @@ jobs:
           cd ./fbw-a32nx/out/
           7z a -t7z -m0=lzma2 -mx=7 ../../${{ env.BUILD_DIR_NAME }}/${{ env.MASTER_ZIP_NAME }} ./flybywire-aircraft-a320-neo/
           cd ../../
-      - name: Upload to CloudFlare CDN
-        env:
-          CLOUDFLARE_BUCKET_PASSWORD: ${{ secrets.CLOUDFLARE_BUCKET_PASSWORD }}
-          CDN_BUCKET_DESTINATION: addons/a32nx/master
-        run: |
-          ./scripts/cf-cdn.sh $CDN_BUCKET_DESTINATION ./fbw-a32nx/out/build-modules
       - name: Delete old GitHub Pre-Release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -94,13 +89,13 @@ jobs:
   build_a380x:
     name: Build and deploy A380X
     # Prevent running this on forks
-    if: github.repository_owner == 'flybywiresim'
+    if: github.repository_owner == 'igor8518'
     runs-on: ubuntu-latest
     env:
       FBW_PRODUCTION_BUILD: 1
-      MASTER_PRE_RELEASE_ID: 66067756
-      MASTER_PRE_RELEASE_TAG: assets/master
-      MASTER_ZIP_NAME: A380X-master.7z
+      MASTER_PRE_RELEASE_ID: 145587069
+      MASTER_PRE_RELEASE_TAG: A380X-igor-v-ex
+      MASTER_ZIP_NAME: A380X-igor-v-ex.zip
       VMASTER_PRE_RELEASE_ID: 32243965
       VMASTER_PRE_RELEASE_TAG: vmaster
       BUILD_DIR_NAME: master-a380x
@@ -141,12 +136,6 @@ jobs:
           cd ./fbw-a380x/out/
           7z a -t7z -m0=lzma2 -mx=7 ../../${{ env.BUILD_DIR_NAME }}/${{ env.MASTER_ZIP_NAME }} ./flybywire-aircraft-a380-842/
           cd ../../
-      - name: Upload to CloudFlare CDN
-        env:
-          CLOUDFLARE_BUCKET_PASSWORD: ${{ secrets.CLOUDFLARE_BUCKET_PASSWORD }}
-          CDN_BUCKET_DESTINATION: addons/a380x/master
-        run: |
-          ./scripts/cf-cdn.sh $CDN_BUCKET_DESTINATION ./fbw-a380x/out/build-modules
       - name: Delete old GitHub Pre-Release assets
         uses: mknejp/delete-release-assets@v1
         with:
