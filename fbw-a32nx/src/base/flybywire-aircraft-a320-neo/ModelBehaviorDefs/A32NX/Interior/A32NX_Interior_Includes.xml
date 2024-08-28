@@ -3,6 +3,7 @@
 
 <ModelBehaviors>
     <Include RelativeFile="../Airbus.xml"/>
+	<Include RelativeFile="../Materials.xml"/>
     <Include RelativeFile="../AirlinerCommon.xml"/>
     <Include RelativeFile="../generated/A32NX_Interior_ADIRS.xml"/>
     <Include RelativeFile="../generated/A32NX_Interior_ATC.xml"/>

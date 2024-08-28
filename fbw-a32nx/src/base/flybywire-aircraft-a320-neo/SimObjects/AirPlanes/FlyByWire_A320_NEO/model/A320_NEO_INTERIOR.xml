@@ -1763,6 +1763,31 @@
                     <WWISE_EVENT>lswitch</WWISE_EVENT>
                 </UseTemplate>
 
+				<UseTemplate Name="FNX320_Emissive_SimVar_Template">
+					<NODE_ID>lit_cabin</NODE_ID>
+					<VAR_NAME>LIGHT POTENTIOMETER</VAR_NAME>
+					<INDEX>12</INDEX>
+					<UNITS>percent over 100</UNITS>
+					<INTENSITY>16.0</INTENSITY>
+				</UseTemplate>
+				<UseTemplate Name="FNX320_Emissive_Template">
+					<NODE_ID>Cabin_No_Smoking_Signs</NODE_ID>
+					<VAR_NAME>A32NX_NO_SMOKING_MEMO</VAR_NAME>
+					<INTENSITY>10</INTENSITY>
+				</UseTemplate>
+				<UseTemplate Name="FNX320_Emissive_SimVar_Template">
+					<NODE_ID>Cabin_Seat_Belt_Signs</NODE_ID>
+					<VAR_NAME>CABIN SEATBELTS ALERT SWITCH</VAR_NAME>
+                    <UNITS>bool</UNITS>
+                    <INDEX>1</INDEX>
+					<INTENSITY>10</INTENSITY>
+				</UseTemplate>
+				<UseTemplate Name="FNX320_Emissive_Template">
+					<NODE_ID>Cabin_Emergency_Exit_Signs</NODE_ID>
+					<VAR_NAME>A32NX_ELEC_AC_ESS_SHED_BUS_IS_POWERED</VAR_NAME>
+					<INTENSITY>10</INTENSITY>
+				</UseTemplate>
+
                 <!-- INT LT EMER EXIT LT -->
                 <UseTemplate Name="FBW_Anim_Interactions">
                     <ANIM_TYPE>SWITCH</ANIM_TYPE>

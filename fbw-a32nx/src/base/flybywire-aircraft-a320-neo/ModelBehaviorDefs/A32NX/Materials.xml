@@ -1,0 +1,102 @@
+<ModelBehaviors>
+	<Template Name="FNX320_Emissive_Template">
+		<DefaultTemplateParameters>
+			<NODE_ID/>
+			<VAR_NAME/>
+			<INTENSITY>1.0</INTENSITY>
+		</DefaultTemplateParameters>
+
+		<Component ID="FNX320_#NODE_ID#" Node="#NODE_ID#">
+			<UseTemplate Name="ASOBO_GT_Part_ID"/>
+			<Material>
+				<EmissiveFactor>
+					<Parameter>
+						<Code>(L:#VAR_NAME#) 1.3 pow 0.1 * #INTENSITY# * </Code>
+					</Parameter>
+					<OverrideBaseEmissive>True</OverrideBaseEmissive>
+				</EmissiveFactor>
+			</Material>
+		</Component>
+	</Template>
+
+	<Template Name="FNX320_Emissive_SimVar_Template">
+		<DefaultTemplateParameters>
+			<NODE_ID/>
+			<VAR_NAME/>
+			<INDEX/>
+			<UNITS/>
+			<INTENSITY>1.0</INTENSITY>
+		</DefaultTemplateParameters>
+
+		<Component ID="FNX320_#NODE_ID#" Node="#NODE_ID#">
+			<UseTemplate Name="ASOBO_GT_Part_ID"/>
+			<Material>
+				<EmissiveFactor>
+					<Parameter>
+						<Code>(A:#VAR_NAME#:#INDEX#, #UNITS#) 1.3 pow 0.1 * #INTENSITY# * </Code>
+					</Parameter>
+					<OverrideBaseEmissive>True</OverrideBaseEmissive>
+				</EmissiveFactor>
+			</Material>
+		</Component>
+	</Template>
+
+	<Template Name="FNX320_Emissive_EFB_Template">
+		<DefaultTemplateParameters>
+			<NODE_ID/>
+			<VAR_NAME/>
+		</DefaultTemplateParameters>
+
+		<Component ID="FNX320_#NODE_ID#" Node="#NODE_ID#">
+			<UseTemplate Name="ASOBO_GT_Part_ID"/>
+			<Material>
+				<EmissiveFactor>
+					<Parameter>
+						<Code>(L:#VAR_NAME#)</Code>
+					</Parameter>
+					<OverrideBaseEmissive>True</OverrideBaseEmissive>
+				</EmissiveFactor>
+			</Material>
+		</Component>
+	</Template>
+
+	<Template Name="FNX320_Emissive_ACP_Template">
+		<DefaultTemplateParameters>
+			<NODE_ID/>
+			<VAR_NAME_LIGHT/>
+			<VAR_NAME_BRIGHTNESS/>
+			<INTENSITY>3.0</INTENSITY>
+		</DefaultTemplateParameters>
+
+		<Component ID="FNX320_#NODE_ID#" Node="#NODE_ID#">
+			<UseTemplate Name="ASOBO_GT_Part_ID"/>
+			<Material>
+				<EmissiveFactor>
+					<Parameter>
+						<Code>(L:#VAR_NAME_LIGHT#) 1 == if{ (L:#VAR_NAME_BRIGHTNESS#) 1.3 pow 0.1 * #INTENSITY# * } els{ 0 }</Code>
+					</Parameter>
+					<OverrideBaseEmissive>True</OverrideBaseEmissive>
+				</EmissiveFactor>
+			</Material>
+		</Component>
+	</Template>
+
+	<Template Name="FNX320_Emissive_Readouts_Template">
+		<DefaultTemplateParameters>
+			<NODE_ID/>
+			<INTENSITY>1.5</INTENSITY>
+		</DefaultTemplateParameters>
+
+		<Component ID="FNX320_#NODE_ID#" Node="#NODE_ID#">
+			<UseTemplate Name="ASOBO_GT_Part_ID"/>
+			<Material>
+				<EmissiveFactor>
+					<Parameter>
+						<Code>1.0 1.3 pow 0.1 * #INTENSITY# * </Code>
+					</Parameter>
+					<OverrideBaseEmissive>True</OverrideBaseEmissive>
+				</EmissiveFactor>
+			</Material>
+		</Component>
+	</Template>
+</ModelBehaviors>

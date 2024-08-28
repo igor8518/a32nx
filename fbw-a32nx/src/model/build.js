@@ -141,7 +141,7 @@ function combineGltf(pathA, pathB, outputPath) {
         }
     }
 
-    // Add materials
+    // Add materialscd
     if (gltfB.materials) {
         for (const material of gltfB.materials) {
             Object.keys(material)
@@ -158,6 +158,14 @@ function combineGltf(pathA, pathB, outputPath) {
                     }
                 });
             if (material.extensions) {
+                if (material.extensions.ASOBO_material_detail_map) {
+                    Object.keys(material.extensions.ASOBO_material_detail_map).forEach((matProperty) => {
+                        const mate = material.extensions.ASOBO_material_detail_map[matProperty];
+                        if (Number.isFinite(mate.index)) {
+                            mate.index += texturesCount;
+                        }
+                    });
+                }
                 for (const extension in material.extensions) {
                     if (!gltfA.extensionsUsed.includes(extension)) {
                         gltfA.extensionsUsed.push(extension);
@@ -170,11 +178,13 @@ function combineGltf(pathA, pathB, outputPath) {
 
     // Add meshes
     for (const mesh of gltfB.meshes) {
-        Object.keys(mesh.primitives[0].attributes)
-            .forEach((attribute) => {
-                mesh.primitives[0].attributes[attribute] += accessorsCount;
-            });
-        mesh.primitives[0].indices += accessorsCount;
+        for (const primitive of mesh.primitives) {
+            Object.keys(primitive.attributes)
+                .forEach((attribute) => {
+                    primitive.attributes[attribute] += accessorsCount;
+                });
+            primitive.indices += accessorsCount;
+        }
         // workaround to allow added meshes to use existing materials
         for (const primitive of mesh.primitives) {
             if (!Number.isFinite(primitive.material)) {

@@ -557,6 +557,25 @@ function getAligned(offset, alignment) {
     return offset + ((alignment - (offset % alignment)) % alignment);
 }
 
+function deleteNodes(baseGltf, nodes) {
+    console.log('deleteNodes', nodes);
+
+    for (const nodeName of nodes) {
+
+        const destinationNode = baseGltf.nodes.find((n) => n.name === nodeName);
+        if (!destinationNode) {
+            throw new Error(`Could not find destination node ${nodeName}!`);
+        }
+        else {
+            assert.equal(destinationNode.children, undefined);
+
+            delete destinationNode.mesh;
+        }
+
+
+    }
+}
+
 function replaceNodes(baseGltf, sourceGltf, nodes, options) {
     console.log('replaceNodes', nodes);
 
@@ -839,6 +858,10 @@ function main(args) {
                     }
                     appendNodes(base_gltf, source_gltf, operation.nodes, operation.options);
                     addExtensionsUsed(base_gltf, source_gltf);
+                }
+                break;
+                case 'delete_nodes': {
+                    deleteNodes(base_gltf, operation.nodes);
                 }
                 break;
                 case "create_instance": {
